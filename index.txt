@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>My Website</ttle>
+	</head>
+	<body>
+		<header>
+			<h1> Juan Lopez</h1>
+			<h2> AI Desinger</h2>
+				<a href="http://example.com">
+					<img src="http://example.com">
+			<nav>
+				<ul>
+					<li>
+						<a href="/"Home</a>
+					</li>
+					<li>
+						<a href="/"projects.html"</a>
+					</li>
+					<li>
+						<a href="/"projects.html"</a>
+					</li>
+					<li>
+						<a href="/"contact.html"</a>
+					</li>
+				
+
+			</nav>
+		</header>
+		<section>
+			<img />
+			<p></p>
+			<img />
+			<p></p>
+			<img />
+			<p></p>
+		</section>
+		<p>Hello world!</p>
+	</body>
+</html>

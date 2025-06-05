@@ -1,0 +1,67 @@
+/* Reset default browser styles */
+body, h1, h2, p, ul, li {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 20px;
+    padding: 0;
+    background-color: #f0f0f0;
+}
+
+header {
+    background-color: #333;
+    color: #fff;
+    padding: 10px;
+}
+
+header h1 {
+    font-size: 24px;
+}
+
+header h2 {
+    font-size: 18px;
+}
+
+header nav ul {
+    list-style-type: none;
+}
+
+header nav ul li {
+    display: inline;
+    margin-right: 10px;
+}
+
+header nav ul li a {
+    color: #fff;
+    text-decoration: none;
+}
+
+section {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+}
+
+section p {
+    margin-bottom: 10px;
+}
+
+section img {
+    display: block;
+    margin-bottom: 10px;
+}
+
+video {
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+p {
+    margin-top: 20px;
+}

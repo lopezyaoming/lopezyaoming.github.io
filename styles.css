@@ -6,24 +6,37 @@ body, h1, h2, p, ul, li {
 
 body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    line-height: 1.6;
+    font-size: 16px;
+    line-height: 1.5;
     margin: 80px;
-    padding: 0;
-    background-color: #E0DED6;
+    background-color: #f0eee9; /* soft off-white for neutral background */
+    color: #111; /* nearly black for high contrast */
 }
 
+/* Layout boxed using fixed-width containers and margins */
 header {
-    background-color: #C5C4BD;
-    color: #1A1A1A;
-    padding: 10px;
+    width: 600px;
+    margin-bottom: 40px;
+    padding: 10px 0;
+    border-bottom: 2px solid #d0cdc6;
 }
 
 header h1 {
-    font-size: 24px;
+    font-size: 48px;
+    font-weight: 500;
+    margin-bottom: 10px;
+    letter-spacing: -1px;
 }
 
 header h2 {
-    font-size: 18px;
+    font-size: 24px;
+    font-weight: 400;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+header nav {
+    margin-top: 20px;
 }
 
 header nav ul {
@@ -31,37 +44,46 @@ header nav ul {
 }
 
 header nav ul li {
-    display: inline;
-    margin-right: 10px;
+    display: inline-block;
+    margin-right: 20px;
+    font-size: 16px;
 }
 
 header nav ul li a {
-    color: #1A1A1A;
+    color: #111;
     text-decoration: none;
+    border-bottom: 1px solid transparent;
 }
 
+header nav ul li a:hover {
+    border-bottom: 1px solid #111;
+}
+
+/* Section with black background and strong padding */
 section {
-    margin-top: 20px;
-    padding: 10px;
-    background-color: #1A1A1A;
-    border: 1px solid #ccc;
+    background-color: #111;
+    color: #f0eee9;
+    padding: 40px;
+    width: 600px;
+    margin-bottom: 40px;
+    border-left: 5px solid #e04e20; /* Swiss red */
 }
 
 section p {
-    margin-bottom: 10px;
+    margin-bottom: 20px;
+    font-size: 18px;
 }
 
-section img {
-    display: block;
-    margin-bottom: 10px;
-}
-
-video {
+/* Imagery and media placed with spacing */
+section img, video {
     display: block;
     width: 100%;
-    margin-bottom: 10px;
+    margin: 20px 0;
 }
 
+/* General paragraph styling */
 p {
+    font-size: 16px;
     margin-top: 20px;
+    max-width: 600px;
 }

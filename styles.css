@@ -7,14 +7,14 @@ body, h1, h2, p, ul, li {
 body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     line-height: 1.6;
-    margin: 20px;
+    margin: 80px;
     padding: 0;
     background-color: #E0DED6;
 }
 
 header {
-    background-color: #333;
-    color: #fff;
+    background-color: #C5C4BD;
+    color: #1A1A1A;
     padding: 10px;
 }
 
@@ -36,14 +36,14 @@ header nav ul li {
 }
 
 header nav ul li a {
-    color: #fff;
+    color: #1A1A1A;
     text-decoration: none;
 }
 
 section {
     margin-top: 20px;
     padding: 10px;
-    background-color: #fff;
+    background-color: #1A1A1A;
     border: 1px solid #ccc;
 }
 

@@ -1,55 +1,66 @@
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("DOM loaded. Initializing script.");
     const video = document.getElementById('axo-video');
     const scrollContainer = document.getElementById('scroll-container');
 
-    // A factor to control playback speed vs scroll.
-    // e.g. 1000 means 1 second of video for every 1000 pixels scrolled.
-    const scrollSpeedFactor = 1000;
+    const scrollSpeedFactor = 1000; // pixels per second of video
+    const loops = 5;
 
-    // We need to wait for the video's metadata to load to get its duration.
+    // Motion physics
+    const accelerationFactor = 0.0025; // how much velocity we gain from scroll
+    const friction = 0.9;              // friction applied per frame
+    const easing = 0.1;                // how fast currentTime approaches targetTime
+
+    let videoDuration = 0;
+    let velocity = 0;
+    let targetTime = 0;
+    let currentTime = 0;
+    let lastScrollY = window.scrollY;
+
     video.addEventListener('loadedmetadata', () => {
-        console.log("Video metadata loaded.");
-        console.log("Video duration:", video.duration, "seconds");
-
-        // Set the height of the scroll container to be large enough for multiple loops.
-        // Let's say 10 loops.
-        const scrollHeight = (video.duration * scrollSpeedFactor) * 10;
+        videoDuration = video.duration;
+        const scrollHeight = videoDuration * scrollSpeedFactor * loops;
         scrollContainer.style.height = `${scrollHeight}px`;
-        console.log("Scroll container height set to:", scrollHeight, "px");
 
-        // "Prime" the video for seeking
-        video.play().then(() => {
-            video.pause();
-            // Initial update
-            updateVideoTime();
+        video.pause();
+        video.currentTime = 0;
+
+        // Prime video
+        video.play().then(() => video.pause());
+
+        // Scroll input → velocity (accumulates on scroll)
+        window.addEventListener('scroll', () => {
+            const deltaY = window.scrollY - lastScrollY;
+            lastScrollY = window.scrollY;
+
+            velocity += deltaY * accelerationFactor;
         });
 
-        // Function to update video time based on scroll
-        const updateVideoTime = () => {
-            const scrollPos = window.scrollY;
-            let newTime = scrollPos / scrollSpeedFactor;
-            console.log("Scroll position:", scrollPos, "New video time:", newTime);
-            
-            // Use modulo for looping
-            if (video.duration) {
-                video.currentTime = newTime % video.duration;
-                // Force a redraw
-                video.play().then(() => {
-                    video.pause();
-                });
-            }
+        const animate = () => {
+            // Apply velocity to targetTime
+            targetTime += velocity;
+
+            // Clamp targetTime to loop cleanly
+            targetTime = (targetTime % videoDuration + videoDuration) % videoDuration;
+
+            // Smooth currentTime toward targetTime
+            currentTime += (targetTime - currentTime) * easing;
+            currentTime = (currentTime + videoDuration) % videoDuration;
+
+            // Apply friction to velocity
+            velocity *= friction;
+
+            // Set video frame
+            video.currentTime = currentTime;
+
+            requestAnimationFrame(animate);
         };
 
-        // Listen for scroll events
-        window.addEventListener('scroll', updateVideoTime);
+        requestAnimationFrame(animate);
     });
 
     video.addEventListener('error', (e) => {
         console.error("Video error:", e);
     });
 
-    // Ensure the video is ready to play.
     video.load();
-    video.pause();
-}); 
+});

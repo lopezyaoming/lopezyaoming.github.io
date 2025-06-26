@@ -18,6 +18,13 @@ document.addEventListener('DOMContentLoaded', () => {
         scrollContainer.style.height = `${scrollHeight}px`;
         console.log("Scroll container height set to:", scrollHeight, "px");
 
+        // "Prime" the video for seeking
+        video.play().then(() => {
+            video.pause();
+            // Initial update
+            updateVideoTime();
+        });
+
         // Function to update video time based on scroll
         const updateVideoTime = () => {
             const scrollPos = window.scrollY;
@@ -32,9 +39,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Listen for scroll events
         window.addEventListener('scroll', updateVideoTime);
-
-        // Initial update
-        updateVideoTime();
     });
 
     video.addEventListener('error', (e) => {

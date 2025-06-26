@@ -34,6 +34,10 @@ document.addEventListener('DOMContentLoaded', () => {
             // Use modulo for looping
             if (video.duration) {
                 video.currentTime = newTime % video.duration;
+                // Force a redraw
+                video.play().then(() => {
+                    video.pause();
+                });
             }
         };
 

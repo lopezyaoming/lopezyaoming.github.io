@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+    console.log("DOM loaded. Initializing script.");
     const video = document.getElementById('axo-video');
     const scrollContainer = document.getElementById('scroll-container');
 
@@ -8,15 +9,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // We need to wait for the video's metadata to load to get its duration.
     video.addEventListener('loadedmetadata', () => {
+        console.log("Video metadata loaded.");
+        console.log("Video duration:", video.duration, "seconds");
+
         // Set the height of the scroll container to be large enough for multiple loops.
         // Let's say 10 loops.
         const scrollHeight = (video.duration * scrollSpeedFactor) * 10;
         scrollContainer.style.height = `${scrollHeight}px`;
+        console.log("Scroll container height set to:", scrollHeight, "px");
 
         // Function to update video time based on scroll
         const updateVideoTime = () => {
             const scrollPos = window.scrollY;
             let newTime = scrollPos / scrollSpeedFactor;
+            console.log("Scroll position:", scrollPos, "New video time:", newTime);
             
             // Use modulo for looping
             if (video.duration) {
@@ -29,6 +35,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Initial update
         updateVideoTime();
+    });
+
+    video.addEventListener('error', (e) => {
+        console.error("Video error:", e);
     });
 
     // Ensure the video is ready to play.

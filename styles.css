@@ -1,89 +1,23 @@
-/* Reset default browser styles */
-body, h1, h2, p, ul, li {
+html, body {
     margin: 0;
     padding: 0;
+    background-color: black;
 }
 
-body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size: 16px;
-    line-height: 1.5;
-    margin: 80px;
-    background-color: #f0eee9; /* soft off-white for neutral background */
-    color: #111; /* nearly black for high contrast */
+#axo-video {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    transform: translateX(-50%) translateY(-50%);
+    z-index: -100;
+    background-size: cover;
 }
 
-/* Layout boxed using fixed-width containers and margins */
-header {
-    width: 600px;
-    margin-bottom: 40px;
-    padding: 10px 0;
-    border-bottom: 2px solid #d0cdc6;
-}
-
-header h1 {
-    font-size: 48px;
-    font-weight: 500;
-    margin-bottom: 10px;
-    letter-spacing: -1px;
-}
-
-header h2 {
-    font-size: 24px;
-    font-weight: 400;
-    color: #333;
-    margin-bottom: 10px;
-}
-
-header nav {
-    margin-top: 20px;
-}
-
-header nav ul {
-    list-style-type: none;
-}
-
-header nav ul li {
-    display: inline-block;
-    margin-right: 20px;
-    font-size: 16px;
-}
-
-header nav ul li a {
-    color: #111;
-    text-decoration: none;
-    border-bottom: 1px solid transparent;
-}
-
-header nav ul li a:hover {
-    border-bottom: 1px solid #111;
-}
-
-/* Section with black background and strong padding */
-section {
-    background-color: #111;
-    color: #f0eee9;
-    padding: 40px;
-    width: 600px;
-    margin-bottom: 40px;
-    border-left: 5px solid #e04e20; /* Swiss red */
-}
-
-section p {
-    margin-bottom: 20px;
-    font-size: 18px;
-}
-
-/* Imagery and media placed with spacing */
-section img, video {
-    display: block;
-    width: 100%;
-    margin: 20px 0;
-}
-
-/* General paragraph styling */
-p {
-    font-size: 16px;
-    margin-top: 20px;
-    max-width: 600px;
+#scroll-container {
+    /* This height will be dynamically set by JavaScript */
+    height: 10000px; /* A default large height to enable scrolling */
 }

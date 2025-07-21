@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lafufu Generator - AVD Controller</title>
+    <link rel="icon" type="image/png" href="assets/lafufu/A0.8V1.0D0.4.png">
+    <link rel="shortcut icon" type="image/png" href="assets/lafufu/A0.8V1.0D0.4.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            font-family: 'Arial', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 90vw;
+            width: 100%;
+        }
+
+        .title {
+            font-size: 2.5rem;
+            font-weight: 300;
+            letter-spacing: 3px;
+            margin-bottom: 2rem;
+            text-align: center;
+            opacity: 0.9;
+        }
+
+        .image-container {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            margin-bottom: 3rem;
+            background: transparent;
+        }
+
+        .lafufu-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            opacity: 0;
+            transition: opacity 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+            filter: brightness(1) contrast(1.05);
+            /* Hide alt text and broken image icons */
+            color: transparent;
+            text-indent: -9999px;
+            font-size: 0;
+        }
+
+        .lafufu-image.active {
+            opacity: 1;
+        }
+
+        .lafufu-image.loading {
+            opacity: 0.2;
+        }
+
+        .loading-spinner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            border: 2px solid #333;
+            border-top: 2px solid #fff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            z-index: 10;
+        }
+
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .slider-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .slider-label {
+            font-size: 1.2rem;
+            font-weight: 500;
+            letter-spacing: 2px;
+            opacity: 0.8;
+            text-transform: uppercase;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            width: 100%;
+        }
+
+        .slider-value {
+            font-size: 1rem;
+            font-weight: 300;
+            min-width: 40px;
+            text-align: center;
+            opacity: 0.7;
+        }
+
+        .slider {
+            flex: 1;
+            -webkit-appearance: none;
+            height: 6px;
+            background: #333;
+            border-radius: 3px;
+            outline: none;
+            transition: background 0.2s;
+        }
+
+        .slider:hover {
+            background: #444;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #fff;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .slider::-webkit-slider-thumb:hover {
+            background: #f0f0f0;
+            transform: scale(1.1);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #fff;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .current-config {
+            display: none;
+        }
+
+        .error-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ff6b6b;
+            font-size: 0.9rem;
+            text-align: center;
+            z-index: 5;
+        }
+
+        .credit {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            font-size: 0.8rem;
+            opacity: 0.5;
+            letter-spacing: 1px;
+            font-weight: 300;
+            color: #ffffff;
+            transition: opacity 0.2s ease;
+            z-index: 1000;
+        }
+
+        .credit:hover {
+            opacity: 0.8;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .image-container {
+                width: 300px;
+                height: 300px;
+            }
+            
+            .title {
+                font-size: 2rem;
+            }
+            
+            .controls {
+                max-width: 90%;
+            }
+
+            .credit {
+                font-size: 0.7rem;
+                bottom: 15px;
+                right: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">MAKE YOUR OWN LAFUFU!</h1>
+        
+        <div class="image-container">
+            <div class="loading-spinner" id="loadingSpinner"></div>
+            <img class="lafufu-image" id="lafufuImageA" alt="" />
+            <img class="lafufu-image" id="lafufuImageB" alt="" />
+            <div class="error-message" id="errorMessage" style="display: none;">
+                Image not found
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="slider-group">
+                <div class="slider-label">AURA</div>
+                <div class="slider-container">
+                    <span class="slider-value" id="auraValue">0.0</span>
+                    <input type="range" class="slider" id="auraSlider" min="0" max="1" step="0.2" value="0">
+                    <span class="slider-value">1.0</span>
+                </div>
+            </div>
+
+            <div class="slider-group">
+                <div class="slider-label">VIBE</div>
+                <div class="slider-container">
+                    <span class="slider-value" id="vibeValue">0.0</span>
+                    <input type="range" class="slider" id="vibeSlider" min="0" max="1" step="0.2" value="0">
+                    <span class="slider-value">1.0</span>
+                </div>
+            </div>
+
+            <div class="slider-group">
+                <div class="slider-label">DRIP</div>
+                <div class="slider-container">
+                    <span class="slider-value" id="dripValue">0.0</span>
+                    <input type="range" class="slider" id="dripSlider" min="0" max="1" step="0.2" value="0">
+                    <span class="slider-value">1.0</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="current-config" id="currentConfig">
+            Current: A0.0V0.0D0.0.png
+        </div>
+    </div>
+
+    <div class="credit">
+        Made by @juan_joselopezc
+    </div>
+
+    <script>
+        class LafufuViewer {
+            constructor() {
+                this.auraSlider = document.getElementById('auraSlider');
+                this.vibeSlider = document.getElementById('vibeSlider');
+                this.dripSlider = document.getElementById('dripSlider');
+                
+                this.auraValue = document.getElementById('auraValue');
+                this.vibeValue = document.getElementById('vibeValue');
+                this.dripValue = document.getElementById('dripValue');
+                
+                this.imageA = document.getElementById('lafufuImageA');
+                this.imageB = document.getElementById('lafufuImageB');
+                this.loadingSpinner = document.getElementById('loadingSpinner');
+                this.errorMessage = document.getElementById('errorMessage');
+                this.currentConfig = document.getElementById('currentConfig');
+                
+                this.basePath = 'assets/lafufu/';
+                this.imageCache = new Map();
+                this.currentImageSrc = '';
+                this.activeImage = 'A'; // Track which image is currently active
+                this.isTransitioning = false;
+                
+                this.init();
+            }
+
+                        init() {
+                // Add event listeners for immediate snapping
+                this.auraSlider.addEventListener('input', () => this.updateImage());
+                this.vibeSlider.addEventListener('input', () => this.updateImage());
+                this.dripSlider.addEventListener('input', () => this.updateImage());
+                
+                // Initial load
+                this.loadInitialImage();
+            }
+
+            // Load the first image immediately when page starts
+            async loadInitialImage() {
+                try {
+                    // Set initial values
+                    this.updateDisplayValues();
+                    
+                    const filename = this.generateFilename();
+                    const newSrc = this.basePath + filename;
+                    
+                    // Show loading briefly
+                    this.showLoading();
+                    
+                    // Load the image
+                    const img = await this.loadImage(filename);
+                    
+                    // Get the first image element
+                    const activeImage = this.getActiveImage();
+                    activeImage.src = newSrc;
+                    
+                    // Show it immediately once loaded
+                    this.hideLoading();
+                    activeImage.classList.add('active');
+                    this.currentImageSrc = newSrc;
+                    this.errorMessage.style.display = 'none';
+                    
+                } catch (error) {
+                    console.error('Failed to load initial image:', error);
+                    this.showError();
+                }
+            }
+
+            // Slider values are already discrete (0.0, 0.2, 0.4, 0.6, 0.8, 1.0)
+            mapToDiscreteValue(sliderValue) {
+                return parseFloat(sliderValue);
+            }
+
+            // Format value for filename (ensure one decimal place)
+            formatValue(value) {
+                return value.toFixed(1);
+            }
+
+            // Generate filename based on current slider values
+            generateFilename() {
+                const aura = this.mapToDiscreteValue(parseFloat(this.auraSlider.value));
+                const vibe = this.mapToDiscreteValue(parseFloat(this.vibeSlider.value));
+                const drip = this.mapToDiscreteValue(parseFloat(this.dripSlider.value));
+                
+                return `A${this.formatValue(aura)}V${this.formatValue(vibe)}D${this.formatValue(drip)}.png`;
+            }
+
+            // Update display values
+            updateDisplayValues() {
+                const aura = this.mapToDiscreteValue(parseFloat(this.auraSlider.value));
+                const vibe = this.mapToDiscreteValue(parseFloat(this.vibeSlider.value));
+                const drip = this.mapToDiscreteValue(parseFloat(this.dripSlider.value));
+                
+                this.auraValue.textContent = this.formatValue(aura);
+                this.vibeValue.textContent = this.formatValue(vibe);
+                this.dripValue.textContent = this.formatValue(drip);
+            }
+
+            // Get current active image element
+            getActiveImage() {
+                return this.activeImage === 'A' ? this.imageA : this.imageB;
+            }
+
+            // Get inactive image element
+            getInactiveImage() {
+                return this.activeImage === 'A' ? this.imageB : this.imageA;
+            }
+
+            // Show loading state
+            showLoading() {
+                if (!this.isTransitioning) {
+                    this.loadingSpinner.style.display = 'block';
+                }
+                this.errorMessage.style.display = 'none';
+            }
+
+            // Hide loading state
+            hideLoading() {
+                this.loadingSpinner.style.display = 'none';
+            }
+
+            // Show error state
+            showError() {
+                this.hideLoading();
+                this.errorMessage.style.display = 'block';
+                // Don't hide active image on error, keep current one visible
+            }
+
+            // Load and display image
+            async loadImage(filename) {
+                const fullPath = this.basePath + filename;
+                
+                // Return cached image if available
+                if (this.imageCache.has(fullPath)) {
+                    return this.imageCache.get(fullPath);
+                }
+
+                return new Promise((resolve, reject) => {
+                    const img = new Image();
+                    
+                    // Ensure image is completely loaded before resolving
+                    img.onload = () => {
+                        // Double-check the image is actually loaded
+                        if (img.complete && img.naturalWidth > 0) {
+                            this.imageCache.set(fullPath, img);
+                            resolve(img);
+                        } else {
+                            reject(new Error(`Image failed to load properly: ${filename}`));
+                        }
+                    };
+                    
+                    img.onerror = () => {
+                        reject(new Error(`Failed to load image: ${filename}`));
+                    };
+                    
+                    // Set source after event listeners to avoid race conditions
+                    img.src = fullPath;
+                });
+            }
+
+            // Update image based on current slider values
+            async updateImage() {
+                // Prevent multiple simultaneous transitions (except for initial load)
+                if (this.isTransitioning && this.currentImageSrc) {
+                    return;
+                }
+
+                this.updateDisplayValues();
+                
+                const filename = this.generateFilename();
+                const newSrc = this.basePath + filename;
+                
+                // Don't reload if it's the same image
+                if (this.currentImageSrc === newSrc) {
+                    return;
+                }
+
+                // currentConfig is now hidden - no need to update
+
+                try {
+                    // Handle first image load differently
+                    if (!this.currentImageSrc) {
+                        this.showLoading();
+                        
+                        // Load the first image directly into the active image element
+                        const activeImage = this.getActiveImage();
+                        
+                        // Load and show the first image immediately
+                        const img = await this.loadImage(filename);
+                        activeImage.src = newSrc;
+                        
+                        // Show it immediately once loaded
+                        this.hideLoading();
+                        activeImage.classList.add('active');
+                        this.currentImageSrc = newSrc;
+                        this.errorMessage.style.display = 'none';
+                        
+                        return;
+                    }
+                    
+                    // Handle subsequent image transitions
+                    this.isTransitioning = true;
+                    
+                    // Load the new image
+                    const img = await this.loadImage(filename);
+                    
+                    // Get the inactive image element to load the new image
+                    const inactiveImage = this.getInactiveImage();
+                    const activeImage = this.getActiveImage();
+                    
+                    // Ensure the inactive image is hidden before loading
+                    inactiveImage.classList.remove('active');
+                    
+                    // Create a promise to ensure image loads properly before showing
+                    await new Promise((resolve, reject) => {
+                        inactiveImage.onload = () => {
+                            if (inactiveImage.complete && inactiveImage.naturalWidth > 0) {
+                                resolve();
+                            } else {
+                                reject(new Error('Image failed to load properly'));
+                            }
+                        };
+                        inactiveImage.onerror = () => reject(new Error('Image failed to load'));
+                        
+                        // Load new image into inactive element
+                        inactiveImage.src = newSrc;
+                    });
+                    
+                    // Start cross-fade transition
+                    inactiveImage.classList.add('active');
+                    
+                    // Wait for transition to complete, then swap active states
+                    setTimeout(() => {
+                        activeImage.classList.remove('active');
+                        // Switch which image is considered active
+                        this.activeImage = this.activeImage === 'A' ? 'B' : 'A';
+                        // Clear the old image source
+                        activeImage.src = '';
+                        
+                        this.currentImageSrc = newSrc;
+                        this.isTransitioning = false;
+                        this.hideLoading();
+                        this.errorMessage.style.display = 'none';
+                    }, 600); // Match the CSS transition duration
+                    
+                } catch (error) {
+                    console.error('Failed to load image:', filename, error);
+                    this.showError();
+                    this.isTransitioning = false;
+                }
+            }
+
+            // Preload nearby images for smoother transitions
+            preloadNearbyImages() {
+                // This could be enhanced to preload adjacent images
+                // for even smoother transitions
+            }
+        }
+
+        // Initialize the viewer when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new LafufuViewer();
+        });
+    </script>
+</body>
+</html> 

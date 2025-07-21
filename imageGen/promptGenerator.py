@@ -1,0 +1,1 @@
+"A plush creature with a round cartoon face, oversized eyes, and sharp teeth. It wears a fuzzy [ANIMAL] costume made from [FABRIC], styled with a [ACCESSORY]. Ultra-detailed character concept render, soft toy design, photographed in a professional studio, sharp focus, high-resolution 4K, clean white background, volumetric lighting, cinematic depth of field."

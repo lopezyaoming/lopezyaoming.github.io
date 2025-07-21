@@ -1,0 +1,421 @@
+{
+  "1": {
+    "inputs": {
+      "image": "pasted/image (7).png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "LOAD IMAGE"
+    }
+  },
+  "2": {
+    "inputs": {
+      "text_input": "face",
+      "task": "referring_expression_segmentation",
+      "fill_mask": true,
+      "keep_model_loaded": false,
+      "max_new_tokens": 1024,
+      "num_beams": 4,
+      "do_sample": true,
+      "output_mask_select": "",
+      "seed": 244432199859541,
+      "image": [
+        "19",
+        0
+      ],
+      "florence2_model": [
+        "4",
+        0
+      ]
+    },
+    "class_type": "Florence2Run",
+    "_meta": {
+      "title": "Florence2Run"
+    }
+  },
+  "3": {
+    "inputs": {
+      "images": [
+        "2",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "Preview Image"
+    }
+  },
+  "4": {
+    "inputs": {
+      "model": "Florence-2-base",
+      "precision": "fp16",
+      "attention": "sdpa",
+      "convert_to_safetensors": false
+    },
+    "class_type": "Florence2ModelLoader",
+    "_meta": {
+      "title": "Florence2ModelLoader"
+    }
+  },
+  "5": {
+    "inputs": {
+      "masks": [
+        "2",
+        1
+      ]
+    },
+    "class_type": "Mask Invert",
+    "_meta": {
+      "title": "Mask Invert"
+    }
+  },
+  "8": {
+    "inputs": {
+      "mask": [
+        "5",
+        0
+      ]
+    },
+    "class_type": "MaskPreview+",
+    "_meta": {
+      "title": "🔧 Mask Preview"
+    }
+  },
+  "9": {
+    "inputs": {
+      "grow_mask_by": 4,
+      "pixels": [
+        "19",
+        0
+      ],
+      "vae": [
+        "18",
+        2
+      ],
+      "mask": [
+        "5",
+        0
+      ]
+    },
+    "class_type": "VAEEncodeForInpaint",
+    "_meta": {
+      "title": "VAE Encode (for Inpainting)"
+    }
+  },
+  "11": {
+    "inputs": {
+      "text": "text, deformed, watermark, distorted, low quality",
+      "clip": [
+        "29",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP Text Encode (Prompt)"
+    }
+  },
+  "12": {
+    "inputs": {
+      "seed": 1104,
+      "steps": 30,
+      "cfg": 8,
+      "sampler_name": "euler",
+      "scheduler": "normal",
+      "denoise": 1,
+      "model": [
+        "29",
+        0
+      ],
+      "positive": [
+        "21",
+        0
+      ],
+      "negative": [
+        "21",
+        1
+      ],
+      "latent_image": [
+        "9",
+        0
+      ]
+    },
+    "class_type": "KSampler",
+    "_meta": {
+      "title": "KSampler"
+    }
+  },
+  "13": {
+    "inputs": {
+      "samples": [
+        "12",
+        0
+      ],
+      "vae": [
+        "18",
+        2
+      ]
+    },
+    "class_type": "VAEDecode",
+    "_meta": {
+      "title": "VAE Decode"
+    }
+  },
+  "18": {
+    "inputs": {
+      "ckpt_name": "sd_xl_base_1.0.safetensors"
+    },
+    "class_type": "CheckpointLoaderSimple",
+    "_meta": {
+      "title": "Load Checkpoint"
+    }
+  },
+  "19": {
+    "inputs": {
+      "width": 1024,
+      "height": 1024,
+      "interpolation": "nearest",
+      "method": "fill / crop",
+      "condition": "always",
+      "multiple_of": 0,
+      "image": [
+        "1",
+        0
+      ]
+    },
+    "class_type": "ImageResize+",
+    "_meta": {
+      "title": "🔧 Image Resize"
+    }
+  },
+  "20": {
+    "inputs": {
+      "strength": 0.37,
+      "start_percent": 0,
+      "end_percent": 1,
+      "positive": [
+        "36",
+        0
+      ],
+      "negative": [
+        "11",
+        0
+      ],
+      "control_net": [
+        "23",
+        0
+      ],
+      "image": [
+        "24",
+        0
+      ],
+      "vae": [
+        "18",
+        2
+      ]
+    },
+    "class_type": "ControlNetApplyAdvanced",
+    "_meta": {
+      "title": "Apply ControlNet"
+    }
+  },
+  "21": {
+    "inputs": {
+      "strength": 0.37,
+      "start_percent": 0,
+      "end_percent": 1,
+      "positive": [
+        "20",
+        0
+      ],
+      "negative": [
+        "20",
+        1
+      ],
+      "control_net": [
+        "22",
+        0
+      ],
+      "image": [
+        "28",
+        0
+      ],
+      "vae": [
+        "18",
+        2
+      ]
+    },
+    "class_type": "ControlNetApplyAdvanced",
+    "_meta": {
+      "title": "Apply ControlNet"
+    }
+  },
+  "22": {
+    "inputs": {
+      "control_net_name": "control-lora-canny-rank256.safetensors"
+    },
+    "class_type": "ControlNetLoader",
+    "_meta": {
+      "title": "Load ControlNet Model"
+    }
+  },
+  "23": {
+    "inputs": {
+      "control_net_name": "control-lora-depth-rank256.safetensors"
+    },
+    "class_type": "ControlNetLoader",
+    "_meta": {
+      "title": "Load ControlNet Model"
+    }
+  },
+  "24": {
+    "inputs": {
+      "ckpt_name": "depth_anything_v2_vitl.pth",
+      "resolution": 1024,
+      "image": [
+        "19",
+        0
+      ]
+    },
+    "class_type": "DepthAnythingV2Preprocessor",
+    "_meta": {
+      "title": "Depth Anything V2 - Relative"
+    }
+  },
+  "25": {
+    "inputs": {
+      "images": [
+        "24",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "Preview Image"
+    }
+  },
+  "27": {
+    "inputs": {
+      "images": [
+        "28",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "Preview Image"
+    }
+  },
+  "28": {
+    "inputs": {
+      "coarse": "disable",
+      "resolution": 1024,
+      "image": [
+        "19",
+        0
+      ]
+    },
+    "class_type": "LineArtPreprocessor",
+    "_meta": {
+      "title": "Realistic Lineart"
+    }
+  },
+  "29": {
+    "inputs": {
+      "lora_name": "xl_more_art-full_v1.safetensors",
+      "strength_model": 0.9500000000000002,
+      "strength_clip": 1,
+      "model": [
+        "18",
+        0
+      ],
+      "clip": [
+        "18",
+        1
+      ]
+    },
+    "class_type": "Lora Loader",
+    "_meta": {
+      "title": "Lora Loader"
+    }
+  },
+  "31": {
+    "inputs": {
+      "model": "u2net_human_seg: human segmentation",
+      "providers": "CUDA"
+    },
+    "class_type": "RemBGSession+",
+    "_meta": {
+      "title": "🔧 RemBG Session"
+    }
+  },
+  "32": {
+    "inputs": {
+      "rembg_session": [
+        "31",
+        0
+      ],
+      "image": [
+        "13",
+        0
+      ]
+    },
+    "class_type": "ImageRemoveBackground+",
+    "_meta": {
+      "title": "🔧 Image Remove Background"
+    }
+  },
+  "34": {
+    "inputs": {
+      "output_path": "[time(%Y-%m-%d)]",
+      "filename_prefix": "ComfyUI",
+      "filename_delimiter": "",
+      "filename_number_padding": 4,
+      "filename_number_start": "false",
+      "extension": "png",
+      "dpi": 300,
+      "quality": 100,
+      "optimize_image": "true",
+      "lossless_webp": "false",
+      "overwrite_mode": "false",
+      "show_history": "false",
+      "show_history_by_prefix": "true",
+      "embed_workflow": "true",
+      "show_previews": "true",
+      "images": [
+        "32",
+        0
+      ]
+    },
+    "class_type": "Image Save",
+    "_meta": {
+      "title": "Image Save"
+    }
+  },
+  "35": {
+    "inputs": {
+      "file_path": "",
+      "dictionary_name": "[filename]"
+    },
+    "class_type": "Load Text File",
+    "_meta": {
+      "title": "LOAD TEXT FILE"
+    }
+  },
+  "36": {
+    "inputs": {
+      "STRING": [
+        "35",
+        0
+      ],
+      "clip": [
+        "29",
+        1
+      ]
+    },
+    "class_type": "Griptape Convert: Text to CLIP Encode",
+    "_meta": {
+      "title": "Griptape Convert: Text to CLIP Encode"
+    }
+  }
+}

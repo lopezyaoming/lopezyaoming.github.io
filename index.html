@@ -48,6 +48,34 @@
             height: 400px;
             margin-bottom: 3rem;
             background: transparent;
+            transition: transform 0.2s ease-out;
+        }
+
+        .image-container.pop-animation {
+            animation: popUp 0.7s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes popUp {
+            0% {
+                transform: scale(1) rotate(0deg);
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            }
+            30% {
+                transform: scale(1.15) rotate(1deg);
+                box-shadow: 0 16px 48px rgba(255, 255, 255, 0.2), 0 8px 32px rgba(0, 0, 0, 0.4);
+            }
+            60% {
+                transform: scale(0.95) rotate(-0.5deg);
+                box-shadow: 0 12px 40px rgba(255, 255, 255, 0.1), 0 8px 32px rgba(0, 0, 0, 0.35);
+            }
+            80% {
+                transform: scale(1.02) rotate(0.2deg);
+                box-shadow: 0 10px 36px rgba(255, 255, 255, 0.05), 0 8px 32px rgba(0, 0, 0, 0.32);
+            }
+            100% {
+                transform: scale(1) rotate(0deg);
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            }
         }
 
         .lafufu-image {
@@ -510,7 +538,9 @@
                 const vibe = this.mapToDiscreteValue(parseFloat(this.vibeSlider.value));
                 const drip = this.mapToDiscreteValue(parseFloat(this.dripSlider.value));
                 
-                return `A${this.formatValue(aura)}V${this.formatValue(vibe)}D${this.formatValue(drip)}.png`;
+                const filename = `A${this.formatValue(aura)}V${this.formatValue(vibe)}D${this.formatValue(drip)}.png`;
+                console.log('Generated filename:', filename, 'Full path:', this.basePath + filename);
+                return filename;
             }
 
             // Update display values
@@ -547,6 +577,25 @@
                 this.loadingSpinner.style.display = 'none';
             }
 
+            // Trigger pop-up animation
+            triggerPopAnimation() {
+                const imageContainer = this.imageContainer;
+                
+                // Remove any existing animation class
+                imageContainer.classList.remove('pop-animation');
+                
+                // Force a reflow to ensure the class removal takes effect
+                imageContainer.offsetHeight;
+                
+                // Add the animation class
+                imageContainer.classList.add('pop-animation');
+                
+                // Remove the animation class after animation completes
+                setTimeout(() => {
+                    imageContainer.classList.remove('pop-animation');
+                }, 700); // Match the animation duration
+            }
+
             // Show error state
             showError() {
                 this.hideLoading();
@@ -578,6 +627,7 @@
                     };
                     
                     img.onerror = () => {
+                        console.error(`Failed to load image: ${filename} at path: ${fullPath}`);
                         reject(new Error(`Failed to load image: ${filename}`));
                     };
                     
@@ -639,23 +689,42 @@
                     // Ensure the inactive image is hidden before loading
                     inactiveImage.classList.remove('active');
                     
+                    // Load new image into inactive element and wait for it to load
+                    inactiveImage.src = newSrc;
+                    
                     // Create a promise to ensure image loads properly before showing
                     await new Promise((resolve, reject) => {
+                        const timeoutId = setTimeout(() => {
+                            reject(new Error('Image load timeout'));
+                        }, 10000); // 10 second timeout
+                        
                         inactiveImage.onload = () => {
+                            clearTimeout(timeoutId);
                             if (inactiveImage.complete && inactiveImage.naturalWidth > 0) {
                                 resolve();
                             } else {
                                 reject(new Error('Image failed to load properly'));
                             }
                         };
-                        inactiveImage.onerror = () => reject(new Error('Image failed to load'));
                         
-                        // Load new image into inactive element
-                        inactiveImage.src = newSrc;
+                        inactiveImage.onerror = (e) => {
+                            clearTimeout(timeoutId);
+                            console.error('Image load error:', e, 'src:', newSrc);
+                            reject(new Error('Image failed to load'));
+                        };
+                        
+                        // If image is already loaded (cached), resolve immediately
+                        if (inactiveImage.complete && inactiveImage.naturalWidth > 0) {
+                            clearTimeout(timeoutId);
+                            resolve();
+                        }
                     });
                     
                     // Start cross-fade transition
                     inactiveImage.classList.add('active');
+                    
+                    // Trigger pop-up animation
+                    this.triggerPopAnimation();
                     
                     // Wait for transition to complete, then swap active states
                     setTimeout(() => {
@@ -673,8 +742,9 @@
                     
                 } catch (error) {
                     console.error('Failed to load image:', filename, error);
-                    this.showError();
                     this.isTransitioning = false;
+                    this.hideLoading();
+                    this.showError();
                 }
             }
 

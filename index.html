@@ -6,6 +6,7 @@
     <title>Lafufu Generator - AVD Controller</title>
     <link rel="icon" type="image/png" href="assets/lafufu/A0.8V1.0D0.4.png">
     <link rel="shortcut icon" type="image/png" href="assets/lafufu/A0.8V1.0D0.4.png">
+
     <style>
         * {
             margin: 0;
@@ -123,79 +124,84 @@
 
         .controls {
             display: flex;
-            flex-direction: column;
-            gap: 2rem;
+            flex-direction: row;
+            gap: 3rem;
             width: 100%;
-            max-width: 500px;
+            max-width: 600px;
+            justify-content: center;
+            align-items: flex-start;
         }
 
-        .slider-group {
+        .knob-group {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 1rem;
+            gap: 1.5rem;
+            min-width: 120px;
         }
 
-        .slider-label {
-            font-size: 1.2rem;
-            font-weight: 500;
-            letter-spacing: 2px;
-            opacity: 0.8;
+        .knob-label {
+            font-size: 1.3rem;
+            font-weight: 600;
+            letter-spacing: 3px;
+            opacity: 0.9;
             text-transform: uppercase;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
 
-        .slider-container {
+        .knob-container {
+            position: relative;
             display: flex;
+            flex-direction: column;
             align-items: center;
             gap: 1rem;
-            width: 100%;
         }
 
-        .slider-value {
-            font-size: 1rem;
-            font-weight: 300;
-            min-width: 40px;
+        .knob-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.9);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.2);
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            min-width: 50px;
             text-align: center;
-            opacity: 0.7;
         }
 
-        .slider {
-            flex: 1;
-            -webkit-appearance: none;
-            height: 6px;
-            background: #333;
-            border-radius: 3px;
-            outline: none;
-            transition: background 0.2s;
-        }
-
-        .slider:hover {
-            background: #444;
-        }
-
-        .slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 20px;
-            height: 20px;
-            background: #fff;
+        /* Custom knob styling */
+        .custom-knob {
+            width: 80px;
+            height: 80px;
+            background-image: url('assets/knob.png');
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: center;
             border-radius: 50%;
             cursor: pointer;
-            transition: all 0.2s;
+            filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.4));
+            transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            position: relative;
         }
 
-        .slider::-webkit-slider-thumb:hover {
-            background: #f0f0f0;
-            transform: scale(1.1);
+        .custom-knob:hover {
+            transform: scale(1.08) translateY(-2px);
+            filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.5));
         }
 
-        .slider::-moz-range-thumb {
-            width: 20px;
-            height: 20px;
-            background: #fff;
-            border-radius: 50%;
-            cursor: pointer;
-            border: none;
-            transition: all 0.2s;
+        .custom-knob:active {
+            transform: scale(1.02) translateY(1px);
+            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.4));
+            transition: all 0.1s ease;
+        }
+
+        /* Add a subtle glow effect */
+        .knob-container:hover .custom-knob {
+            filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 20px rgba(255, 255, 255, 0.1));
         }
 
         .current-config {
@@ -245,7 +251,7 @@
             
             .controls {
                 max-width: 90%;
-                gap: 1.5rem;
+                gap: 2rem;
             }
 
             .credit {
@@ -281,40 +287,33 @@
             }
 
             .controls {
-                gap: 1.5rem;
+                flex-direction: column;
+                gap: 2rem;
                 max-width: 100%;
             }
 
-            .slider-group {
-                gap: 0.8rem;
+            .knob-group {
+                gap: 1rem;
+                min-width: 100px;
             }
 
-            .slider-label {
+            .knob-label {
                 font-size: 1.1rem;
-                letter-spacing: 1.5px;
+                letter-spacing: 2px;
             }
 
-            .slider-container {
+            .knob-container {
                 gap: 0.8rem;
             }
 
-            .slider-value {
+            .knob-value {
                 font-size: 0.9rem;
-                min-width: 35px;
+                padding: 0.2rem 0.6rem;
             }
 
-            .slider {
-                height: 8px;
-            }
-
-            .slider::-webkit-slider-thumb {
-                width: 24px;
-                height: 24px;
-            }
-
-            .slider::-moz-range-thumb {
-                width: 24px;
-                height: 24px;
+            .custom-knob {
+                width: 70px;
+                height: 70px;
             }
 
             .credit {
@@ -336,35 +335,32 @@
                 height: 250px;
             }
 
-            .slider-label {
+            .knob-label {
                 font-size: 1rem;
                 letter-spacing: 1px;
             }
 
-            .slider-container {
+            .knob-container {
                 gap: 0.6rem;
             }
 
-            .slider-value {
+            .knob-value {
                 font-size: 0.8rem;
-                min-width: 30px;
+                padding: 0.2rem 0.5rem;
+            }
+
+            .custom-knob {
+                width: 60px;
+                height: 60px;
             }
         }
 
         /* Ensure touch targets are adequate */
         @media (max-width: 768px) {
-            .slider {
+            .custom-knob {
                 cursor: pointer;
                 -webkit-tap-highlight-color: transparent;
-            }
-
-            .slider::-webkit-slider-thumb {
-                cursor: pointer;
-                -webkit-tap-highlight-color: transparent;
-            }
-
-            .slider::-moz-range-thumb {
-                cursor: pointer;
+                touch-action: manipulation;
             }
         }
 
@@ -399,7 +395,18 @@
 
             .controls {
                 margin-top: 3rem;
-                max-width: 300px;
+                max-width: 400px;
+                flex-direction: row;
+                gap: 2rem;
+            }
+
+            .knob-group {
+                min-width: 80px;
+            }
+
+            .custom-knob {
+                width: 60px;
+                height: 60px;
             }
         }
     </style>
@@ -418,30 +425,27 @@
         </div>
 
         <div class="controls">
-            <div class="slider-group">
-                <div class="slider-label">AURA</div>
-                <div class="slider-container">
-                    <span class="slider-value" id="auraValue">0.0</span>
-                    <input type="range" class="slider" id="auraSlider" min="0" max="1" step="0.2" value="0">
-                    <span class="slider-value">1.0</span>
+            <div class="knob-group">
+                <div class="knob-label">AURA</div>
+                <div class="knob-container">
+                    <div class="custom-knob" id="auraKnob" data-value="0" data-min="0" data-max="1"></div>
+                    <div class="knob-value" id="auraValue">0.0</div>
                 </div>
             </div>
 
-            <div class="slider-group">
-                <div class="slider-label">VIBE</div>
-                <div class="slider-container">
-                    <span class="slider-value" id="vibeValue">0.0</span>
-                    <input type="range" class="slider" id="vibeSlider" min="0" max="1" step="0.2" value="0">
-                    <span class="slider-value">1.0</span>
+            <div class="knob-group">
+                <div class="knob-label">VIBE</div>
+                <div class="knob-container">
+                    <div class="custom-knob" id="vibeKnob" data-value="0" data-min="0" data-max="1"></div>
+                    <div class="knob-value" id="vibeValue">0.0</div>
                 </div>
             </div>
 
-            <div class="slider-group">
-                <div class="slider-label">DRIP</div>
-                <div class="slider-container">
-                    <span class="slider-value" id="dripValue">0.0</span>
-                    <input type="range" class="slider" id="dripSlider" min="0" max="1" step="0.2" value="0">
-                    <span class="slider-value">1.0</span>
+            <div class="knob-group">
+                <div class="knob-label">DRIP</div>
+                <div class="knob-container">
+                    <div class="custom-knob" id="dripKnob" data-value="0" data-min="0" data-max="1"></div>
+                    <div class="knob-value" id="dripValue">0.0</div>
                 </div>
             </div>
         </div>
@@ -458,9 +462,9 @@
     <script>
         class LafufuViewer {
             constructor() {
-                this.auraSlider = document.getElementById('auraSlider');
-                this.vibeSlider = document.getElementById('vibeSlider');
-                this.dripSlider = document.getElementById('dripSlider');
+                this.auraKnob = document.getElementById('auraKnob');
+                this.vibeKnob = document.getElementById('vibeKnob');
+                this.dripKnob = document.getElementById('dripKnob');
                 
                 this.auraValue = document.getElementById('auraValue');
                 this.vibeValue = document.getElementById('vibeValue');
@@ -468,6 +472,7 @@
                 
                 this.imageA = document.getElementById('lafufuImageA');
                 this.imageB = document.getElementById('lafufuImageB');
+                this.imageContainer = document.querySelector('.image-container');
                 this.loadingSpinner = document.getElementById('loadingSpinner');
                 this.errorMessage = document.getElementById('errorMessage');
                 this.currentConfig = document.getElementById('currentConfig');
@@ -481,14 +486,115 @@
                 this.init();
             }
 
-                        init() {
-                // Add event listeners for immediate snapping
-                this.auraSlider.addEventListener('input', () => this.updateImage());
-                this.vibeSlider.addEventListener('input', () => this.updateImage());
-                this.dripSlider.addEventListener('input', () => this.updateImage());
+            init() {
+                // Debug: Check if knobs are found
+                console.log('Initializing knobs:', {
+                    aura: this.auraKnob,
+                    vibe: this.vibeKnob,
+                    drip: this.dripKnob
+                });
+                
+                // Add event listeners for custom knobs
+                if (this.auraKnob) this.setupKnobInteraction(this.auraKnob, () => this.updateImage());
+                if (this.vibeKnob) this.setupKnobInteraction(this.vibeKnob, () => this.updateImage());
+                if (this.dripKnob) this.setupKnobInteraction(this.dripKnob, () => this.updateImage());
                 
                 // Initial load
                 this.loadInitialImage();
+            }
+
+            // Setup knob interaction with rotation
+            setupKnobInteraction(knob, callback) {
+                console.log('Setting up knob interaction for:', knob.id);
+                
+                let isDragging = false;
+                let startAngle = 0;
+                let currentRotation = -135; // Start at minimum position (-135 degrees)
+                
+                // Set initial rotation
+                knob.style.transform = `rotate(${currentRotation}deg)`;
+                console.log('Initial rotation set for', knob.id, ':', currentRotation);
+                
+                const getAngle = (e, knob) => {
+                    const rect = knob.getBoundingClientRect();
+                    const centerX = rect.left + rect.width / 2;
+                    const centerY = rect.top + rect.height / 2;
+                    
+                    let clientX, clientY;
+                    if (e.touches && e.touches[0]) {
+                        clientX = e.touches[0].clientX;
+                        clientY = e.touches[0].clientY;
+                    } else {
+                        clientX = e.clientX;
+                        clientY = e.clientY;
+                    }
+                    
+                    return Math.atan2(clientY - centerY, clientX - centerX) * (180 / Math.PI);
+                };
+                
+                const updateKnobValue = () => {
+                    // Map rotation (-135 to +135 degrees) to value (0 to 1)
+                    const normalizedRotation = (currentRotation + 135) / 270; // 270 degrees total range
+                    const clampedValue = Math.max(0, Math.min(1, normalizedRotation));
+                    knob.dataset.value = clampedValue.toString();
+                    callback();
+                };
+                
+                const startDrag = (e) => {
+                    isDragging = true;
+                    startAngle = getAngle(e, knob);
+                    e.preventDefault();
+                    
+                    // Add global event listeners
+                    document.addEventListener('mousemove', drag);
+                    document.addEventListener('mouseup', endDrag);
+                    document.addEventListener('touchmove', drag);
+                    document.addEventListener('touchend', endDrag);
+                };
+                
+                const drag = (e) => {
+                    if (!isDragging) return;
+                    
+                    const currentAngle = getAngle(e, knob);
+                    let deltaAngle = currentAngle - startAngle;
+                    
+                    // Handle angle wrapping
+                    if (deltaAngle > 180) deltaAngle -= 360;
+                    if (deltaAngle < -180) deltaAngle += 360;
+                    
+                    // Update rotation with constraints
+                    const newRotation = currentRotation + deltaAngle;
+                    currentRotation = Math.max(-135, Math.min(135, newRotation));
+                    
+                    // Apply rotation
+                    knob.style.transform = `rotate(${currentRotation}deg)`;
+                    
+                    startAngle = currentAngle;
+                    updateKnobValue();
+                    
+                    e.preventDefault();
+                };
+                
+                const endDrag = () => {
+                    isDragging = false;
+                    
+                    // Remove global event listeners
+                    document.removeEventListener('mousemove', drag);
+                    document.removeEventListener('mouseup', endDrag);
+                    document.removeEventListener('touchmove', drag);
+                    document.removeEventListener('touchend', endDrag);
+                };
+                
+                // Add local event listeners
+                knob.addEventListener('mousedown', startDrag);
+                knob.addEventListener('touchstart', startDrag);
+                
+                // Store rotation for this knob
+                knob._currentRotation = currentRotation;
+                knob._updateKnobValue = updateKnobValue;
+                
+                // Set initial value
+                updateKnobValue();
             }
 
             // Load the first image immediately when page starts
@@ -522,9 +628,11 @@
                 }
             }
 
-            // Slider values are already discrete (0.0, 0.2, 0.4, 0.6, 0.8, 1.0)
-            mapToDiscreteValue(sliderValue) {
-                return parseFloat(sliderValue);
+            // Map smooth knob values (0.0-1.0) to discrete values (0.0, 0.2, 0.4, 0.6, 0.8, 1.0)
+            mapToDiscreteValue(knobValue) {
+                // Round to nearest 0.2 increment
+                const discrete = Math.round(knobValue * 5) / 5;
+                return Math.max(0, Math.min(1, discrete));
             }
 
             // Format value for filename (ensure one decimal place)
@@ -532,11 +640,11 @@
                 return value.toFixed(1);
             }
 
-            // Generate filename based on current slider values
+            // Generate filename based on current knob values
             generateFilename() {
-                const aura = this.mapToDiscreteValue(parseFloat(this.auraSlider.value));
-                const vibe = this.mapToDiscreteValue(parseFloat(this.vibeSlider.value));
-                const drip = this.mapToDiscreteValue(parseFloat(this.dripSlider.value));
+                const aura = this.mapToDiscreteValue(parseFloat(this.auraKnob.dataset.value || 0));
+                const vibe = this.mapToDiscreteValue(parseFloat(this.vibeKnob.dataset.value || 0));
+                const drip = this.mapToDiscreteValue(parseFloat(this.dripKnob.dataset.value || 0));
                 
                 const filename = `A${this.formatValue(aura)}V${this.formatValue(vibe)}D${this.formatValue(drip)}.png`;
                 console.log('Generated filename:', filename, 'Full path:', this.basePath + filename);
@@ -545,9 +653,9 @@
 
             // Update display values
             updateDisplayValues() {
-                const aura = this.mapToDiscreteValue(parseFloat(this.auraSlider.value));
-                const vibe = this.mapToDiscreteValue(parseFloat(this.vibeSlider.value));
-                const drip = this.mapToDiscreteValue(parseFloat(this.dripSlider.value));
+                const aura = this.mapToDiscreteValue(parseFloat(this.auraKnob.dataset.value || 0));
+                const vibe = this.mapToDiscreteValue(parseFloat(this.vibeKnob.dataset.value || 0));
+                const drip = this.mapToDiscreteValue(parseFloat(this.dripKnob.dataset.value || 0));
                 
                 this.auraValue.textContent = this.formatValue(aura);
                 this.vibeValue.textContent = this.formatValue(vibe);

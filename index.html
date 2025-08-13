@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -17,14 +17,148 @@
         body {
             background-color: #000000;
             color: #ffffff;
-            font-family: 'Arial', sans-serif;
+            font-family: 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             overflow-x: hidden;
+            position: relative;
         }
+
+        /* Background System */
+        .background-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -2;
+            overflow: hidden;
+        }
+
+        .background-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0;
+            transition: opacity 1s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                        filter 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            filter: blur(3px) brightness(0.4) contrast(1.1);
+        }
+
+        .background-image.active {
+            opacity: 1;
+        }
+
+        .background-image.transitioning {
+            filter: blur(4px) brightness(0.3) contrast(1.2);
+        }
+
+        /* Background Navigation Arrows */
+        .bg-nav {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            user-select: none;
+        }
+
+        .bg-nav:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-50%) scale(1.05);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .bg-nav:active {
+            transform: translateY(-50%) scale(0.95);
+        }
+
+        .bg-nav-left {
+            left: 2rem;
+        }
+
+        .bg-nav-right {
+            right: 2rem;
+        }
+
+        .bg-nav svg {
+            width: 24px;
+            height: 24px;
+            fill: rgba(255, 255, 255, 0.8);
+            transition: fill 0.3s ease;
+        }
+
+        .bg-nav:hover svg {
+            fill: rgba(255, 255, 255, 1);
+        }
+
+        /* Environmental Tinting System - Super Subtle (90% reduced) */
+        .image-container.env-cloudscape .lafufu-image.active,
+        .image-container.env-cloudscape .default-mask {
+            filter: brightness(1) contrast(1.05) blur(0px) hue-rotate(20deg) saturate(1.005);
+        }
+
+        .image-container.env-floorislava .lafufu-image.active,
+        .image-container.env-floorislava .default-mask {
+            filter: brightness(1.005) contrast(1.05) blur(0px) hue-rotate(355deg) saturate(1.01);
+        }
+
+        .image-container.env-freudsoffice .lafufu-image.active,
+        .image-container.env-freudsoffice .default-mask {
+            filter: brightness(1.002) contrast(1.05) blur(0px) hue-rotate(3deg) saturate(1.008);
+        }
+
+        .image-container.env-pillowfortress .lafufu-image.active,
+        .image-container.env-pillowfortress .default-mask {
+            filter: brightness(0.998) contrast(1.05) blur(0px) hue-rotate(9deg) saturate(1.005);
+        }
+
+        .image-container.env-chroma .lafufu-image.active,
+        .image-container.env-chroma .default-mask {
+            filter: brightness(1) contrast(1.05) blur(0px);
+        }
+
+        /* Transitioning states preserve environmental tinting */
+        .image-container.env-cloudscape .lafufu-image.transitioning {
+            filter: brightness(0.9) contrast(1.1) blur(1px) hue-rotate(20deg) saturate(1.005);
+        }
+
+        .image-container.env-floorislava .lafufu-image.transitioning {
+            filter: brightness(0.905) contrast(1.1) blur(1px) hue-rotate(355deg) saturate(1.01);
+        }
+
+        .image-container.env-freudsoffice .lafufu-image.transitioning {
+            filter: brightness(0.902) contrast(1.1) blur(1px) hue-rotate(3deg) saturate(1.008);
+        }
+
+        .image-container.env-pillowfortress .lafufu-image.transitioning {
+            filter: brightness(0.898) contrast(1.1) blur(1px) hue-rotate(9deg) saturate(1.005);
+        }
+
+        .image-container.env-chroma .lafufu-image.transitioning {
+            filter: brightness(0.9) contrast(1.1) blur(1px);
+        }
+
+        /* Background Indicator - Removed for cleaner design */
 
         .container {
             display: flex;
@@ -35,48 +169,61 @@
         }
 
         .title {
-            font-size: 2.5rem;
+            font-size: 1.8rem;
             font-weight: 300;
-            letter-spacing: 3px;
+            letter-spacing: 2px;
             margin-bottom: 2rem;
             text-align: center;
             opacity: 0.9;
+            white-space: nowrap;
         }
 
         .image-container {
             position: relative;
-            width: 400px;
-            height: 400px;
+            width: 500px;
+            height: 500px;
             margin-bottom: 3rem;
             background: transparent;
             transition: transform 0.2s ease-out;
         }
 
-        .image-container.pop-animation {
+        .image-container.pop-animation .lafufu-image.active,
+        .image-container.pop-animation .default-mask {
             animation: popUp 0.7s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
 
+        /* Environment-specific pop animations that preserve tinting */
         @keyframes popUp {
             0% {
                 transform: scale(1) rotate(0deg);
-                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
             }
             30% {
                 transform: scale(1.15) rotate(1deg);
-                box-shadow: 0 16px 48px rgba(255, 255, 255, 0.2), 0 8px 32px rgba(0, 0, 0, 0.4);
+                filter: brightness(1.3) contrast(1.2) blur(0px) drop-shadow(0 0 20px rgba(255, 255, 255, 0.8));
             }
             60% {
                 transform: scale(0.95) rotate(-0.5deg);
-                box-shadow: 0 12px 40px rgba(255, 255, 255, 0.1), 0 8px 32px rgba(0, 0, 0, 0.35);
+                filter: brightness(1.1) contrast(1.1) blur(0px) drop-shadow(0 0 15px rgba(255, 255, 255, 0.4));
             }
             80% {
                 transform: scale(1.02) rotate(0.2deg);
-                box-shadow: 0 10px 36px rgba(255, 255, 255, 0.05), 0 8px 32px rgba(0, 0, 0, 0.32);
+                filter: brightness(1.05) contrast(1.05) blur(0px) drop-shadow(0 0 8px rgba(255, 255, 255, 0.2));
             }
             100% {
                 transform: scale(1) rotate(0deg);
-                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
             }
+        }
+
+        .default-mask {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            opacity: 1;
+            z-index: 1;
+            /* Always visible as fallback for cut faces */
         }
 
         .lafufu-image {
@@ -87,8 +234,10 @@
             height: 100%;
             object-fit: contain;
             opacity: 0;
-            transition: opacity 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
-            filter: brightness(1) contrast(1.05);
+            z-index: 2;
+            transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+                        filter 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            filter: brightness(1) contrast(1.05) blur(0px);
             /* Hide alt text and broken image icons */
             color: transparent;
             text-indent: -9999px;
@@ -97,6 +246,11 @@
 
         .lafufu-image.active {
             opacity: 1;
+            filter: brightness(1) contrast(1.05) blur(0px);
+        }
+
+        .lafufu-image.transitioning {
+            filter: brightness(0.9) contrast(1.1) blur(1px);
         }
 
         .lafufu-image.loading {
@@ -125,9 +279,9 @@
         .controls {
             display: flex;
             flex-direction: row;
-            gap: 3rem;
+            gap: 3.125rem;
             width: 100%;
-            max-width: 600px;
+            max-width: 875px;
             justify-content: center;
             align-items: flex-start;
         }
@@ -136,14 +290,14 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 1.5rem;
-            min-width: 120px;
+            gap: 1.875rem;
+            min-width: 150px;
         }
 
         .knob-label {
-            font-size: 1.3rem;
+            font-size: 1.625rem;
             font-weight: 600;
-            letter-spacing: 3px;
+            letter-spacing: 3.75px;
             opacity: 0.9;
             text-transform: uppercase;
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
@@ -154,7 +308,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 1rem;
+            gap: 1.25rem;
         }
 
         .knob-value {
@@ -172,15 +326,15 @@
 
         /* Custom knob styling */
         .custom-knob {
-            width: 80px;
-            height: 80px;
+            width: 100px;
+            height: 100px;
             background-image: url('assets/knob.png');
             background-repeat: no-repeat;
             background-size: cover;
             background-position: center;
             border-radius: 50%;
             cursor: pointer;
-            filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.4));
+            filter: drop-shadow(0 7.5px 20px rgba(0, 0, 0, 0.4));
             transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
             user-select: none;
             -webkit-user-select: none;
@@ -189,19 +343,58 @@
         }
 
         .custom-knob:hover {
-            transform: scale(1.08) translateY(-2px);
-            filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.5));
+            transform: scale(1.08) translateY(-2.5px);
+            filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.5));
         }
 
         .custom-knob:active {
-            transform: scale(1.02) translateY(1px);
-            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.4));
+            transform: scale(1.02) translateY(1.25px);
+            filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.4));
             transition: all 0.1s ease;
         }
 
         /* Add a subtle glow effect */
         .knob-container:hover .custom-knob {
-            filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 20px rgba(255, 255, 255, 0.1));
+            filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 25px rgba(255, 255, 255, 0.1));
+        }
+
+        /* Mix button styling */
+        .mix-button {
+            width: 100px;
+            height: 100px;
+            background-image: url('assets/redbutton.png');
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: center;
+            border-radius: 50%;
+            cursor: pointer;
+            filter: drop-shadow(0 7.5px 20px rgba(0, 0, 0, 0.4));
+            transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            position: relative;
+        }
+
+        .mix-button:hover {
+            transform: scale(1.08) translateY(-2.5px);
+            filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.5));
+        }
+
+        .mix-button:active {
+            transform: scale(1.02) translateY(1.25px);
+            filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.4));
+            transition: all 0.1s ease;
+        }
+
+        /* Green button state when activated */
+        .mix-button.activated {
+            background-image: url('assets/greenbutton.png');
+        }
+
+        /* Add a subtle glow effect */
+        .knob-container:hover .mix-button {
+            filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 25px rgba(255, 255, 255, 0.1));
         }
 
         .current-config {
@@ -236,22 +429,45 @@
             opacity: 0.8;
         }
 
+        /* Mobile optimizations for background navigation */
+        @media (max-width: 768px) {
+            .bg-nav {
+                width: 50px;
+                height: 50px;
+            }
+
+            .bg-nav-left {
+                left: 1rem;
+            }
+
+            .bg-nav-right {
+                right: 1rem;
+            }
+
+            .bg-nav svg {
+                width: 20px;
+                height: 20px;
+            }
+
+            /* Background indicator removed */
+        }
+
         /* Responsive design */
         @media (max-width: 768px) {
             .image-container {
-                width: 300px;
-                height: 300px;
+                width: 375px;
+                height: 375px;
                 margin-bottom: 2rem;
             }
             
             .title {
-                font-size: 2rem;
+                font-size: 1.8rem;
                 margin-bottom: 1.5rem;
             }
             
             .controls {
                 max-width: 90%;
-                gap: 2rem;
+                gap: 2.5rem;
             }
 
             .credit {
@@ -274,46 +490,51 @@
             }
 
             .title {
-                font-size: 1.8rem;
-                letter-spacing: 2px;
+                font-size: 1.6rem;
+                letter-spacing: 1.8px;
                 margin-bottom: 1.5rem;
                 line-height: 1.2;
             }
 
             .image-container {
-                width: 280px;
-                height: 280px;
+                width: 350px;
+                height: 350px;
                 margin-bottom: 2rem;
             }
 
             .controls {
                 flex-direction: column;
-                gap: 2rem;
+                gap: 2.5rem;
                 max-width: 100%;
             }
 
+            .mix-button {
+                width: 87.5px;
+                height: 87.5px;
+            }
+
             .knob-group {
-                gap: 1rem;
-                min-width: 100px;
+                gap: 1.25rem;
+                min-width: 125px;
             }
 
             .knob-label {
-                font-size: 1.1rem;
-                letter-spacing: 2px;
+                font-size: 1.375rem;
+                letter-spacing: 2.5px;
             }
 
             .knob-container {
-                gap: 0.8rem;
+                gap: 1rem;
             }
 
             .knob-value {
-                font-size: 0.9rem;
-                padding: 0.2rem 0.6rem;
+                font-size: 1.125rem;
+                padding: 0.25rem 0.75rem;
             }
 
             .custom-knob {
-                width: 70px;
-                height: 70px;
+                width: 87.5px;
+                height: 87.5px;
             }
 
             .credit {
@@ -326,38 +547,43 @@
         /* Very small screens (iPhone SE, etc.) */
         @media (max-width: 375px) {
             .title {
-                font-size: 1.6rem;
-                letter-spacing: 1px;
+                font-size: 1.4rem;
+                letter-spacing: 1.25px;
             }
 
             .image-container {
-                width: 250px;
-                height: 250px;
+                width: 312.5px;
+                height: 312.5px;
             }
 
             .knob-label {
-                font-size: 1rem;
-                letter-spacing: 1px;
+                font-size: 1.25rem;
+                letter-spacing: 1.25px;
             }
 
             .knob-container {
-                gap: 0.6rem;
+                gap: 0.75rem;
             }
 
             .knob-value {
-                font-size: 0.8rem;
-                padding: 0.2rem 0.5rem;
+                font-size: 1rem;
+                padding: 0.25rem 0.625rem;
             }
 
             .custom-knob {
-                width: 60px;
-                height: 60px;
+                width: 75px;
+                height: 75px;
+            }
+
+            .mix-button {
+                width: 75px;
+                height: 75px;
             }
         }
 
         /* Ensure touch targets are adequate */
         @media (max-width: 768px) {
-            .custom-knob {
+            .custom-knob, .mix-button {
                 cursor: pointer;
                 -webkit-tap-highlight-color: transparent;
                 touch-action: manipulation;
@@ -382,7 +608,7 @@
                 top: 1rem;
                 left: 50%;
                 transform: translateX(-50%);
-                font-size: 1.5rem;
+                font-size: 1.2rem;
                 margin-bottom: 0;
             }
 
@@ -395,28 +621,308 @@
 
             .controls {
                 margin-top: 3rem;
-                max-width: 400px;
+                max-width: 625px;
                 flex-direction: row;
-                gap: 2rem;
+                gap: 1.875rem;
             }
 
             .knob-group {
-                min-width: 80px;
+                min-width: 87.5px;
             }
 
-            .custom-knob {
-                width: 60px;
-                height: 60px;
+            .custom-knob, .mix-button {
+                width: 68.75px;
+                height: 68.75px;
+            }
+        }
+
+        /* Hamburger Menu Styles */
+        .hamburger-menu {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            padding: 10px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .hamburger-menu:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: scale(1.05);
+        }
+
+        .hamburger-line {
+            width: 24px;
+            height: 2px;
+            background-color: #ffffff;
+            border-radius: 2px;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .hamburger-menu.active .hamburger-line:nth-child(1) {
+            transform: rotate(45deg) translate(7px, 7px);
+        }
+
+        .hamburger-menu.active .hamburger-line:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger-menu.active .hamburger-line:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -7px);
+        }
+
+        /* About Panel Styles */
+        .about-panel {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 400px;
+            height: 100vh;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(20, 20, 20, 0.95) 100%);
+            backdrop-filter: blur(20px);
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 999;
+            transition: right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            overflow-y: auto;
+        }
+
+        .about-panel.open {
+            right: 0;
+        }
+
+        .about-content {
+            padding: 3rem 2rem;
+            color: #ffffff;
+            line-height: 1.6;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-size: 2rem;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: rotate(90deg);
+        }
+
+        .about-content h2 {
+            font-size: 1.8rem;
+            font-weight: 300;
+            margin-bottom: 2rem;
+            text-align: center;
+            letter-spacing: 2px;
+            opacity: 0.9;
+        }
+
+        .about-text {
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+
+        .about-text p {
+            margin-bottom: 1rem;
+        }
+
+        .about-text p em {
+            color: #ffd700;
+            font-style: italic;
+            opacity: 1;
+            text-align: center;
+            display: block;
+            margin-bottom: 1rem;
+        }
+
+        .about-text h3 {
+            color: #ffd700;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            opacity: 1;
+        }
+
+        .about-text ul {
+            padding-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .about-text ol {
+            padding-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .about-text li {
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+
+        .about-text strong {
+            color: #ffffff;
+            opacity: 1;
+        }
+
+        .about-text .signature {
+            text-align: center;
+            font-style: italic;
+            color: #ffd700;
+            opacity: 0.7;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        /* Responsive Design for Menu */
+        @media (max-width: 768px) {
+            .hamburger-menu {
+                top: 1rem;
+                right: 1rem;
+                width: 45px;
+                height: 45px;
+            }
+
+            .about-panel {
+                width: 90vw;
+                right: -90vw;
+            }
+
+            .about-content {
+                padding: 2rem 1.5rem;
+            }
+
+            .about-content h2 {
+                font-size: 1.5rem;
+            }
+
+            .about-text {
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hamburger-menu {
+                width: 40px;
+                height: 40px;
+            }
+
+            .hamburger-line {
+                width: 20px;
+            }
+
+            .about-panel {
+                width: 100vw;
+                right: -100vw;
+            }
+
+            .about-content {
+                padding: 1.5rem 1rem;
             }
         }
     </style>
 </head>
-<body>
+    <body>
+    <!-- Background System -->
+    <div class="background-container" id="backgroundContainer">
+        <div class="background-image active" data-bg="cloudscape" style="background-image: url('assets/bg/cloudscape.png')"></div>
+        <div class="background-image" data-bg="pillowfortress" style="background-image: url('assets/bg/pillowfortress.png')"></div>
+        <div class="background-image" data-bg="freudsoffice" style="background-image: url('assets/bg/freudsoffice.png')"></div>
+        <div class="background-image" data-bg="floorislava" style="background-image: url('assets/bg/floorislava.png')"></div>
+        <div class="background-image" data-bg="chroma" style="background-image: url('assets/bg/chroma.png')"></div>
+    </div>
+
+    <!-- Background Navigation -->
+    <div class="bg-nav bg-nav-left" id="bgNavLeft">
+        <svg viewBox="0 0 24 24">
+            <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+        </svg>
+    </div>
+    
+    <div class="bg-nav bg-nav-right" id="bgNavRight">
+        <svg viewBox="0 0 24 24">
+            <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+        </svg>
+    </div>
+
+    <!-- Background Indicator removed for cleaner design -->
+
+    <!-- Hamburger Menu -->
+    <div class="hamburger-menu" id="hamburgerMenu">
+        <div class="hamburger-line"></div>
+        <div class="hamburger-line"></div>
+        <div class="hamburger-line"></div>
+    </div>
+    
+    <!-- About Panel -->
+    <div class="about-panel" id="aboutPanel">
+        <div class="about-content">
+            <button class="close-btn" id="closeBtn">&times;</button>
+            <h2>The Lafufu Laboratory ðŸ§ª</h2>
+            <div class="about-text">
+                <p><em>"Where digital dreams meet adorable chaos"</em></p>
+                <br>
+                <p>Welcome to the most scientifically unscientific character generator in the multiverse! You've stumbled upon a top-secret laboratory where we've successfully cracked the code to manufacturing pure cuteness.</p>
+                <br>
+                <h3>ðŸŽ›ï¸ The Sacred Trinity of Lafufu Creation:</h3>
+                <br>
+                <ul>
+                    <li><strong>AURA (0.0-1.0):</strong> The mystical energy field that makes your Lafufu either zen master or chaotic gremlin. Low aura = chill vibes, High aura = cosmic entity that probably knows your WiFi password.</li>
+                    <br>
+                    <li><strong>VIBE (0.0-1.0):</strong> The emotional frequency of your creature. Think of it as the difference between "I just woke up" energy and "I had 7 espressos" energy. Choose wisely.</li>
+                    <br>
+                    <li><strong>DRIP (0.0-1.0):</strong> The fashion sense quotient. From "borrowed my dad's clothes" to "walking the runway in Milan." Because even interdimensional beings need to look fresh.</li>
+                </ul>
+                <br>
+                <h3>ðŸ¤– The ComfyUI Magic Behind the Madness:</h3>
+                <br>
+                <p>Each Lafufu is born from a sophisticated AI art pipeline that would make even the most caffeinated data scientist weep tears of joy:</p>
+                <br>
+                <ol>
+                    <li><strong>Prompt Engineering:</strong> Your A/V/D values get injected into carefully crafted prompts that tell our AI exactly what kind of adorable chaos to create.</li>
+                    <br>
+                    <li><strong>Stable Diffusion XL:</strong> The heavy-lifting AI model that transforms your numerical desires into visual reality through the dark arts of latent space manipulation.</li>
+                    <br>
+                    <li><strong>ComfyUI Workflow:</strong> A complex node-based system that processes your inputs through multiple stages - like a digital assembly line for manufacturing cuteness.</li>
+                    <br>
+                    <li><strong>Pre-Generation Matrix:</strong> We've pre-rendered 216 unique combinations (6Ã—6Ã—6 grid) so you get instant gratification instead of waiting for the AI gods to respond.</li>
+                </ol>
+                <br>
+                <p><strong>ðŸŽ² PRO TIP:</strong> Hit the MIX button when you're feeling adventurous - it's like shaking a magic 8-ball, but instead of cryptic advice, you get an adorable creature that may or may not judge your life choices.</p>
+                <br>
+                <p class="signature">Built with â¤ï¸, caffeine, and questionable amounts of AI wizardry.</p>
+            </div>
+        </div>
+    </div>
+    
     <div class="container">
         <h1 class="title">MAKE YOUR OWN LAFUFU!</h1>
         
-        <div class="image-container">
+        <div class="image-container env-cloudscape" id="imageContainer">
             <div class="loading-spinner" id="loadingSpinner"></div>
+            <img class="default-mask" id="defaultMask" src="assets/defaultmask.png" alt="" />
             <img class="lafufu-image" id="lafufuImageA" alt="" />
             <img class="lafufu-image" id="lafufuImageB" alt="" />
             <div class="error-message" id="errorMessage" style="display: none;">
@@ -428,24 +934,28 @@
             <div class="knob-group">
                 <div class="knob-label">AURA</div>
                 <div class="knob-container">
-                    <div class="custom-knob" id="auraKnob" data-value="0" data-min="0" data-max="1"></div>
-                    <div class="knob-value" id="auraValue">0.0</div>
+                    <div class="custom-knob" id="auraKnob" data-value="0.0" data-min="0" data-max="1"></div>
                 </div>
             </div>
 
             <div class="knob-group">
                 <div class="knob-label">VIBE</div>
                 <div class="knob-container">
-                    <div class="custom-knob" id="vibeKnob" data-value="0" data-min="0" data-max="1"></div>
-                    <div class="knob-value" id="vibeValue">0.0</div>
+                    <div class="custom-knob" id="vibeKnob" data-value="0.0" data-min="0" data-max="1"></div>
                 </div>
             </div>
 
             <div class="knob-group">
                 <div class="knob-label">DRIP</div>
                 <div class="knob-container">
-                    <div class="custom-knob" id="dripKnob" data-value="0" data-min="0" data-max="1"></div>
-                    <div class="knob-value" id="dripValue">0.0</div>
+                    <div class="custom-knob" id="dripKnob" data-value="0.0" data-min="0" data-max="1"></div>
+                </div>
+            </div>
+
+            <div class="knob-group">
+                <div class="knob-label">MIX</div>
+                <div class="knob-container">
+                    <div class="mix-button" id="mixButton"></div>
                 </div>
             </div>
         </div>
@@ -472,32 +982,1445 @@
                 
                 this.imageA = document.getElementById('lafufuImageA');
                 this.imageB = document.getElementById('lafufuImageB');
-                this.imageContainer = document.querySelector('.image-container');
+                this.imageContainer = document.getElementById('imageContainer');
                 this.loadingSpinner = document.getElementById('loadingSpinner');
                 this.errorMessage = document.getElementById('errorMessage');
                 this.currentConfig = document.getElementById('currentConfig');
+                this.mixButton = document.getElementById('mixButton');
                 
-                this.basePath = 'assets/lafufu/';
+                // Menu elements
+                this.hamburgerMenu = document.getElementById('hamburgerMenu');
+                this.aboutPanel = document.getElementById('aboutPanel');
+                this.closeBtn = document.getElementById('closeBtn');
+                
+                // Background elements
+                this.backgroundContainer = document.getElementById('backgroundContainer');
+                this.bgNavLeft = document.getElementById('bgNavLeft');
+                this.bgNavRight = document.getElementById('bgNavRight');
+                this.backgrounds = ['cloudscape', 'pillowfortress', 'freudsoffice', 'floorislava', 'chroma'];
+                this.currentBgIndex = 0;
+                this.isBgTransitioning = false;
+                
+                // Debug: Check if background elements are found
+                console.log('Background elements:', {
+                    container: this.backgroundContainer,
+                    navLeft: this.bgNavLeft,
+                    navRight: this.bgNavRight
+                });
+                
+                this.basePath = 'assets/lafufuv2/';
                 this.imageCache = new Map();
                 this.currentImageSrc = '';
                 this.activeImage = 'A'; // Track which image is currently active
                 this.isTransitioning = false;
+                this.currentLafufuTitle = '';
+                
+                // Complete mapping of ALL 1,331 available Lafufu files
+                this.availableFiles = new Map([
+                    ['A0.0V0.0D0.0', 'A0.0V0.0D0.0_Flopsy_Hustle_of_Sentiment_in_Dad_Fit.png'],
+                    ['A0.0V0.0D0.1', 'A0.0V0.0D0.1_Carrot_Capital_with_Ancestral_Debt_in_See-through_Ambition.png'],
+                    ['A0.0V0.0D0.2', 'A0.0V0.0D0.2_Carrot_Capital_of_Quiet_Flex_in_Hood_Optional.png'],
+                    ['A0.0V0.0D0.3', 'A0.0V0.0D0.3_Carrot_Capital_with_Ancestral_Debt_in_Zoo_Chic.png'],
+                    ['A0.0V0.0D0.4', 'A0.0V0.0D0.4_Flopsy_Hustle_with_Ancestral_Debt_in_Formal-ish.png'],
+                    ['A0.0V0.0D0.5', 'A0.0V0.0D0.5_Flopsy_Hustle_of_Quiet_Flex_in_Hot_Car_Seat.png'],
+                    ['A0.0V0.0D0.6', 'A0.0V0.0D0.6_Harebrained_of_Sentiment_in_Faculty_Meeting.png'],
+                    ['A0.0V0.0D0.7', 'A0.0V0.0D0.7_Carrot_Capital_of_Sentiment_in_Unsubtle.png'],
+                    ['A0.0V0.0D0.8', 'A0.0V0.0D0.8_Flopsy_Hustle_of_Sentiment_in_Touch_Me_Not.png'],
+                    ['A0.0V0.0D0.9', 'A0.0V0.0D0.9_Harebrained_of_Sentiment_in_Itchy_Decision.png'],
+                    ['A0.0V0.0D1.0', 'A0.0V0.0D1.0_Flopsy_Hustle_with_Ancestral_Debt_in_Campfire_Smoke.png'],
+                    ['A0.0V0.1D0.0', 'A0.0V0.1D0.0_Carrot_Capital_of_Mild_Power_in_Straight_Cut.png'],
+                    ['A0.0V0.1D0.1', 'A0.0V0.1D0.1_Flopsy_Hustle_from_Summer_Camp_in_Drafty_Statement.png'],
+                    ['A0.0V0.1D0.2', 'A0.0V0.1D0.2_Flopsy_Hustle_from_Summer_Camp_in_Michelin_Mood.png'],
+                    ['A0.0V0.1D0.3', 'A0.0V0.1D0.3_Harebrained_of_Mild_Power_in_Shed_Risk.png'],
+                    ['A0.0V0.1D0.4', 'A0.0V0.1D0.4_Carrot_Capital_you_Found_on_Etsy_in_Slippery_Deal.png'],
+                    ['A0.0V0.1D0.5', 'A0.0V0.1D0.5_Flopsy_Hustle_of_Mild_Power_in_Hot_Car_Seat.png'],
+                    ['A0.0V0.1D0.6', 'A0.0V0.1D0.6_Harebrained_from_Summer_Camp_in_Grandpa_Energy.png'],
+                    ['A0.0V0.1D0.7', 'A0.0V0.1D0.7_Harebrained_of_Mild_Power_in_Unsubtle.png'],
+                    ['A0.0V0.1D0.8', 'A0.0V0.1D0.8_Carrot_Capital_you_Found_on_Etsy_in_Touch_Me_Not.png'],
+                    ['A0.0V0.1D0.9', 'A0.0V0.1D0.9_Carrot_Capital_you_Found_on_Etsy_in_Sweater_Weather.png'],
+                    ['A0.0V0.1D1.0', 'A0.0V0.1D1.0_Harebrained_from_Summer_Camp_in_Polyester_Hug.png'],
+                    ['A0.0V0.2D0.0', 'A0.0V0.2D0.0_Flopsy_Hustle_that_Smells_Like_Coffee_in_Straight_Cut.png'],
+                    ['A0.0V0.2D0.1', 'A0.0V0.2D0.1_Flopsy_Hustle_from_Grandma_in_Drafty_Statement.png'],
+                    ['A0.0V0.2D0.2', 'A0.0V0.2D0.2_Carrot_Capital_from_Grandma_in_Hood_Optional.png'],
+                    ['A0.0V0.2D0.3', 'A0.0V0.2D0.3_Flopsy_Hustle_from_Grandma_in_Shed_Risk.png'],
+                    ['A0.0V0.2D0.4', 'A0.0V0.2D0.4_Carrot_Capital_from_Grandma_in_Formal-ish.png'],
+                    ['A0.0V0.2D0.5', 'A0.0V0.2D0.5_Flopsy_Hustle_of_Seasonal_Confusion_in_Cow_Adjacent.png'],
+                    ['A0.0V0.2D0.6', 'A0.0V0.2D0.6_Flopsy_Hustle_of_Seasonal_Confusion_in_ASMR_Pants.png'],
+                    ['A0.0V0.2D0.7', 'A0.0V0.2D0.7_Carrot_Capital_of_Seasonal_Confusion_in_Dance_Floor_Hazard.png'],
+                    ['A0.0V0.2D0.8', 'A0.0V0.2D0.8_Carrot_Capital_that_Smells_Like_Coffee_in_Touch_Me_Not.png'],
+                    ['A0.0V0.2D0.9', 'A0.0V0.2D0.9_Harebrained_that_Smells_Like_Coffee_in_Sweater_Weather.png'],
+                    ['A0.0V0.2D1.0', 'A0.0V0.2D1.0_Flopsy_Hustle_of_Seasonal_Confusion_in_Mall_Santa.png'],
+                    ['A0.0V0.3D0.0', 'A0.0V0.3D0.0_Carrot_Capital_for_No_Reason_in_Straight_Cut.png'],
+                    ['A0.0V0.3D0.1', 'A0.0V0.3D0.1_Flopsy_Hustle_of_Cloud_Watching_in_Breathable_Drama.png'],
+                    ['A0.0V0.3D0.2', 'A0.0V0.3D0.2_Harebrained_for_No_Reason_in_Overinflated_Ego.png'],
+                    ['A0.0V0.3D0.3', 'A0.0V0.3D0.3_Harebrained_for_No_Reason_in_Shed_Risk.png'],
+                    ['A0.0V0.3D0.4', 'A0.0V0.3D0.4_Carrot_Capital_of_Cloud_Watching_in_Slippery_Deal.png'],
+                    ['A0.0V0.3D0.5', 'A0.0V0.3D0.5_Carrot_Capital_for_No_Reason_in_Rebel_Lite.png'],
+                    ['A0.0V0.3D0.6', 'A0.0V0.3D0.6_Carrot_Capital_for_No_Reason_in_ASMR_Pants.png'],
+                    ['A0.0V0.3D0.7', 'A0.0V0.3D0.7_Carrot_Capital_of_Cloud_Watching_in_Glitter_Debt.png'],
+                    ['A0.0V0.3D0.8', 'A0.0V0.3D0.8_Carrot_Capital_of_Cloud_Watching_in_Theatre_Kid.png'],
+                    ['A0.0V0.3D0.9', 'A0.0V0.3D0.9_Harebrained_for_No_Reason_in_Sheep_Tax.png'],
+                    ['A0.0V0.3D1.0', 'A0.0V0.3D1.0_Flopsy_Hustle_of_Deep_Sea_Lies_in_Mall_Santa.png'],
+                    ['A0.0V0.4D0.0', 'A0.0V0.4D0.0_Harebrained_from_a_Pawn_Shop_in_Acid_Wash.png'],
+                    ['A0.0V0.4D0.1', 'A0.0V0.4D0.1_Harebrained_with_Crypto_Ambitions_in_Drafty_Statement.png'],
+                    ['A0.0V0.4D0.2', 'A0.0V0.4D0.2_Carrot_Capital_of_Questionable_Origin_in_Hood_Optional.png'],
+                    ['A0.0V0.4D0.3', 'A0.0V0.4D0.3_Harebrained_from_a_Pawn_Shop_in_Shed_Risk.png'],
+                    ['A0.0V0.4D0.4', 'A0.0V0.4D0.4_Carrot_Capital_from_a_Pawn_Shop_in_Prom_Night.png'],
+                    ['A0.0V0.4D0.5', 'A0.0V0.4D0.5_Carrot_Capital_with_Crypto_Ambitions_in_Cow_Adjacent.png'],
+                    ['A0.0V0.4D0.6', 'A0.0V0.4D0.6_Flopsy_Hustle_with_Crypto_Ambitions_in_Faculty_Meeting.png'],
+                    ['A0.0V0.4D0.7', 'A0.0V0.4D0.7_Flopsy_Hustle_from_a_Pawn_Shop_in_Dance_Floor_Hazard.png'],
+                    ['A0.0V0.4D0.8', 'A0.0V0.4D0.8_Carrot_Capital_of_Questionable_Origin_in_Theatre_Kid.png'],
+                    ['A0.0V0.4D0.9', 'A0.0V0.4D0.9_Flopsy_Hustle_with_Crypto_Ambitions_in_Itchy_Decision.png'],
+                    ['A0.0V0.4D1.0', 'A0.0V0.4D1.0_Carrot_Capital_from_a_Pawn_Shop_in_Campfire_Smoke.png'],
+                    ['A0.0V0.5D0.0', 'A0.0V0.5D0.0_Flopsy_Hustle_that_Missed_the_Drop_in_Acid_Wash.png'],
+                    ['A0.0V0.5D0.1', 'A0.0V0.5D0.1_Carrot_Capital_from_the_Back_of_a_Trunk_in_Drafty_Statement.png'],
+                    ['A0.0V0.5D0.2', 'A0.0V0.5D0.2_Flopsy_Hustle_with_Street_Regret_in_Hood_Optional.png'],
+                    ['A0.0V0.5D0.3', 'A0.0V0.5D0.3_Flopsy_Hustle_with_Street_Regret_in_Shed_Risk.png'],
+                    ['A0.0V0.5D0.4', 'A0.0V0.5D0.4_Flopsy_Hustle_with_Street_Regret_in_Formal-ish.png'],
+                    ['A0.0V0.5D0.5', 'A0.0V0.5D0.5_Flopsy_Hustle_with_Street_Regret_in_Hot_Car_Seat.png'],
+                    ['A0.0V0.5D0.6', 'A0.0V0.5D0.6_Flopsy_Hustle_from_the_Back_of_a_Trunk_in_Faculty_Meeting.png'],
+                    ['A0.0V0.5D0.7', 'A0.0V0.5D0.7_Flopsy_Hustle_from_the_Back_of_a_Trunk_in_Dance_Floor_Hazard.png'],
+                    ['A0.0V0.5D0.8', 'A0.0V0.5D0.8_Carrot_Capital_from_the_Back_of_a_Trunk_in_Lounge_Lizard.png'],
+                    ['A0.0V0.5D0.9', 'A0.0V0.5D0.9_Harebrained_that_Missed_the_Drop_in_Sweater_Weather.png'],
+                    ['A0.0V0.5D1.0', 'A0.0V0.5D1.0_Harebrained_with_Street_Regret_in_Polyester_Hug.png'],
+                    ['A0.0V0.6D0.0', 'A0.0V0.6D0.0_Harebrained_of_Sweat_Equity_in_Straight_Cut.png'],
+                    ['A0.0V0.6D0.1', 'A0.0V0.6D0.1_Harebrained_of_Mid_80s_Aerobics_in_See-through_Ambition.png'],
+                    ['A0.0V0.6D0.2', 'A0.0V0.6D0.2_Flopsy_Hustle_of_Mid_80s_Aerobics_in_Overinflated_Ego.png'],
+                    ['A0.0V0.6D0.3', 'A0.0V0.6D0.3_Flopsy_Hustle_of_Mid_80s_Aerobics_in_Pettable_Crime.png'],
+                    ['A0.0V0.6D0.4', 'A0.0V0.6D0.4_Harebrained_of_Sweat_Equity_in_Slippery_Deal.png'],
+                    ['A0.0V0.6D0.5', 'A0.0V0.6D0.5_Harebrained_from_a_Failed_Marathon_in_Cow_Adjacent.png'],
+                    ['A0.0V0.6D0.6', 'A0.0V0.6D0.6_Carrot_Capital_of_Sweat_Equity_in_Grandpa_Energy.png'],
+                    ['A0.0V0.6D0.7', 'A0.0V0.6D0.7_Flopsy_Hustle_from_a_Failed_Marathon_in_Glitter_Debt.png'],
+                    ['A0.0V0.6D0.8', 'A0.0V0.6D0.8_Flopsy_Hustle_of_Sweat_Equity_in_Touch_Me_Not.png'],
+                    ['A0.0V0.6D0.9', 'A0.0V0.6D0.9_Carrot_Capital_of_Sweat_Equity_in_Itchy_Decision.png'],
+                    ['A0.0V0.6D1.0', 'A0.0V0.6D1.0_Harebrained_of_Sweat_Equity_in_Campfire_Smoke.png'],
+                    ['A0.0V0.7D0.0', 'A0.0V0.7D0.0_Flopsy_Hustle_with_Misspelled_Title_in_Dad_Fit.png'],
+                    ['A0.0V0.7D0.1', 'A0.0V0.7D0.1_Harebrained_from_a_Lost_Pageant_in_Breathable_Drama.png'],
+                    ['A0.0V0.7D0.2', 'A0.0V0.7D0.2_Harebrained_of_Participation_in_Michelin_Mood.png'],
+                    ['A0.0V0.7D0.3', 'A0.0V0.7D0.3_Carrot_Capital_of_Participation_in_Zoo_Chic.png'],
+                    ['A0.0V0.7D0.4', 'A0.0V0.7D0.4_Carrot_Capital_of_Participation_in_Formal-ish.png'],
+                    ['A0.0V0.7D0.5', 'A0.0V0.7D0.5_Flopsy_Hustle_of_Participation_in_Cow_Adjacent.png'],
+                    ['A0.0V0.7D0.6', 'A0.0V0.7D0.6_Harebrained_of_Participation_in_ASMR_Pants.png'],
+                    ['A0.0V0.7D0.7', 'A0.0V0.7D0.7_Harebrained_from_a_Lost_Pageant_in_Dance_Floor_Hazard.png'],
+                    ['A0.0V0.7D0.8', 'A0.0V0.7D0.8_Harebrained_from_a_Lost_Pageant_in_Touch_Me_Not.png'],
+                    ['A0.0V0.7D0.9', 'A0.0V0.7D0.9_Harebrained_from_a_Lost_Pageant_in_Itchy_Decision.png'],
+                    ['A0.0V0.7D1.0', 'A0.0V0.7D1.0_Harebrained_from_a_Lost_Pageant_in_Campfire_Smoke.png'],
+                    ['A0.0V0.8D0.0', 'A0.0V0.8D0.0_Carrot_Capital_from_Camp_Nope_in_Dad_Fit.png'],
+                    ['A0.0V0.8D0.1', 'A0.0V0.8D0.1_Harebrained_of_Minimal_Authority_in_Drafty_Statement.png'],
+                    ['A0.0V0.8D0.2', 'A0.0V0.8D0.2_Harebrained_from_Camp_Nope_in_Michelin_Mood.png'],
+                    ['A0.0V0.8D0.3', 'A0.0V0.8D0.3_Carrot_Capital_of_Minimal_Authority_in_Pettable_Crime.png'],
+                    ['A0.0V0.8D0.4', 'A0.0V0.8D0.4_Flopsy_Hustle_from_Camp_Nope_in_Slippery_Deal.png'],
+                    ['A0.0V0.8D0.5', 'A0.0V0.8D0.5_Carrot_Capital_from_Camp_Nope_in_Cow_Adjacent.png'],
+                    ['A0.0V0.8D0.6', 'A0.0V0.8D0.6_Flopsy_Hustle_from_Camp_Nope_in_Faculty_Meeting.png'],
+                    ['A0.0V0.8D0.7', 'A0.0V0.8D0.7_Flopsy_Hustle_of_Minimal_Authority_in_Glitter_Debt.png'],
+                    ['A0.0V0.8D0.8', 'A0.0V0.8D0.8_Carrot_Capital_that_Says_\'Hi\'_in_Touch_Me_Not.png'],
+                    ['A0.0V0.8D0.9', 'A0.0V0.8D0.9_Harebrained_of_Minimal_Authority_in_Sheep_Tax.png'],
+                    ['A0.0V0.8D1.0', 'A0.0V0.8D1.0_Flopsy_Hustle_that_Says_\'Hi\'_in_Polyester_Hug.png'],
+                    ['A0.0V0.9D0.0', 'A0.0V0.9D0.0_Flopsy_Hustle_of_Loose_Morals_in_Straight_Cut.png'],
+                    ['A0.0V0.9D0.1', 'A0.0V0.9D0.1_Flopsy_Hustle_of_Poor_Fit_in_See-through_Ambition.png'],
+                    ['A0.0V0.9D0.2', 'A0.0V0.9D0.2_Harebrained_of_Loose_Morals_in_Michelin_Mood.png'],
+                    ['A0.0V0.9D0.3', 'A0.0V0.9D0.3_Flopsy_Hustle_of_Loose_Morals_in_Shed_Risk.png'],
+                    ['A0.0V0.9D0.4', 'A0.0V0.9D0.4_Flopsy_Hustle_of_Loose_Morals_in_Formal-ish.png'],
+                    ['A0.0V0.9D0.5', 'A0.0V0.9D0.5_Carrot_Capital_of_Poor_Fit_in_Rebel_Lite.png'],
+                    ['A0.0V0.9D0.6', 'A0.0V0.9D0.6_Flopsy_Hustle_from_Dad\'s_Closet_in_ASMR_Pants.png'],
+                    ['A0.0V0.9D0.7', 'A0.0V0.9D0.7_Harebrained_from_Dad\'s_Closet_in_Dance_Floor_Hazard.png'],
+                    ['A0.0V0.9D0.8', 'A0.0V0.9D0.8_Flopsy_Hustle_of_Poor_Fit_in_Lounge_Lizard.png'],
+                    ['A0.0V0.9D0.9', 'A0.0V0.9D0.9_Carrot_Capital_of_Poor_Fit_in_Sweater_Weather.png'],
+                    ['A0.0V0.9D1.0', 'A0.0V0.9D1.0_Harebrained_of_Poor_Fit_in_Campfire_Smoke.png'],
+                    ['A0.0V1.0D0.0', 'A0.0V1.0D0.0_Flopsy_Hustle_of_Hollow_Gold_in_Acid_Wash.png'],
+                    ['A0.0V1.0D0.1', 'A0.0V1.0D0.1_Flopsy_Hustle_of_Questionable_Sovereignty_in_Breathable_Drama.png'],
+                    ['A0.0V1.0D0.2', 'A0.0V1.0D0.2_Flopsy_Hustle_of_Questionable_Sovereignty_in_Michelin_Mood.png'],
+                    ['A0.0V1.0D0.3', 'A0.0V1.0D0.3_Harebrained_of_Questionable_Sovereignty_in_Zoo_Chic.png'],
+                    ['A0.0V1.0D0.4', 'A0.0V1.0D0.4_Harebrained_of_Questionable_Sovereignty_in_Slippery_Deal.png'],
+                    ['A0.0V1.0D0.5', 'A0.0V1.0D0.5_Harebrained_of_Hollow_Gold_in_Cow_Adjacent.png'],
+                    ['A0.0V1.0D0.6', 'A0.0V1.0D0.6_Harebrained_of_Hollow_Gold_in_Faculty_Meeting.png'],
+                    ['A0.0V1.0D0.7', 'A0.0V1.0D0.7_Flopsy_Hustle_of_Hollow_Gold_in_Dance_Floor_Hazard.png'],
+                    ['A0.0V1.0D0.8', 'A0.0V1.0D0.8_Flopsy_Hustle_of_Questionable_Sovereignty_in_Lounge_Lizard.png'],
+                    ['A0.0V1.0D0.9', 'A0.0V1.0D0.9_Carrot_Capital_of_Questionable_Sovereignty_in_Itchy_Decision.png'],
+                    ['A0.0V1.0D1.0', 'A0.0V1.0D1.0_Harebrained_of_Hollow_Gold_in_Campfire_Smoke.png'],
+                    ['A0.1V0.0D0.0', 'A0.1V0.0D0.0_Cluck_Norris_of_Quiet_Flex_in_Acid_Wash.png'],
+                    ['A0.1V0.0D0.1', 'A0.1V0.0D0.1_Cluck_Norris_with_Ancestral_Debt_in_See-through_Ambition.png'],
+                    ['A0.1V0.0D0.2', 'A0.1V0.0D0.2_Dawn_Caller_of_Quiet_Flex_in_Michelin_Mood.png'],
+                    ['A0.1V0.0D0.3', 'A0.1V0.0D0.3_Eggsecutive_of_Sentiment_in_Pettable_Crime.png'],
+                    ['A0.1V0.0D0.4', 'A0.1V0.0D0.4_Dawn_Caller_of_Sentiment_in_Slippery_Deal.png'],
+                    ['A0.1V0.0D0.5', 'A0.1V0.0D0.5_Eggsecutive_with_Ancestral_Debt_in_Hot_Car_Seat.png'],
+                    ['A0.1V0.0D0.6', 'A0.1V0.0D0.6_Dawn_Caller_of_Sentiment_in_Grandpa_Energy.png'],
+                    ['A0.1V0.0D0.7', 'A0.1V0.0D0.7_Eggsecutive_of_Sentiment_in_Dance_Floor_Hazard.png'],
+                    ['A0.1V0.0D0.8', 'A0.1V0.0D0.8_Eggsecutive_of_Sentiment_in_Touch_Me_Not.png'],
+                    ['A0.1V0.0D0.9', 'A0.1V0.0D0.9_Eggsecutive_of_Quiet_Flex_in_Sheep_Tax.png'],
+                    ['A0.1V0.0D1.0', 'A0.1V0.0D1.0_Dawn_Caller_of_Sentiment_in_Mall_Santa.png'],
+                    ['A0.1V0.1D0.0', 'A0.1V0.1D0.0_Eggsecutive_from_Summer_Camp_in_Straight_Cut.png'],
+                    ['A0.1V0.1D0.1', 'A0.1V0.1D0.1_Cluck_Norris_you_Found_on_Etsy_in_Breathable_Drama.png'],
+                    ['A0.1V0.1D0.2', 'A0.1V0.1D0.2_Dawn_Caller_from_Summer_Camp_in_Hood_Optional.png'],
+                    ['A0.1V0.1D0.3', 'A0.1V0.1D0.3_Eggsecutive_you_Found_on_Etsy_in_Zoo_Chic.png'],
+                    ['A0.1V0.1D0.4', 'A0.1V0.1D0.4_Eggsecutive_you_Found_on_Etsy_in_Prom_Night.png'],
+                    ['A0.1V0.1D0.5', 'A0.1V0.1D0.5_Eggsecutive_you_Found_on_Etsy_in_Cow_Adjacent.png'],
+                    ['A0.1V0.1D0.6', 'A0.1V0.1D0.6_Dawn_Caller_from_Summer_Camp_in_Grandpa_Energy.png'],
+                    ['A0.1V0.1D0.7', 'A0.1V0.1D0.7_Eggsecutive_from_Summer_Camp_in_Dance_Floor_Hazard.png'],
+                    ['A0.1V0.1D0.8', 'A0.1V0.1D0.8_Cluck_Norris_you_Found_on_Etsy_in_Touch_Me_Not.png'],
+                    ['A0.1V0.1D0.9', 'A0.1V0.1D0.9_Cluck_Norris_from_Summer_Camp_in_Sweater_Weather.png'],
+                    ['A0.1V0.1D1.0', 'A0.1V0.1D1.0_Dawn_Caller_from_Summer_Camp_in_Campfire_Smoke.png'],
+                    ['A0.1V0.2D0.0', 'A0.1V0.2D0.0_Eggsecutive_from_Grandma_in_Straight_Cut.png'],
+                    ['A0.1V0.2D0.1', 'A0.1V0.2D0.1_Cluck_Norris_of_Seasonal_Confusion_in_Drafty_Statement.png'],
+                    ['A0.1V0.2D0.2', 'A0.1V0.2D0.2_Cluck_Norris_of_Seasonal_Confusion_in_Overinflated_Ego.png'],
+                    ['A0.1V0.2D0.3', 'A0.1V0.2D0.3_Eggsecutive_from_Grandma_in_Pettable_Crime.png'],
+                    ['A0.1V0.2D0.4', 'A0.1V0.2D0.4_Dawn_Caller_from_Grandma_in_Formal-ish.png'],
+                    ['A0.1V0.2D0.5', 'A0.1V0.2D0.5_Dawn_Caller_that_Smells_Like_Coffee_in_Rebel_Lite.png'],
+                    ['A0.1V0.2D0.6', 'A0.1V0.2D0.6_Eggsecutive_that_Smells_Like_Coffee_in_Faculty_Meeting.png'],
+                    ['A0.1V0.2D0.7', 'A0.1V0.2D0.7_Dawn_Caller_from_Grandma_in_Dance_Floor_Hazard.png'],
+                    ['A0.1V0.2D0.8', 'A0.1V0.2D0.8_Eggsecutive_that_Smells_Like_Coffee_in_Theatre_Kid.png'],
+                    ['A0.1V0.2D0.9', 'A0.1V0.2D0.9_Eggsecutive_of_Seasonal_Confusion_in_Sheep_Tax.png'],
+                    ['A0.1V0.2D1.0', 'A0.1V0.2D1.0_Eggsecutive_from_Grandma_in_Polyester_Hug.png'],
+                    ['A0.1V0.3D0.0', 'A0.1V0.3D0.0_Dawn_Caller_of_Cloud_Watching_in_Acid_Wash.png'],
+                    ['A0.1V0.3D0.1', 'A0.1V0.3D0.1_Eggsecutive_of_Cloud_Watching_in_See-through_Ambition.png'],
+                    ['A0.1V0.3D0.2', 'A0.1V0.3D0.2_Eggsecutive_of_Deep_Sea_Lies_in_Hood_Optional.png'],
+                    ['A0.1V0.3D0.3', 'A0.1V0.3D0.3_Dawn_Caller_for_No_Reason_in_Zoo_Chic.png'],
+                    ['A0.1V0.3D0.4', 'A0.1V0.3D0.4_Cluck_Norris_of_Cloud_Watching_in_Formal-ish.png'],
+                    ['A0.1V0.3D0.5', 'A0.1V0.3D0.5_Cluck_Norris_of_Cloud_Watching_in_Rebel_Lite.png'],
+                    ['A0.1V0.3D0.6', 'A0.1V0.3D0.6_Cluck_Norris_for_No_Reason_in_Grandpa_Energy.png'],
+                    ['A0.1V0.3D0.7', 'A0.1V0.3D0.7_Eggsecutive_for_No_Reason_in_Glitter_Debt.png'],
+                    ['A0.1V0.3D0.8', 'A0.1V0.3D0.8_Cluck_Norris_of_Cloud_Watching_in_Touch_Me_Not.png'],
+                    ['A0.1V0.3D0.9', 'A0.1V0.3D0.9_Eggsecutive_for_No_Reason_in_Sweater_Weather.png'],
+                    ['A0.1V0.3D1.0', 'A0.1V0.3D1.0_Dawn_Caller_for_No_Reason_in_Campfire_Smoke.png'],
+                    ['A0.1V0.4D0.0', 'A0.1V0.4D0.0_Eggsecutive_from_a_Pawn_Shop_in_Acid_Wash.png'],
+                    ['A0.1V0.4D0.1', 'A0.1V0.4D0.1_Eggsecutive_of_Questionable_Origin_in_Drafty_Statement.png'],
+                    ['A0.1V0.4D0.2', 'A0.1V0.4D0.2_Dawn_Caller_from_a_Pawn_Shop_in_Overinflated_Ego.png'],
+                    ['A0.1V0.4D0.3', 'A0.1V0.4D0.3_Eggsecutive_from_a_Pawn_Shop_in_Pettable_Crime.png'],
+                    ['A0.1V0.4D0.4', 'A0.1V0.4D0.4_Eggsecutive_with_Crypto_Ambitions_in_Prom_Night.png'],
+                    ['A0.1V0.4D0.5', 'A0.1V0.4D0.5_Eggsecutive_with_Crypto_Ambitions_in_Hot_Car_Seat.png'],
+                    ['A0.1V0.4D0.6', 'A0.1V0.4D0.6_Cluck_Norris_with_Crypto_Ambitions_in_Faculty_Meeting.png'],
+                    ['A0.1V0.4D0.7', 'A0.1V0.4D0.7_Cluck_Norris_from_a_Pawn_Shop_in_Unsubtle.png'],
+                    ['A0.1V0.4D0.8', 'A0.1V0.4D0.8_Dawn_Caller_from_a_Pawn_Shop_in_Touch_Me_Not.png'],
+                    ['A0.1V0.4D0.9', 'A0.1V0.4D0.9_Eggsecutive_of_Questionable_Origin_in_Itchy_Decision.png'],
+                    ['A0.1V0.4D1.0', 'A0.1V0.4D1.0_Eggsecutive_with_Crypto_Ambitions_in_Polyester_Hug.png'],
+                    ['A0.1V0.5D0.0', 'A0.1V0.5D0.0_Cluck_Norris_from_the_Back_of_a_Trunk_in_Straight_Cut.png'],
+                    ['A0.1V0.5D0.1', 'A0.1V0.5D0.1_Eggsecutive_that_Missed_the_Drop_in_See-through_Ambition.png'],
+                    ['A0.1V0.5D0.2', 'A0.1V0.5D0.2_Cluck_Norris_with_Street_Regret_in_Michelin_Mood.png'],
+                    ['A0.1V0.5D0.3', 'A0.1V0.5D0.3_Dawn_Caller_that_Missed_the_Drop_in_Pettable_Crime.png'],
+                    ['A0.1V0.5D0.4', 'A0.1V0.5D0.4_Cluck_Norris_from_the_Back_of_a_Trunk_in_Slippery_Deal.png'],
+                    ['A0.1V0.5D0.5', 'A0.1V0.5D0.5_Dawn_Caller_with_Street_Regret_in_Hot_Car_Seat.png'],
+                    ['A0.1V0.5D0.6', 'A0.1V0.5D0.6_Dawn_Caller_that_Missed_the_Drop_in_Faculty_Meeting.png'],
+                    ['A0.1V0.5D0.7', 'A0.1V0.5D0.7_Eggsecutive_from_the_Back_of_a_Trunk_in_Unsubtle.png'],
+                    ['A0.1V0.5D0.8', 'A0.1V0.5D0.8_Eggsecutive_that_Missed_the_Drop_in_Lounge_Lizard.png'],
+                    ['A0.1V0.5D0.9', 'A0.1V0.5D0.9_Cluck_Norris_with_Street_Regret_in_Sweater_Weather.png'],
+                    ['A0.1V0.5D1.0', 'A0.1V0.5D1.0_Eggsecutive_that_Missed_the_Drop_in_Polyester_Hug.png'],
+                    ['A0.1V0.6D0.0', 'A0.1V0.6D0.0_Cluck_Norris_of_Sweat_Equity_in_Dad_Fit.png'],
+                    ['A0.1V0.6D0.1', 'A0.1V0.6D0.1_Eggsecutive_from_a_Failed_Marathon_in_Drafty_Statement.png'],
+                    ['A0.1V0.6D0.2', 'A0.1V0.6D0.2_Cluck_Norris_of_Sweat_Equity_in_Hood_Optional.png'],
+                    ['A0.1V0.6D0.3', 'A0.1V0.6D0.3_Dawn_Caller_of_Mid_80s_Aerobics_in_Pettable_Crime.png'],
+                    ['A0.1V0.6D0.4', 'A0.1V0.6D0.4_Dawn_Caller_of_Mid_80s_Aerobics_in_Slippery_Deal.png'],
+                    ['A0.1V0.6D0.5', 'A0.1V0.6D0.5_Dawn_Caller_from_a_Failed_Marathon_in_Rebel_Lite.png'],
+                    ['A0.1V0.6D0.6', 'A0.1V0.6D0.6_Dawn_Caller_of_Sweat_Equity_in_ASMR_Pants.png'],
+                    ['A0.1V0.6D0.7', 'A0.1V0.6D0.7_Cluck_Norris_of_Sweat_Equity_in_Unsubtle.png'],
+                    ['A0.1V0.6D0.8', 'A0.1V0.6D0.8_Eggsecutive_of_Sweat_Equity_in_Lounge_Lizard.png'],
+                    ['A0.1V0.6D0.9', 'A0.1V0.6D0.9_Dawn_Caller_of_Mid_80s_Aerobics_in_Itchy_Decision.png'],
+                    ['A0.1V0.6D1.0', 'A0.1V0.6D1.0_Dawn_Caller_of_Mid_80s_Aerobics_in_Campfire_Smoke.png'],
+                    ['A0.1V0.7D0.0', 'A0.1V0.7D0.0_Dawn_Caller_of_Participation_in_Straight_Cut.png'],
+                    ['A0.1V0.7D0.1', 'A0.1V0.7D0.1_Eggsecutive_from_a_Lost_Pageant_in_Drafty_Statement.png'],
+                    ['A0.1V0.7D0.2', 'A0.1V0.7D0.2_Cluck_Norris_from_a_Lost_Pageant_in_Michelin_Mood.png'],
+                    ['A0.1V0.7D0.3', 'A0.1V0.7D0.3_Eggsecutive_with_Misspelled_Title_in_Shed_Risk.png'],
+                    ['A0.1V0.7D0.4', 'A0.1V0.7D0.4_Cluck_Norris_from_a_Lost_Pageant_in_Prom_Night.png'],
+                    ['A0.1V0.7D0.5', 'A0.1V0.7D0.5_Cluck_Norris_from_a_Lost_Pageant_in_Cow_Adjacent.png'],
+                    ['A0.1V0.7D0.6', 'A0.1V0.7D0.6_Cluck_Norris_from_a_Lost_Pageant_in_Grandpa_Energy.png'],
+                    ['A0.1V0.7D0.7', 'A0.1V0.7D0.7_Cluck_Norris_of_Participation_in_Glitter_Debt.png'],
+                    ['A0.1V0.7D0.8', 'A0.1V0.7D0.8_Cluck_Norris_with_Misspelled_Title_in_Lounge_Lizard.png'],
+                    ['A0.1V0.7D0.9', 'A0.1V0.7D0.9_Dawn_Caller_from_a_Lost_Pageant_in_Sheep_Tax.png'],
+                    ['A0.1V0.7D1.0', 'A0.1V0.7D1.0_Dawn_Caller_with_Misspelled_Title_in_Campfire_Smoke.png'],
+                    ['A0.1V0.8D0.0', 'A0.1V0.8D0.0_Dawn_Caller_that_Says_\'Hi\'_in_Dad_Fit.png'],
+                    ['A0.1V0.8D0.1', 'A0.1V0.8D0.1_Dawn_Caller_that_Says_\'Hi\'_in_See-through_Ambition.png'],
+                    ['A0.1V0.8D0.2', 'A0.1V0.8D0.2_Dawn_Caller_of_Minimal_Authority_in_Michelin_Mood.png'],
+                    ['A0.1V0.8D0.3', 'A0.1V0.8D0.3_Eggsecutive_of_Minimal_Authority_in_Shed_Risk.png'],
+                    ['A0.1V0.8D0.4', 'A0.1V0.8D0.4_Eggsecutive_that_Says_\'Hi\'_in_Slippery_Deal.png'],
+                    ['A0.1V0.8D0.5', 'A0.1V0.8D0.5_Eggsecutive_that_Says_\'Hi\'_in_Hot_Car_Seat.png'],
+                    ['A0.1V0.8D0.6', 'A0.1V0.8D0.6_Cluck_Norris_of_Minimal_Authority_in_Faculty_Meeting.png'],
+                    ['A0.1V0.8D0.7', 'A0.1V0.8D0.7_Cluck_Norris_of_Minimal_Authority_in_Glitter_Debt.png'],
+                    ['A0.1V0.8D0.8', 'A0.1V0.8D0.8_Eggsecutive_that_Says_\'Hi\'_in_Touch_Me_Not.png'],
+                    ['A0.1V0.8D0.9', 'A0.1V0.8D0.9_Eggsecutive_that_Says_\'Hi\'_in_Sweater_Weather.png'],
+                    ['A0.1V0.8D1.0', 'A0.1V0.8D1.0_Dawn_Caller_that_Says_\'Hi\'_in_Campfire_Smoke.png'],
+                    ['A0.1V0.9D0.0', 'A0.1V0.9D0.0_Cluck_Norris_of_Poor_Fit_in_Straight_Cut.png'],
+                    ['A0.1V0.9D0.1', 'A0.1V0.9D0.1_Dawn_Caller_of_Poor_Fit_in_Breathable_Drama.png'],
+                    ['A0.1V0.9D0.2', 'A0.1V0.9D0.2_Dawn_Caller_of_Loose_Morals_in_Overinflated_Ego.png'],
+                    ['A0.1V0.9D0.3', 'A0.1V0.9D0.3_Cluck_Norris_of_Loose_Morals_in_Shed_Risk.png'],
+                    ['A0.1V0.9D0.4', 'A0.1V0.9D0.4_Cluck_Norris_of_Loose_Morals_in_Prom_Night.png'],
+                    ['A0.1V0.9D0.5', 'A0.1V0.9D0.5_Cluck_Norris_from_Dad\'s_Closet_in_Rebel_Lite.png'],
+                    ['A0.1V0.9D0.6', 'A0.1V0.9D0.6_Eggsecutive_of_Loose_Morals_in_ASMR_Pants.png'],
+                    ['A0.1V0.9D0.7', 'A0.1V0.9D0.7_Eggsecutive_of_Poor_Fit_in_Dance_Floor_Hazard.png'],
+                    ['A0.1V0.9D0.8', 'A0.1V0.9D0.8_Dawn_Caller_from_Dad\'s_Closet_in_Lounge_Lizard.png'],
+                    ['A0.1V0.9D0.9', 'A0.1V0.9D0.9_Dawn_Caller_of_Loose_Morals_in_Sheep_Tax.png'],
+                    ['A0.1V0.9D1.0', 'A0.1V0.9D1.0_Cluck_Norris_of_Loose_Morals_in_Polyester_Hug.png'],
+                    ['A0.1V1.0D0.0', 'A0.1V1.0D0.0_Cluck_Norris_of_Hollow_Gold_in_Dad_Fit.png'],
+                    ['A0.1V1.0D0.1', 'A0.1V1.0D0.1_Eggsecutive_of_Questionable_Sovereignty_in_Drafty_Statement.png'],
+                    ['A0.1V1.0D0.2', 'A0.1V1.0D0.2_Dawn_Caller_of_Questionable_Sovereignty_in_Hood_Optional.png'],
+                    ['A0.1V1.0D0.3', 'A0.1V1.0D0.3_Cluck_Norris_from_a_Party_Store_in_Zoo_Chic.png'],
+                    ['A0.1V1.0D0.4', 'A0.1V1.0D0.4_Eggsecutive_of_Questionable_Sovereignty_in_Formal-ish.png'],
+                    ['A0.1V1.0D0.5', 'A0.1V1.0D0.5_Dawn_Caller_of_Hollow_Gold_in_Cow_Adjacent.png'],
+                    ['A0.1V1.0D0.6', 'A0.1V1.0D0.6_Eggsecutive_from_a_Party_Store_in_Faculty_Meeting.png'],
+                    ['A0.1V1.0D0.7', 'A0.1V1.0D0.7_Cluck_Norris_from_a_Party_Store_in_Unsubtle.png'],
+                    ['A0.1V1.0D0.8', 'A0.1V1.0D0.8_Cluck_Norris_of_Hollow_Gold_in_Touch_Me_Not.png'],
+                    ['A0.1V1.0D0.9', 'A0.1V1.0D0.9_Eggsecutive_from_a_Party_Store_in_Sheep_Tax.png'],
+                    ['A0.1V1.0D1.0', 'A0.1V1.0D1.0_Eggsecutive_of_Hollow_Gold_in_Mall_Santa.png'],
+                    ['A0.2V0.0D0.0', 'A0.2V0.0D0.0_Snoop_Pupper_of_Sentiment_in_Dad_Fit.png'],
+                    ['A0.2V0.0D0.1', 'A0.2V0.0D0.1_Snoop_Pupper_of_Quiet_Flex_in_Breathable_Drama.png'],
+                    ['A0.2V0.0D0.2', 'A0.2V0.0D0.2_Snoop_Pupper_of_Quiet_Flex_in_Overinflated_Ego.png'],
+                    ['A0.2V0.0D0.3', 'A0.2V0.0D0.3_Snoop_Pupper_of_Sentiment_in_Shed_Risk.png'],
+                    ['A0.2V0.0D0.4', 'A0.2V0.0D0.4_Snoop_Pupper_of_Sentiment_in_Prom_Night.png'],
+                    ['A0.2V0.0D0.5', 'A0.2V0.0D0.5_Bark_Wahlberg_with_Ancestral_Debt_in_Rebel_Lite.png'],
+                    ['A0.2V0.0D0.6', 'A0.2V0.0D0.6_Snoop_Pupper_with_Ancestral_Debt_in_Grandpa_Energy.png'],
+                    ['A0.2V0.0D0.7', 'A0.2V0.0D0.7_Snoop_Pupper_of_Sentiment_in_Unsubtle.png'],
+                    ['A0.2V0.0D0.8', 'A0.2V0.0D0.8_Bone_Collector_of_Sentiment_in_Theatre_Kid.png'],
+                    ['A0.2V0.0D0.9', 'A0.2V0.0D0.9_Bark_Wahlberg_of_Quiet_Flex_in_Sheep_Tax.png'],
+                    ['A0.2V0.0D1.0', 'A0.2V0.0D1.0_Snoop_Pupper_with_Ancestral_Debt_in_Campfire_Smoke.png'],
+                    ['A0.2V0.1D0.0', 'A0.2V0.1D0.0_Snoop_Pupper_of_Mild_Power_in_Straight_Cut.png'],
+                    ['A0.2V0.1D0.1', 'A0.2V0.1D0.1_Bark_Wahlberg_from_Summer_Camp_in_Breathable_Drama.png'],
+                    ['A0.2V0.1D0.2', 'A0.2V0.1D0.2_Bone_Collector_of_Mild_Power_in_Hood_Optional.png'],
+                    ['A0.2V0.1D0.3', 'A0.2V0.1D0.3_Bone_Collector_of_Mild_Power_in_Pettable_Crime.png'],
+                    ['A0.2V0.1D0.4', 'A0.2V0.1D0.4_Snoop_Pupper_you_Found_on_Etsy_in_Slippery_Deal.png'],
+                    ['A0.2V0.1D0.5', 'A0.2V0.1D0.5_Bone_Collector_of_Mild_Power_in_Cow_Adjacent.png'],
+                    ['A0.2V0.1D0.6', 'A0.2V0.1D0.6_Snoop_Pupper_of_Mild_Power_in_Grandpa_Energy.png'],
+                    ['A0.2V0.1D0.7', 'A0.2V0.1D0.7_Bark_Wahlberg_you_Found_on_Etsy_in_Dance_Floor_Hazard.png'],
+                    ['A0.2V0.1D0.8', 'A0.2V0.1D0.8_Bone_Collector_from_Summer_Camp_in_Lounge_Lizard.png'],
+                    ['A0.2V0.1D0.9', 'A0.2V0.1D0.9_Snoop_Pupper_from_Summer_Camp_in_Sweater_Weather.png'],
+                    ['A0.2V0.1D1.0', 'A0.2V0.1D1.0_Bone_Collector_from_Summer_Camp_in_Mall_Santa.png'],
+                    ['A0.2V0.2D0.0', 'A0.2V0.2D0.0_Snoop_Pupper_that_Smells_Like_Coffee_in_Acid_Wash.png'],
+                    ['A0.2V0.2D0.1', 'A0.2V0.2D0.1_Snoop_Pupper_of_Seasonal_Confusion_in_See-through_Ambition.png'],
+                    ['A0.2V0.2D0.2', 'A0.2V0.2D0.2_Bark_Wahlberg_that_Smells_Like_Coffee_in_Hood_Optional.png'],
+                    ['A0.2V0.2D0.3', 'A0.2V0.2D0.3_Snoop_Pupper_from_Grandma_in_Zoo_Chic.png'],
+                    ['A0.2V0.2D0.4', 'A0.2V0.2D0.4_Bone_Collector_from_Grandma_in_Slippery_Deal.png'],
+                    ['A0.2V0.2D0.5', 'A0.2V0.2D0.5_Snoop_Pupper_of_Seasonal_Confusion_in_Hot_Car_Seat.png'],
+                    ['A0.2V0.2D0.6', 'A0.2V0.2D0.6_Snoop_Pupper_of_Seasonal_Confusion_in_ASMR_Pants.png'],
+                    ['A0.2V0.2D0.7', 'A0.2V0.2D0.7_Snoop_Pupper_of_Seasonal_Confusion_in_Unsubtle.png'],
+                    ['A0.2V0.2D0.8', 'A0.2V0.2D0.8_Bark_Wahlberg_of_Seasonal_Confusion_in_Touch_Me_Not.png'],
+                    ['A0.2V0.2D0.9', 'A0.2V0.2D0.9_Bark_Wahlberg_that_Smells_Like_Coffee_in_Itchy_Decision.png'],
+                    ['A0.2V0.2D1.0', 'A0.2V0.2D1.0_Bone_Collector_that_Smells_Like_Coffee_in_Campfire_Smoke.png'],
+                    ['A0.2V0.3D0.0', 'A0.2V0.3D0.0_Bone_Collector_for_No_Reason_in_Dad_Fit.png'],
+                    ['A0.2V0.3D0.1', 'A0.2V0.3D0.1_Bone_Collector_of_Cloud_Watching_in_See-through_Ambition.png'],
+                    ['A0.2V0.3D0.2', 'A0.2V0.3D0.2_Bark_Wahlberg_for_No_Reason_in_Michelin_Mood.png'],
+                    ['A0.2V0.3D0.3', 'A0.2V0.3D0.3_Bark_Wahlberg_of_Cloud_Watching_in_Pettable_Crime.png'],
+                    ['A0.2V0.3D0.4', 'A0.2V0.3D0.4_Bone_Collector_of_Cloud_Watching_in_Slippery_Deal.png'],
+                    ['A0.2V0.3D0.5', 'A0.2V0.3D0.5_Bark_Wahlberg_of_Deep_Sea_Lies_in_Cow_Adjacent.png'],
+                    ['A0.2V0.3D0.6', 'A0.2V0.3D0.6_Bone_Collector_of_Deep_Sea_Lies_in_Grandpa_Energy.png'],
+                    ['A0.2V0.3D0.7', 'A0.2V0.3D0.7_Bark_Wahlberg_of_Deep_Sea_Lies_in_Dance_Floor_Hazard.png'],
+                    ['A0.2V0.3D0.8', 'A0.2V0.3D0.8_Bark_Wahlberg_for_No_Reason_in_Touch_Me_Not.png'],
+                    ['A0.2V0.3D0.9', 'A0.2V0.3D0.9_Snoop_Pupper_for_No_Reason_in_Itchy_Decision.png'],
+                    ['A0.2V0.3D1.0', 'A0.2V0.3D1.0_Bone_Collector_of_Cloud_Watching_in_Campfire_Smoke.png'],
+                    ['A0.2V0.4D0.0', 'A0.2V0.4D0.0_Snoop_Pupper_from_a_Pawn_Shop_in_Dad_Fit.png'],
+                    ['A0.2V0.4D0.1', 'A0.2V0.4D0.1_Snoop_Pupper_of_Questionable_Origin_in_Breathable_Drama.png'],
+                    ['A0.2V0.4D0.2', 'A0.2V0.4D0.2_Bark_Wahlberg_of_Questionable_Origin_in_Hood_Optional.png'],
+                    ['A0.2V0.4D0.3', 'A0.2V0.4D0.3_Snoop_Pupper_from_a_Pawn_Shop_in_Shed_Risk.png'],
+                    ['A0.2V0.4D0.4', 'A0.2V0.4D0.4_Bone_Collector_from_a_Pawn_Shop_in_Slippery_Deal.png'],
+                    ['A0.2V0.4D0.5', 'A0.2V0.4D0.5_Bark_Wahlberg_of_Questionable_Origin_in_Rebel_Lite.png'],
+                    ['A0.2V0.4D0.6', 'A0.2V0.4D0.6_Bone_Collector_of_Questionable_Origin_in_Grandpa_Energy.png'],
+                    ['A0.2V0.4D0.7', 'A0.2V0.4D0.7_Bone_Collector_with_Crypto_Ambitions_in_Glitter_Debt.png'],
+                    ['A0.2V0.4D0.8', 'A0.2V0.4D0.8_Snoop_Pupper_with_Crypto_Ambitions_in_Theatre_Kid.png'],
+                    ['A0.2V0.4D0.9', 'A0.2V0.4D0.9_Bark_Wahlberg_from_a_Pawn_Shop_in_Sheep_Tax.png'],
+                    ['A0.2V0.4D1.0', 'A0.2V0.4D1.0_Bark_Wahlberg_of_Questionable_Origin_in_Mall_Santa.png'],
+                    ['A0.2V0.5D0.0', 'A0.2V0.5D0.0_Bone_Collector_that_Missed_the_Drop_in_Acid_Wash.png'],
+                    ['A0.2V0.5D0.1', 'A0.2V0.5D0.1_Bark_Wahlberg_from_the_Back_of_a_Trunk_in_Drafty_Statement.png'],
+                    ['A0.2V0.5D0.2', 'A0.2V0.5D0.2_Snoop_Pupper_that_Missed_the_Drop_in_Hood_Optional.png'],
+                    ['A0.2V0.5D0.3', 'A0.2V0.5D0.3_Snoop_Pupper_that_Missed_the_Drop_in_Shed_Risk.png'],
+                    ['A0.2V0.5D0.4', 'A0.2V0.5D0.4_Bark_Wahlberg_from_the_Back_of_a_Trunk_in_Prom_Night.png'],
+                    ['A0.2V0.5D0.5', 'A0.2V0.5D0.5_Bark_Wahlberg_from_the_Back_of_a_Trunk_in_Hot_Car_Seat.png'],
+                    ['A0.2V0.5D0.6', 'A0.2V0.5D0.6_Bark_Wahlberg_that_Missed_the_Drop_in_Faculty_Meeting.png'],
+                    ['A0.2V0.5D0.7', 'A0.2V0.5D0.7_Bark_Wahlberg_from_the_Back_of_a_Trunk_in_Dance_Floor_Hazard.png'],
+                    ['A0.2V0.5D0.8', 'A0.2V0.5D0.8_Snoop_Pupper_from_the_Back_of_a_Trunk_in_Theatre_Kid.png'],
+                    ['A0.2V0.5D0.9', 'A0.2V0.5D0.9_Bone_Collector_that_Missed_the_Drop_in_Sheep_Tax.png'],
+                    ['A0.2V0.5D1.0', 'A0.2V0.5D1.0_Snoop_Pupper_from_the_Back_of_a_Trunk_in_Campfire_Smoke.png'],
+                    ['A0.2V0.6D0.0', 'A0.2V0.6D0.0_Bone_Collector_from_a_Failed_Marathon_in_Acid_Wash.png'],
+                    ['A0.2V0.6D0.1', 'A0.2V0.6D0.1_Bone_Collector_of_Mid_80s_Aerobics_in_Drafty_Statement.png'],
+                    ['A0.2V0.6D0.2', 'A0.2V0.6D0.2_Bark_Wahlberg_of_Sweat_Equity_in_Michelin_Mood.png'],
+                    ['A0.2V0.6D0.3', 'A0.2V0.6D0.3_Snoop_Pupper_of_Mid_80s_Aerobics_in_Zoo_Chic.png'],
+                    ['A0.2V0.6D0.4', 'A0.2V0.6D0.4_Bone_Collector_from_a_Failed_Marathon_in_Slippery_Deal.png'],
+                    ['A0.2V0.6D0.5', 'A0.2V0.6D0.5_Snoop_Pupper_from_a_Failed_Marathon_in_Rebel_Lite.png'],
+                    ['A0.2V0.6D0.6', 'A0.2V0.6D0.6_Snoop_Pupper_of_Sweat_Equity_in_Grandpa_Energy.png'],
+                    ['A0.2V0.6D0.7', 'A0.2V0.6D0.7_Bone_Collector_from_a_Failed_Marathon_in_Dance_Floor_Hazard.png'],
+                    ['A0.2V0.6D0.8', 'A0.2V0.6D0.8_Snoop_Pupper_of_Sweat_Equity_in_Theatre_Kid.png'],
+                    ['A0.2V0.6D0.9', 'A0.2V0.6D0.9_Snoop_Pupper_of_Sweat_Equity_in_Sheep_Tax.png'],
+                    ['A0.2V0.6D1.0', 'A0.2V0.6D1.0_Snoop_Pupper_of_Mid_80s_Aerobics_in_Campfire_Smoke.png'],
+                    ['A0.2V0.7D0.0', 'A0.2V0.7D0.0_Bark_Wahlberg_of_Participation_in_Acid_Wash.png'],
+                    ['A0.2V0.7D0.1', 'A0.2V0.7D0.1_Snoop_Pupper_of_Participation_in_Breathable_Drama.png'],
+                    ['A0.2V0.7D0.2', 'A0.2V0.7D0.2_Bark_Wahlberg_with_Misspelled_Title_in_Overinflated_Ego.png'],
+                    ['A0.2V0.7D0.3', 'A0.2V0.7D0.3_Snoop_Pupper_with_Misspelled_Title_in_Zoo_Chic.png'],
+                    ['A0.2V0.7D0.4', 'A0.2V0.7D0.4_Snoop_Pupper_from_a_Lost_Pageant_in_Prom_Night.png'],
+                    ['A0.2V0.7D0.5', 'A0.2V0.7D0.5_Bone_Collector_with_Misspelled_Title_in_Rebel_Lite.png'],
+                    ['A0.2V0.7D0.6', 'A0.2V0.7D0.6_Bone_Collector_with_Misspelled_Title_in_ASMR_Pants.png'],
+                    ['A0.2V0.7D0.7', 'A0.2V0.7D0.7_Bone_Collector_with_Misspelled_Title_in_Dance_Floor_Hazard.png'],
+                    ['A0.2V0.7D0.8', 'A0.2V0.7D0.8_Bone_Collector_of_Participation_in_Theatre_Kid.png'],
+                    ['A0.2V0.7D0.9', 'A0.2V0.7D0.9_Bone_Collector_of_Participation_in_Itchy_Decision.png'],
+                    ['A0.2V0.7D1.0', 'A0.2V0.7D1.0_Snoop_Pupper_from_a_Lost_Pageant_in_Mall_Santa.png'],
+                    ['A0.2V0.8D0.0', 'A0.2V0.8D0.0_Bark_Wahlberg_from_Camp_Nope_in_Straight_Cut.png'],
+                    ['A0.2V0.8D0.1', 'A0.2V0.8D0.1_Snoop_Pupper_from_Camp_Nope_in_Drafty_Statement.png'],
+                    ['A0.2V0.8D0.2', 'A0.2V0.8D0.2_Snoop_Pupper_from_Camp_Nope_in_Hood_Optional.png'],
+                    ['A0.2V0.8D0.3', 'A0.2V0.8D0.3_Bone_Collector_from_Camp_Nope_in_Pettable_Crime.png'],
+                    ['A0.2V0.8D0.4', 'A0.2V0.8D0.4_Bark_Wahlberg_that_Says_\'Hi\'_in_Prom_Night.png'],
+                    ['A0.2V0.8D0.5', 'A0.2V0.8D0.5_Bark_Wahlberg_that_Says_\'Hi\'_in_Rebel_Lite.png'],
+                    ['A0.2V0.8D0.6', 'A0.2V0.8D0.6_Bark_Wahlberg_from_Camp_Nope_in_Grandpa_Energy.png'],
+                    ['A0.2V0.8D0.7', 'A0.2V0.8D0.7_Bone_Collector_that_Says_\'Hi\'_in_Dance_Floor_Hazard.png'],
+                    ['A0.2V0.8D0.8', 'A0.2V0.8D0.8_Snoop_Pupper_from_Camp_Nope_in_Theatre_Kid.png'],
+                    ['A0.2V0.8D0.9', 'A0.2V0.8D0.9_Bone_Collector_of_Minimal_Authority_in_Sheep_Tax.png'],
+                    ['A0.2V0.8D1.0', 'A0.2V0.8D1.0_Snoop_Pupper_from_Camp_Nope_in_Campfire_Smoke.png'],
+                    ['A0.2V0.9D0.0', 'A0.2V0.9D0.0_Snoop_Pupper_of_Loose_Morals_in_Acid_Wash.png'],
+                    ['A0.2V0.9D0.1', 'A0.2V0.9D0.1_Snoop_Pupper_from_Dad\'s_Closet_in_See-through_Ambition.png'],
+                    ['A0.2V0.9D0.2', 'A0.2V0.9D0.2_Snoop_Pupper_of_Loose_Morals_in_Michelin_Mood.png'],
+                    ['A0.2V0.9D0.3', 'A0.2V0.9D0.3_Bark_Wahlberg_from_Dad\'s_Closet_in_Pettable_Crime.png'],
+                    ['A0.2V0.9D0.4', 'A0.2V0.9D0.4_Bone_Collector_of_Loose_Morals_in_Prom_Night.png'],
+                    ['A0.2V0.9D0.5', 'A0.2V0.9D0.5_Bone_Collector_from_Dad\'s_Closet_in_Rebel_Lite.png'],
+                    ['A0.2V0.9D0.6', 'A0.2V0.9D0.6_Bark_Wahlberg_of_Poor_Fit_in_Grandpa_Energy.png'],
+                    ['A0.2V0.9D0.7', 'A0.2V0.9D0.7_Bone_Collector_of_Loose_Morals_in_Dance_Floor_Hazard.png'],
+                    ['A0.2V0.9D0.8', 'A0.2V0.9D0.8_Snoop_Pupper_of_Poor_Fit_in_Touch_Me_Not.png'],
+                    ['A0.2V0.9D0.9', 'A0.2V0.9D0.9_Bone_Collector_of_Poor_Fit_in_Sheep_Tax.png'],
+                    ['A0.2V0.9D1.0', 'A0.2V0.9D1.0_Bone_Collector_from_Dad\'s_Closet_in_Mall_Santa.png'],
+                    ['A0.2V1.0D0.0', 'A0.2V1.0D0.0_Bark_Wahlberg_of_Hollow_Gold_in_Dad_Fit.png'],
+                    ['A0.2V1.0D0.1', 'A0.2V1.0D0.1_Bark_Wahlberg_from_a_Party_Store_in_Breathable_Drama.png'],
+                    ['A0.2V1.0D0.2', 'A0.2V1.0D0.2_Bark_Wahlberg_of_Hollow_Gold_in_Hood_Optional.png'],
+                    ['A0.2V1.0D0.3', 'A0.2V1.0D0.3_Bark_Wahlberg_from_a_Party_Store_in_Shed_Risk.png'],
+                    ['A0.2V1.0D0.4', 'A0.2V1.0D0.4_Snoop_Pupper_from_a_Party_Store_in_Slippery_Deal.png'],
+                    ['A0.2V1.0D0.5', 'A0.2V1.0D0.5_Bark_Wahlberg_from_a_Party_Store_in_Hot_Car_Seat.png'],
+                    ['A0.2V1.0D0.6', 'A0.2V1.0D0.6_Bone_Collector_of_Hollow_Gold_in_Faculty_Meeting.png'],
+                    ['A0.2V1.0D0.7', 'A0.2V1.0D0.7_Bone_Collector_of_Questionable_Sovereignty_in_Dance_Floor_Hazard.png'],
+                    ['A0.2V1.0D0.8', 'A0.2V1.0D0.8_Bark_Wahlberg_of_Questionable_Sovereignty_in_Lounge_Lizard.png'],
+                    ['A0.2V1.0D0.9', 'A0.2V1.0D0.9_Bark_Wahlberg_of_Hollow_Gold_in_Sheep_Tax.png'],
+                    ['A0.2V1.0D1.0', 'A0.2V1.0D1.0_Snoop_Pupper_of_Hollow_Gold_in_Campfire_Smoke.png'],
+                    ['A0.3V0.0D0.0', 'A0.3V0.0D0.0_Chimp_Spree_of_Sentiment_in_Acid_Wash.png'],
+                    ['A0.3V0.0D0.1', 'A0.3V0.0D0.1_Banana_Liability_of_Sentiment_in_See-through_Ambition.png'],
+                    ['A0.3V0.0D0.2', 'A0.3V0.0D0.2_Chimp_Spree_with_Ancestral_Debt_in_Overinflated_Ego.png'],
+                    ['A0.3V0.0D0.3', 'A0.3V0.0D0.3_Primate_Suspect_of_Quiet_Flex_in_Zoo_Chic.png'],
+                    ['A0.3V0.0D0.4', 'A0.3V0.0D0.4_Chimp_Spree_of_Quiet_Flex_in_Prom_Night.png'],
+                    ['A0.3V0.0D0.5', 'A0.3V0.0D0.5_Chimp_Spree_with_Ancestral_Debt_in_Rebel_Lite.png'],
+                    ['A0.3V0.0D0.6', 'A0.3V0.0D0.6_Primate_Suspect_with_Ancestral_Debt_in_Grandpa_Energy.png'],
+                    ['A0.3V0.0D0.7', 'A0.3V0.0D0.7_Primate_Suspect_of_Sentiment_in_Dance_Floor_Hazard.png'],
+                    ['A0.3V0.0D0.8', 'A0.3V0.0D0.8_Banana_Liability_of_Sentiment_in_Theatre_Kid.png'],
+                    ['A0.3V0.0D0.9', 'A0.3V0.0D0.9_Primate_Suspect_of_Quiet_Flex_in_Sheep_Tax.png'],
+                    ['A0.3V0.0D1.0', 'A0.3V0.0D1.0_Chimp_Spree_of_Quiet_Flex_in_Mall_Santa.png'],
+                    ['A0.3V0.1D0.0', 'A0.3V0.1D0.0_Chimp_Spree_you_Found_on_Etsy_in_Dad_Fit.png'],
+                    ['A0.3V0.1D0.1', 'A0.3V0.1D0.1_Banana_Liability_of_Mild_Power_in_Drafty_Statement.png'],
+                    ['A0.3V0.1D0.2', 'A0.3V0.1D0.2_Banana_Liability_from_Summer_Camp_in_Michelin_Mood.png'],
+                    ['A0.3V0.1D0.3', 'A0.3V0.1D0.3_Primate_Suspect_of_Mild_Power_in_Pettable_Crime.png'],
+                    ['A0.3V0.1D0.4', 'A0.3V0.1D0.4_Primate_Suspect_from_Summer_Camp_in_Slippery_Deal.png'],
+                    ['A0.3V0.1D0.5', 'A0.3V0.1D0.5_Primate_Suspect_from_Summer_Camp_in_Hot_Car_Seat.png'],
+                    ['A0.3V0.1D0.6', 'A0.3V0.1D0.6_Primate_Suspect_from_Summer_Camp_in_Grandpa_Energy.png'],
+                    ['A0.3V0.1D0.7', 'A0.3V0.1D0.7_Primate_Suspect_from_Summer_Camp_in_Dance_Floor_Hazard.png'],
+                    ['A0.3V0.1D0.8', 'A0.3V0.1D0.8_Primate_Suspect_from_Summer_Camp_in_Lounge_Lizard.png'],
+                    ['A0.3V0.1D0.9', 'A0.3V0.1D0.9_Primate_Suspect_you_Found_on_Etsy_in_Sweater_Weather.png'],
+                    ['A0.3V0.1D1.0', 'A0.3V0.1D1.0_Chimp_Spree_you_Found_on_Etsy_in_Mall_Santa.png'],
+                    ['A0.3V0.2D0.0', 'A0.3V0.2D0.0_Banana_Liability_that_Smells_Like_Coffee_in_Dad_Fit.png'],
+                    ['A0.3V0.2D0.1', 'A0.3V0.2D0.1_Banana_Liability_from_Grandma_in_Drafty_Statement.png'],
+                    ['A0.3V0.2D0.2', 'A0.3V0.2D0.2_Primate_Suspect_from_Grandma_in_Overinflated_Ego.png'],
+                    ['A0.3V0.2D0.3', 'A0.3V0.2D0.3_Banana_Liability_from_Grandma_in_Zoo_Chic.png'],
+                    ['A0.3V0.2D0.4', 'A0.3V0.2D0.4_Primate_Suspect_that_Smells_Like_Coffee_in_Slippery_Deal.png'],
+                    ['A0.3V0.2D0.5', 'A0.3V0.2D0.5_Primate_Suspect_that_Smells_Like_Coffee_in_Rebel_Lite.png'],
+                    ['A0.3V0.2D0.6', 'A0.3V0.2D0.6_Banana_Liability_that_Smells_Like_Coffee_in_ASMR_Pants.png'],
+                    ['A0.3V0.2D0.7', 'A0.3V0.2D0.7_Primate_Suspect_that_Smells_Like_Coffee_in_Dance_Floor_Hazard.png'],
+                    ['A0.3V0.2D0.8', 'A0.3V0.2D0.8_Primate_Suspect_that_Smells_Like_Coffee_in_Lounge_Lizard.png'],
+                    ['A0.3V0.2D0.9', 'A0.3V0.2D0.9_Banana_Liability_from_Grandma_in_Sheep_Tax.png'],
+                    ['A0.3V0.2D1.0', 'A0.3V0.2D1.0_Primate_Suspect_from_Grandma_in_Campfire_Smoke.png'],
+                    ['A0.3V0.3D0.0', 'A0.3V0.3D0.0_Primate_Suspect_of_Deep_Sea_Lies_in_Straight_Cut.png'],
+                    ['A0.3V0.3D0.1', 'A0.3V0.3D0.1_Chimp_Spree_of_Deep_Sea_Lies_in_Breathable_Drama.png'],
+                    ['A0.3V0.3D0.2', 'A0.3V0.3D0.2_Banana_Liability_for_No_Reason_in_Hood_Optional.png'],
+                    ['A0.3V0.3D0.3', 'A0.3V0.3D0.3_Banana_Liability_for_No_Reason_in_Shed_Risk.png'],
+                    ['A0.3V0.3D0.4', 'A0.3V0.3D0.4_Banana_Liability_of_Deep_Sea_Lies_in_Formal-ish.png'],
+                    ['A0.3V0.3D0.5', 'A0.3V0.3D0.5_Primate_Suspect_of_Deep_Sea_Lies_in_Rebel_Lite.png'],
+                    ['A0.3V0.3D0.6', 'A0.3V0.3D0.6_Primate_Suspect_of_Deep_Sea_Lies_in_Faculty_Meeting.png'],
+                    ['A0.3V0.3D0.7', 'A0.3V0.3D0.7_Banana_Liability_of_Cloud_Watching_in_Glitter_Debt.png'],
+                    ['A0.3V0.3D0.8', 'A0.3V0.3D0.8_Primate_Suspect_of_Cloud_Watching_in_Lounge_Lizard.png'],
+                    ['A0.3V0.3D0.9', 'A0.3V0.3D0.9_Banana_Liability_for_No_Reason_in_Itchy_Decision.png'],
+                    ['A0.3V0.3D1.0', 'A0.3V0.3D1.0_Primate_Suspect_of_Deep_Sea_Lies_in_Polyester_Hug.png'],
+                    ['A0.3V0.4D0.0', 'A0.3V0.4D0.0_Banana_Liability_from_a_Pawn_Shop_in_Straight_Cut.png'],
+                    ['A0.3V0.4D0.1', 'A0.3V0.4D0.1_Primate_Suspect_with_Crypto_Ambitions_in_Drafty_Statement.png'],
+                    ['A0.3V0.4D0.2', 'A0.3V0.4D0.2_Primate_Suspect_from_a_Pawn_Shop_in_Hood_Optional.png'],
+                    ['A0.3V0.4D0.3', 'A0.3V0.4D0.3_Chimp_Spree_with_Crypto_Ambitions_in_Pettable_Crime.png'],
+                    ['A0.3V0.4D0.4', 'A0.3V0.4D0.4_Primate_Suspect_of_Questionable_Origin_in_Prom_Night.png'],
+                    ['A0.3V0.4D0.5', 'A0.3V0.4D0.5_Banana_Liability_with_Crypto_Ambitions_in_Hot_Car_Seat.png'],
+                    ['A0.3V0.4D0.6', 'A0.3V0.4D0.6_Banana_Liability_with_Crypto_Ambitions_in_Faculty_Meeting.png'],
+                    ['A0.3V0.4D0.7', 'A0.3V0.4D0.7_Banana_Liability_of_Questionable_Origin_in_Unsubtle.png'],
+                    ['A0.3V0.4D0.8', 'A0.3V0.4D0.8_Primate_Suspect_with_Crypto_Ambitions_in_Touch_Me_Not.png'],
+                    ['A0.3V0.4D0.9', 'A0.3V0.4D0.9_Primate_Suspect_from_a_Pawn_Shop_in_Sheep_Tax.png'],
+                    ['A0.3V0.4D1.0', 'A0.3V0.4D1.0_Primate_Suspect_from_a_Pawn_Shop_in_Polyester_Hug.png'],
+                    ['A0.3V0.5D0.0', 'A0.3V0.5D0.0_Banana_Liability_that_Missed_the_Drop_in_Acid_Wash.png'],
+                    ['A0.3V0.5D0.1', 'A0.3V0.5D0.1_Primate_Suspect_with_Street_Regret_in_Breathable_Drama.png'],
+                    ['A0.3V0.5D0.2', 'A0.3V0.5D0.2_Primate_Suspect_from_the_Back_of_a_Trunk_in_Michelin_Mood.png'],
+                    ['A0.3V0.5D0.3', 'A0.3V0.5D0.3_Banana_Liability_with_Street_Regret_in_Shed_Risk.png'],
+                    ['A0.3V0.5D0.4', 'A0.3V0.5D0.4_Banana_Liability_with_Street_Regret_in_Formal-ish.png'],
+                    ['A0.3V0.5D0.5', 'A0.3V0.5D0.5_Banana_Liability_from_the_Back_of_a_Trunk_in_Cow_Adjacent.png'],
+                    ['A0.3V0.5D0.6', 'A0.3V0.5D0.6_Primate_Suspect_from_the_Back_of_a_Trunk_in_ASMR_Pants.png'],
+                    ['A0.3V0.5D0.7', 'A0.3V0.5D0.7_Primate_Suspect_with_Street_Regret_in_Glitter_Debt.png'],
+                    ['A0.3V0.5D0.8', 'A0.3V0.5D0.8_Primate_Suspect_with_Street_Regret_in_Theatre_Kid.png'],
+                    ['A0.3V0.5D0.9', 'A0.3V0.5D0.9_Primate_Suspect_that_Missed_the_Drop_in_Itchy_Decision.png'],
+                    ['A0.3V0.5D1.0', 'A0.3V0.5D1.0_Banana_Liability_from_the_Back_of_a_Trunk_in_Mall_Santa.png'],
+                    ['A0.3V0.6D0.0', 'A0.3V0.6D0.0_Banana_Liability_of_Sweat_Equity_in_Dad_Fit.png'],
+                    ['A0.3V0.6D0.1', 'A0.3V0.6D0.1_Banana_Liability_of_Mid_80s_Aerobics_in_Breathable_Drama.png'],
+                    ['A0.3V0.6D0.2', 'A0.3V0.6D0.2_Banana_Liability_of_Mid_80s_Aerobics_in_Michelin_Mood.png'],
+                    ['A0.3V0.6D0.3', 'A0.3V0.6D0.3_Banana_Liability_of_Mid_80s_Aerobics_in_Shed_Risk.png'],
+                    ['A0.3V0.6D0.4', 'A0.3V0.6D0.4_Chimp_Spree_from_a_Failed_Marathon_in_Slippery_Deal.png'],
+                    ['A0.3V0.6D0.5', 'A0.3V0.6D0.5_Primate_Suspect_of_Mid_80s_Aerobics_in_Rebel_Lite.png'],
+                    ['A0.3V0.6D0.6', 'A0.3V0.6D0.6_Banana_Liability_from_a_Failed_Marathon_in_Grandpa_Energy.png'],
+                    ['A0.3V0.6D0.7', 'A0.3V0.6D0.7_Chimp_Spree_of_Sweat_Equity_in_Glitter_Debt.png'],
+                    ['A0.3V0.6D0.8', 'A0.3V0.6D0.8_Primate_Suspect_of_Mid_80s_Aerobics_in_Touch_Me_Not.png'],
+                    ['A0.3V0.6D0.9', 'A0.3V0.6D0.9_Primate_Suspect_of_Sweat_Equity_in_Sheep_Tax.png'],
+                    ['A0.3V0.6D1.0', 'A0.3V0.6D1.0_Banana_Liability_from_a_Failed_Marathon_in_Mall_Santa.png'],
+                    ['A0.3V0.7D0.0', 'A0.3V0.7D0.0_Chimp_Spree_with_Misspelled_Title_in_Straight_Cut.png'],
+                    ['A0.3V0.7D0.1', 'A0.3V0.7D0.1_Primate_Suspect_of_Participation_in_Breathable_Drama.png'],
+                    ['A0.3V0.7D0.2', 'A0.3V0.7D0.2_Banana_Liability_of_Participation_in_Hood_Optional.png'],
+                    ['A0.3V0.7D0.3', 'A0.3V0.7D0.3_Chimp_Spree_with_Misspelled_Title_in_Shed_Risk.png'],
+                    ['A0.3V0.7D0.4', 'A0.3V0.7D0.4_Primate_Suspect_of_Participation_in_Formal-ish.png'],
+                    ['A0.3V0.7D0.5', 'A0.3V0.7D0.5_Primate_Suspect_of_Participation_in_Hot_Car_Seat.png'],
+                    ['A0.3V0.7D0.6', 'A0.3V0.7D0.6_Primate_Suspect_with_Misspelled_Title_in_Faculty_Meeting.png'],
+                    ['A0.3V0.7D0.7', 'A0.3V0.7D0.7_Primate_Suspect_from_a_Lost_Pageant_in_Dance_Floor_Hazard.png'],
+                    ['A0.3V0.7D0.8', 'A0.3V0.7D0.8_Banana_Liability_of_Participation_in_Lounge_Lizard.png'],
+                    ['A0.3V0.7D0.9', 'A0.3V0.7D0.9_Banana_Liability_with_Misspelled_Title_in_Itchy_Decision.png'],
+                    ['A0.3V0.7D1.0', 'A0.3V0.7D1.0_Chimp_Spree_with_Misspelled_Title_in_Polyester_Hug.png'],
+                    ['A0.3V0.8D0.0', 'A0.3V0.8D0.0_Primate_Suspect_that_Says_\'Hi\'_in_Acid_Wash.png'],
+                    ['A0.3V0.8D0.1', 'A0.3V0.8D0.1_Chimp_Spree_of_Minimal_Authority_in_See-through_Ambition.png'],
+                    ['A0.3V0.8D0.2', 'A0.3V0.8D0.2_Banana_Liability_that_Says_\'Hi\'_in_Michelin_Mood.png'],
+                    ['A0.3V0.8D0.3', 'A0.3V0.8D0.3_Chimp_Spree_from_Camp_Nope_in_Shed_Risk.png'],
+                    ['A0.3V0.8D0.4', 'A0.3V0.8D0.4_Chimp_Spree_of_Minimal_Authority_in_Prom_Night.png'],
+                    ['A0.3V0.8D0.5', 'A0.3V0.8D0.5_Chimp_Spree_from_Camp_Nope_in_Hot_Car_Seat.png'],
+                    ['A0.3V0.8D0.6', 'A0.3V0.8D0.6_Banana_Liability_that_Says_\'Hi\'_in_Grandpa_Energy.png'],
+                    ['A0.3V0.8D0.7', 'A0.3V0.8D0.7_Primate_Suspect_that_Says_\'Hi\'_in_Unsubtle.png'],
+                    ['A0.3V0.8D0.8', 'A0.3V0.8D0.8_Primate_Suspect_from_Camp_Nope_in_Theatre_Kid.png'],
+                    ['A0.3V0.8D0.9', 'A0.3V0.8D0.9_Banana_Liability_from_Camp_Nope_in_Sheep_Tax.png'],
+                    ['A0.3V0.8D1.0', 'A0.3V0.8D1.0_Banana_Liability_from_Camp_Nope_in_Campfire_Smoke.png'],
+                    ['A0.3V0.9D0.0', 'A0.3V0.9D0.0_Banana_Liability_from_Dad\'s_Closet_in_Straight_Cut.png'],
+                    ['A0.3V0.9D0.1', 'A0.3V0.9D0.1_Chimp_Spree_from_Dad\'s_Closet_in_See-through_Ambition.png'],
+                    ['A0.3V0.9D0.2', 'A0.3V0.9D0.2_Chimp_Spree_of_Poor_Fit_in_Michelin_Mood.png'],
+                    ['A0.3V0.9D0.3', 'A0.3V0.9D0.3_Primate_Suspect_of_Poor_Fit_in_Zoo_Chic.png'],
+                    ['A0.3V0.9D0.4', 'A0.3V0.9D0.4_Banana_Liability_of_Poor_Fit_in_Slippery_Deal.png'],
+                    ['A0.3V0.9D0.5', 'A0.3V0.9D0.5_Primate_Suspect_from_Dad\'s_Closet_in_Cow_Adjacent.png'],
+                    ['A0.3V0.9D0.6', 'A0.3V0.9D0.6_Primate_Suspect_from_Dad\'s_Closet_in_Grandpa_Energy.png'],
+                    ['A0.3V0.9D0.7', 'A0.3V0.9D0.7_Chimp_Spree_from_Dad\'s_Closet_in_Unsubtle.png'],
+                    ['A0.3V0.9D0.8', 'A0.3V0.9D0.8_Banana_Liability_from_Dad\'s_Closet_in_Touch_Me_Not.png'],
+                    ['A0.3V0.9D0.9', 'A0.3V0.9D0.9_Primate_Suspect_from_Dad\'s_Closet_in_Itchy_Decision.png'],
+                    ['A0.3V0.9D1.0', 'A0.3V0.9D1.0_Chimp_Spree_from_Dad\'s_Closet_in_Campfire_Smoke.png'],
+                    ['A0.3V1.0D0.0', 'A0.3V1.0D0.0_Banana_Liability_of_Hollow_Gold_in_Straight_Cut.png'],
+                    ['A0.3V1.0D0.1', 'A0.3V1.0D0.1_Banana_Liability_from_a_Party_Store_in_Breathable_Drama.png'],
+                    ['A0.3V1.0D0.2', 'A0.3V1.0D0.2_Chimp_Spree_of_Questionable_Sovereignty_in_Hood_Optional.png'],
+                    ['A0.3V1.0D0.3', 'A0.3V1.0D0.3_Chimp_Spree_of_Questionable_Sovereignty_in_Shed_Risk.png'],
+                    ['A0.3V1.0D0.4', 'A0.3V1.0D0.4_Primate_Suspect_from_a_Party_Store_in_Slippery_Deal.png'],
+                    ['A0.3V1.0D0.5', 'A0.3V1.0D0.5_Primate_Suspect_of_Questionable_Sovereignty_in_Cow_Adjacent.png'],
+                    ['A0.3V1.0D0.6', 'A0.3V1.0D0.6_Chimp_Spree_from_a_Party_Store_in_Grandpa_Energy.png'],
+                    ['A0.3V1.0D0.7', 'A0.3V1.0D0.7_Chimp_Spree_of_Hollow_Gold_in_Unsubtle.png'],
+                    ['A0.3V1.0D0.8', 'A0.3V1.0D0.8_Banana_Liability_from_a_Party_Store_in_Lounge_Lizard.png'],
+                    ['A0.3V1.0D0.9', 'A0.3V1.0D0.9_Banana_Liability_of_Questionable_Sovereignty_in_Sheep_Tax.png'],
+                    ['A0.3V1.0D1.0', 'A0.3V1.0D1.0_Primate_Suspect_of_Hollow_Gold_in_Mall_Santa.png'],
+                    ['A0.4V0.0D0.0', 'A0.4V0.0D0.0_Big_Cat_Energy_of_Quiet_Flex_in_Dad_Fit.png'],
+                    ['A0.4V0.0D0.1', 'A0.4V0.0D0.1_Tony\'s_Cousin_of_Sentiment_in_Breathable_Drama.png'],
+                    ['A0.4V0.0D0.2', 'A0.4V0.0D0.2_Stripe_Tax_of_Sentiment_in_Hood_Optional.png'],
+                    ['A0.4V0.0D0.3', 'A0.4V0.0D0.3_Big_Cat_Energy_with_Ancestral_Debt_in_Pettable_Crime.png'],
+                    ['A0.4V0.0D0.4', 'A0.4V0.0D0.4_Tony\'s_Cousin_of_Sentiment_in_Prom_Night.png'],
+                    ['A0.4V0.0D0.5', 'A0.4V0.0D0.5_Tony\'s_Cousin_of_Sentiment_in_Hot_Car_Seat.png'],
+                    ['A0.4V0.0D0.6', 'A0.4V0.0D0.6_Big_Cat_Energy_of_Sentiment_in_Grandpa_Energy.png'],
+                    ['A0.4V0.0D0.7', 'A0.4V0.0D0.7_Big_Cat_Energy_of_Quiet_Flex_in_Dance_Floor_Hazard.png'],
+                    ['A0.4V0.0D0.8', 'A0.4V0.0D0.8_Stripe_Tax_of_Sentiment_in_Touch_Me_Not.png'],
+                    ['A0.4V0.0D0.9', 'A0.4V0.0D0.9_Big_Cat_Energy_with_Ancestral_Debt_in_Sheep_Tax.png'],
+                    ['A0.4V0.0D1.0', 'A0.4V0.0D1.0_Tony\'s_Cousin_of_Quiet_Flex_in_Mall_Santa.png'],
+                    ['A0.4V0.1D0.0', 'A0.4V0.1D0.0_Stripe_Tax_you_Found_on_Etsy_in_Acid_Wash.png'],
+                    ['A0.4V0.1D0.1', 'A0.4V0.1D0.1_Tony\'s_Cousin_from_Summer_Camp_in_See-through_Ambition.png'],
+                    ['A0.4V0.1D0.2', 'A0.4V0.1D0.2_Tony\'s_Cousin_of_Mild_Power_in_Michelin_Mood.png'],
+                    ['A0.4V0.1D0.3', 'A0.4V0.1D0.3_Tony\'s_Cousin_of_Mild_Power_in_Shed_Risk.png'],
+                    ['A0.4V0.1D0.4', 'A0.4V0.1D0.4_Tony\'s_Cousin_you_Found_on_Etsy_in_Slippery_Deal.png'],
+                    ['A0.4V0.1D0.5', 'A0.4V0.1D0.5_Stripe_Tax_from_Summer_Camp_in_Rebel_Lite.png'],
+                    ['A0.4V0.1D0.6', 'A0.4V0.1D0.6_Tony\'s_Cousin_you_Found_on_Etsy_in_Grandpa_Energy.png'],
+                    ['A0.4V0.1D0.7', 'A0.4V0.1D0.7_Tony\'s_Cousin_from_Summer_Camp_in_Glitter_Debt.png'],
+                    ['A0.4V0.1D0.8', 'A0.4V0.1D0.8_Big_Cat_Energy_you_Found_on_Etsy_in_Touch_Me_Not.png'],
+                    ['A0.4V0.1D0.9', 'A0.4V0.1D0.9_Stripe_Tax_you_Found_on_Etsy_in_Itchy_Decision.png'],
+                    ['A0.4V0.1D1.0', 'A0.4V0.1D1.0_Stripe_Tax_you_Found_on_Etsy_in_Mall_Santa.png'],
+                    ['A0.4V0.2D0.0', 'A0.4V0.2D0.0_Big_Cat_Energy_of_Seasonal_Confusion_in_Acid_Wash.png'],
+                    ['A0.4V0.2D0.1', 'A0.4V0.2D0.1_Big_Cat_Energy_from_Grandma_in_Breathable_Drama.png'],
+                    ['A0.4V0.2D0.2', 'A0.4V0.2D0.2_Tony\'s_Cousin_that_Smells_Like_Coffee_in_Michelin_Mood.png'],
+                    ['A0.4V0.2D0.3', 'A0.4V0.2D0.3_Tony\'s_Cousin_that_Smells_Like_Coffee_in_Zoo_Chic.png'],
+                    ['A0.4V0.2D0.4', 'A0.4V0.2D0.4_Stripe_Tax_from_Grandma_in_Formal-ish.png'],
+                    ['A0.4V0.2D0.5', 'A0.4V0.2D0.5_Tony\'s_Cousin_that_Smells_Like_Coffee_in_Cow_Adjacent.png'],
+                    ['A0.4V0.2D0.6', 'A0.4V0.2D0.6_Stripe_Tax_from_Grandma_in_ASMR_Pants.png'],
+                    ['A0.4V0.2D0.7', 'A0.4V0.2D0.7_Tony\'s_Cousin_of_Seasonal_Confusion_in_Glitter_Debt.png'],
+                    ['A0.4V0.2D0.8', 'A0.4V0.2D0.8_Stripe_Tax_of_Seasonal_Confusion_in_Lounge_Lizard.png'],
+                    ['A0.4V0.2D0.9', 'A0.4V0.2D0.9_Big_Cat_Energy_that_Smells_Like_Coffee_in_Itchy_Decision.png'],
+                    ['A0.4V0.2D1.0', 'A0.4V0.2D1.0_Stripe_Tax_from_Grandma_in_Polyester_Hug.png'],
+                    ['A0.4V0.3D0.0', 'A0.4V0.3D0.0_Tony\'s_Cousin_of_Cloud_Watching_in_Acid_Wash.png'],
+                    ['A0.4V0.3D0.1', 'A0.4V0.3D0.1_Tony\'s_Cousin_for_No_Reason_in_See-through_Ambition.png'],
+                    ['A0.4V0.3D0.2', 'A0.4V0.3D0.2_Stripe_Tax_of_Cloud_Watching_in_Hood_Optional.png'],
+                    ['A0.4V0.3D0.3', 'A0.4V0.3D0.3_Stripe_Tax_of_Deep_Sea_Lies_in_Zoo_Chic.png'],
+                    ['A0.4V0.3D0.4', 'A0.4V0.3D0.4_Big_Cat_Energy_of_Deep_Sea_Lies_in_Prom_Night.png'],
+                    ['A0.4V0.3D0.5', 'A0.4V0.3D0.5_Tony\'s_Cousin_of_Cloud_Watching_in_Hot_Car_Seat.png'],
+                    ['A0.4V0.3D0.6', 'A0.4V0.3D0.6_Tony\'s_Cousin_of_Cloud_Watching_in_ASMR_Pants.png'],
+                    ['A0.4V0.3D0.7', 'A0.4V0.3D0.7_Tony\'s_Cousin_for_No_Reason_in_Unsubtle.png'],
+                    ['A0.4V0.3D0.8', 'A0.4V0.3D0.8_Big_Cat_Energy_of_Deep_Sea_Lies_in_Theatre_Kid.png'],
+                    ['A0.4V0.3D0.9', 'A0.4V0.3D0.9_Big_Cat_Energy_of_Deep_Sea_Lies_in_Sheep_Tax.png'],
+                    ['A0.4V0.3D1.0', 'A0.4V0.3D1.0_Tony\'s_Cousin_of_Deep_Sea_Lies_in_Campfire_Smoke.png'],
+                    ['A0.4V0.4D0.0', 'A0.4V0.4D0.0_Tony\'s_Cousin_of_Questionable_Origin_in_Acid_Wash.png'],
+                    ['A0.4V0.4D0.1', 'A0.4V0.4D0.1_Stripe_Tax_from_a_Pawn_Shop_in_Breathable_Drama.png'],
+                    ['A0.4V0.4D0.2', 'A0.4V0.4D0.2_Stripe_Tax_with_Crypto_Ambitions_in_Hood_Optional.png'],
+                    ['A0.4V0.4D0.3', 'A0.4V0.4D0.3_Stripe_Tax_of_Questionable_Origin_in_Shed_Risk.png'],
+                    ['A0.4V0.4D0.4', 'A0.4V0.4D0.4_Tony\'s_Cousin_from_a_Pawn_Shop_in_Prom_Night.png'],
+                    ['A0.4V0.4D0.5', 'A0.4V0.4D0.5_Tony\'s_Cousin_with_Crypto_Ambitions_in_Cow_Adjacent.png'],
+                    ['A0.4V0.4D0.6', 'A0.4V0.4D0.6_Big_Cat_Energy_from_a_Pawn_Shop_in_ASMR_Pants.png'],
+                    ['A0.4V0.4D0.7', 'A0.4V0.4D0.7_Stripe_Tax_from_a_Pawn_Shop_in_Glitter_Debt.png'],
+                    ['A0.4V0.4D0.8', 'A0.4V0.4D0.8_Tony\'s_Cousin_with_Crypto_Ambitions_in_Lounge_Lizard.png'],
+                    ['A0.4V0.4D0.9', 'A0.4V0.4D0.9_Tony\'s_Cousin_from_a_Pawn_Shop_in_Sweater_Weather.png'],
+                    ['A0.4V0.4D1.0', 'A0.4V0.4D1.0_Stripe_Tax_from_a_Pawn_Shop_in_Polyester_Hug.png'],
+                    ['A0.4V0.5D0.0', 'A0.4V0.5D0.0_Big_Cat_Energy_with_Street_Regret_in_Dad_Fit.png'],
+                    ['A0.4V0.5D0.1', 'A0.4V0.5D0.1_Big_Cat_Energy_that_Missed_the_Drop_in_Drafty_Statement.png'],
+                    ['A0.4V0.5D0.2', 'A0.4V0.5D0.2_Tony\'s_Cousin_that_Missed_the_Drop_in_Overinflated_Ego.png'],
+                    ['A0.4V0.5D0.3', 'A0.4V0.5D0.3_Big_Cat_Energy_from_the_Back_of_a_Trunk_in_Pettable_Crime.png'],
+                    ['A0.4V0.5D0.4', 'A0.4V0.5D0.4_Tony\'s_Cousin_that_Missed_the_Drop_in_Prom_Night.png'],
+                    ['A0.4V0.5D0.5', 'A0.4V0.5D0.5_Stripe_Tax_with_Street_Regret_in_Cow_Adjacent.png'],
+                    ['A0.4V0.5D0.6', 'A0.4V0.5D0.6_Stripe_Tax_from_the_Back_of_a_Trunk_in_ASMR_Pants.png'],
+                    ['A0.4V0.5D0.7', 'A0.4V0.5D0.7_Stripe_Tax_that_Missed_the_Drop_in_Unsubtle.png'],
+                    ['A0.4V0.5D0.8', 'A0.4V0.5D0.8_Big_Cat_Energy_from_the_Back_of_a_Trunk_in_Theatre_Kid.png'],
+                    ['A0.4V0.5D0.9', 'A0.4V0.5D0.9_Stripe_Tax_with_Street_Regret_in_Sheep_Tax.png'],
+                    ['A0.4V0.5D1.0', 'A0.4V0.5D1.0_Tony\'s_Cousin_that_Missed_the_Drop_in_Mall_Santa.png'],
+                    ['A0.4V0.6D0.0', 'A0.4V0.6D0.0_Big_Cat_Energy_from_a_Failed_Marathon_in_Straight_Cut.png'],
+                    ['A0.4V0.6D0.1', 'A0.4V0.6D0.1_Stripe_Tax_of_Sweat_Equity_in_Drafty_Statement.png'],
+                    ['A0.4V0.6D0.2', 'A0.4V0.6D0.2_Stripe_Tax_of_Sweat_Equity_in_Overinflated_Ego.png'],
+                    ['A0.4V0.6D0.3', 'A0.4V0.6D0.3_Tony\'s_Cousin_of_Sweat_Equity_in_Zoo_Chic.png'],
+                    ['A0.4V0.6D0.4', 'A0.4V0.6D0.4_Stripe_Tax_from_a_Failed_Marathon_in_Prom_Night.png'],
+                    ['A0.4V0.6D0.5', 'A0.4V0.6D0.5_Big_Cat_Energy_of_Sweat_Equity_in_Cow_Adjacent.png'],
+                    ['A0.4V0.6D0.6', 'A0.4V0.6D0.6_Big_Cat_Energy_from_a_Failed_Marathon_in_Faculty_Meeting.png'],
+                    ['A0.4V0.6D0.7', 'A0.4V0.6D0.7_Big_Cat_Energy_from_a_Failed_Marathon_in_Dance_Floor_Hazard.png'],
+                    ['A0.4V0.6D0.8', 'A0.4V0.6D0.8_Tony\'s_Cousin_of_Mid_80s_Aerobics_in_Theatre_Kid.png'],
+                    ['A0.4V0.6D0.9', 'A0.4V0.6D0.9_Stripe_Tax_of_Mid_80s_Aerobics_in_Sheep_Tax.png'],
+                    ['A0.4V0.6D1.0', 'A0.4V0.6D1.0_Stripe_Tax_of_Sweat_Equity_in_Polyester_Hug.png'],
+                    ['A0.4V0.7D0.0', 'A0.4V0.7D0.0_Tony\'s_Cousin_from_a_Lost_Pageant_in_Straight_Cut.png'],
+                    ['A0.4V0.7D0.1', 'A0.4V0.7D0.1_Stripe_Tax_of_Participation_in_Breathable_Drama.png'],
+                    ['A0.4V0.7D0.2', 'A0.4V0.7D0.2_Big_Cat_Energy_from_a_Lost_Pageant_in_Hood_Optional.png'],
+                    ['A0.4V0.7D0.3', 'A0.4V0.7D0.3_Stripe_Tax_with_Misspelled_Title_in_Pettable_Crime.png'],
+                    ['A0.4V0.7D0.4', 'A0.4V0.7D0.4_Tony\'s_Cousin_of_Participation_in_Formal-ish.png'],
+                    ['A0.4V0.7D0.5', 'A0.4V0.7D0.5_Stripe_Tax_from_a_Lost_Pageant_in_Rebel_Lite.png'],
+                    ['A0.4V0.7D0.6', 'A0.4V0.7D0.6_Tony\'s_Cousin_of_Participation_in_ASMR_Pants.png'],
+                    ['A0.4V0.7D0.7', 'A0.4V0.7D0.7_Stripe_Tax_of_Participation_in_Unsubtle.png'],
+                    ['A0.4V0.7D0.8', 'A0.4V0.7D0.8_Tony\'s_Cousin_of_Participation_in_Touch_Me_Not.png'],
+                    ['A0.4V0.7D0.9', 'A0.4V0.7D0.9_Big_Cat_Energy_of_Participation_in_Sweater_Weather.png'],
+                    ['A0.4V0.7D1.0', 'A0.4V0.7D1.0_Tony\'s_Cousin_from_a_Lost_Pageant_in_Mall_Santa.png'],
+                    ['A0.4V0.8D0.0', 'A0.4V0.8D0.0_Stripe_Tax_from_Camp_Nope_in_Straight_Cut.png'],
+                    ['A0.4V0.8D0.1', 'A0.4V0.8D0.1_Big_Cat_Energy_from_Camp_Nope_in_Breathable_Drama.png'],
+                    ['A0.4V0.8D0.2', 'A0.4V0.8D0.2_Big_Cat_Energy_from_Camp_Nope_in_Hood_Optional.png'],
+                    ['A0.4V0.8D0.3', 'A0.4V0.8D0.3_Big_Cat_Energy_that_Says_\'Hi\'_in_Shed_Risk.png'],
+                    ['A0.4V0.8D0.4', 'A0.4V0.8D0.4_Big_Cat_Energy_from_Camp_Nope_in_Slippery_Deal.png'],
+                    ['A0.4V0.8D0.5', 'A0.4V0.8D0.5_Big_Cat_Energy_from_Camp_Nope_in_Rebel_Lite.png'],
+                    ['A0.4V0.8D0.6', 'A0.4V0.8D0.6_Stripe_Tax_of_Minimal_Authority_in_ASMR_Pants.png'],
+                    ['A0.4V0.8D0.7', 'A0.4V0.8D0.7_Stripe_Tax_of_Minimal_Authority_in_Glitter_Debt.png'],
+                    ['A0.4V0.8D0.8', 'A0.4V0.8D0.8_Big_Cat_Energy_that_Says_\'Hi\'_in_Touch_Me_Not.png'],
+                    ['A0.4V0.8D0.9', 'A0.4V0.8D0.9_Stripe_Tax_that_Says_\'Hi\'_in_Itchy_Decision.png'],
+                    ['A0.4V0.8D1.0', 'A0.4V0.8D1.0_Big_Cat_Energy_of_Minimal_Authority_in_Polyester_Hug.png'],
+                    ['A0.4V0.9D0.0', 'A0.4V0.9D0.0_Stripe_Tax_from_Dad\'s_Closet_in_Straight_Cut.png'],
+                    ['A0.4V0.9D0.1', 'A0.4V0.9D0.1_Big_Cat_Energy_from_Dad\'s_Closet_in_See-through_Ambition.png'],
+                    ['A0.4V0.9D0.2', 'A0.4V0.9D0.2_Tony\'s_Cousin_of_Poor_Fit_in_Michelin_Mood.png'],
+                    ['A0.4V0.9D0.3', 'A0.4V0.9D0.3_Stripe_Tax_from_Dad\'s_Closet_in_Pettable_Crime.png'],
+                    ['A0.4V0.9D0.4', 'A0.4V0.9D0.4_Big_Cat_Energy_of_Loose_Morals_in_Formal-ish.png'],
+                    ['A0.4V0.9D0.5', 'A0.4V0.9D0.5_Stripe_Tax_from_Dad\'s_Closet_in_Hot_Car_Seat.png'],
+                    ['A0.4V0.9D0.6', 'A0.4V0.9D0.6_Stripe_Tax_of_Poor_Fit_in_ASMR_Pants.png'],
+                    ['A0.4V0.9D0.7', 'A0.4V0.9D0.7_Stripe_Tax_of_Poor_Fit_in_Glitter_Debt.png'],
+                    ['A0.4V0.9D0.8', 'A0.4V0.9D0.8_Big_Cat_Energy_from_Dad\'s_Closet_in_Lounge_Lizard.png'],
+                    ['A0.4V0.9D0.9', 'A0.4V0.9D0.9_Tony\'s_Cousin_from_Dad\'s_Closet_in_Sweater_Weather.png'],
+                    ['A0.4V0.9D1.0', 'A0.4V0.9D1.0_Stripe_Tax_from_Dad\'s_Closet_in_Mall_Santa.png'],
+                    ['A0.4V1.0D0.0', 'A0.4V1.0D0.0_Tony\'s_Cousin_of_Hollow_Gold_in_Acid_Wash.png'],
+                    ['A0.4V1.0D0.1', 'A0.4V1.0D0.1_Big_Cat_Energy_from_a_Party_Store_in_Drafty_Statement.png'],
+                    ['A0.4V1.0D0.2', 'A0.4V1.0D0.2_Big_Cat_Energy_of_Hollow_Gold_in_Michelin_Mood.png'],
+                    ['A0.4V1.0D0.3', 'A0.4V1.0D0.3_Tony\'s_Cousin_of_Questionable_Sovereignty_in_Pettable_Crime.png'],
+                    ['A0.4V1.0D0.4', 'A0.4V1.0D0.4_Stripe_Tax_of_Questionable_Sovereignty_in_Formal-ish.png'],
+                    ['A0.4V1.0D0.5', 'A0.4V1.0D0.5_Stripe_Tax_from_a_Party_Store_in_Hot_Car_Seat.png'],
+                    ['A0.4V1.0D0.6', 'A0.4V1.0D0.6_Tony\'s_Cousin_from_a_Party_Store_in_ASMR_Pants.png'],
+                    ['A0.4V1.0D0.7', 'A0.4V1.0D0.7_Tony\'s_Cousin_from_a_Party_Store_in_Glitter_Debt.png'],
+                    ['A0.4V1.0D0.8', 'A0.4V1.0D0.8_Big_Cat_Energy_of_Hollow_Gold_in_Touch_Me_Not.png'],
+                    ['A0.4V1.0D0.9', 'A0.4V1.0D0.9_Big_Cat_Energy_of_Hollow_Gold_in_Itchy_Decision.png'],
+                    ['A0.4V1.0D1.0', 'A0.4V1.0D1.0_Tony\'s_Cousin_of_Questionable_Sovereignty_in_Campfire_Smoke.png'],
+                    ['A0.5V0.0D0.0', 'A0.5V0.0D0.0_Mildly_Mythical_of_Sentiment_in_Straight_Cut.png'],
+                    ['A0.5V0.0D0.1', 'A0.5V0.0D0.1_Smaug\'s_Intern_of_Sentiment_in_See-through_Ambition.png'],
+                    ['A0.5V0.0D0.2', 'A0.5V0.0D0.2_Winged_Rumor_of_Quiet_Flex_in_Overinflated_Ego.png'],
+                    ['A0.5V0.0D0.3', 'A0.5V0.0D0.3_Smaug\'s_Intern_of_Quiet_Flex_in_Shed_Risk.png'],
+                    ['A0.5V0.0D0.4', 'A0.5V0.0D0.4_Mildly_Mythical_with_Ancestral_Debt_in_Prom_Night.png'],
+                    ['A0.5V0.0D0.5', 'A0.5V0.0D0.5_Winged_Rumor_of_Sentiment_in_Hot_Car_Seat.png'],
+                    ['A0.5V0.0D0.6', 'A0.5V0.0D0.6_Winged_Rumor_of_Quiet_Flex_in_Grandpa_Energy.png'],
+                    ['A0.5V0.0D0.7', 'A0.5V0.0D0.7_Smaug\'s_Intern_of_Sentiment_in_Unsubtle.png'],
+                    ['A0.5V0.0D0.8', 'A0.5V0.0D0.8_Winged_Rumor_of_Sentiment_in_Touch_Me_Not.png'],
+                    ['A0.5V0.0D0.9', 'A0.5V0.0D0.9_Smaug\'s_Intern_of_Sentiment_in_Itchy_Decision.png'],
+                    ['A0.5V0.0D1.0', 'A0.5V0.0D1.0_Winged_Rumor_of_Sentiment_in_Campfire_Smoke.png'],
+                    ['A0.5V0.1D0.0', 'A0.5V0.1D0.0_Smaug\'s_Intern_of_Mild_Power_in_Dad_Fit.png'],
+                    ['A0.5V0.1D0.1', 'A0.5V0.1D0.1_Smaug\'s_Intern_you_Found_on_Etsy_in_Breathable_Drama.png'],
+                    ['A0.5V0.1D0.2', 'A0.5V0.1D0.2_Smaug\'s_Intern_of_Mild_Power_in_Michelin_Mood.png'],
+                    ['A0.5V0.1D0.3', 'A0.5V0.1D0.3_Mildly_Mythical_from_Summer_Camp_in_Shed_Risk.png'],
+                    ['A0.5V0.1D0.4', 'A0.5V0.1D0.4_Winged_Rumor_of_Mild_Power_in_Prom_Night.png'],
+                    ['A0.5V0.1D0.5', 'A0.5V0.1D0.5_Mildly_Mythical_of_Mild_Power_in_Rebel_Lite.png'],
+                    ['A0.5V0.1D0.6', 'A0.5V0.1D0.6_Mildly_Mythical_from_Summer_Camp_in_ASMR_Pants.png'],
+                    ['A0.5V0.1D0.7', 'A0.5V0.1D0.7_Mildly_Mythical_from_Summer_Camp_in_Dance_Floor_Hazard.png'],
+                    ['A0.5V0.1D0.8', 'A0.5V0.1D0.8_Mildly_Mythical_you_Found_on_Etsy_in_Touch_Me_Not.png'],
+                    ['A0.5V0.1D0.9', 'A0.5V0.1D0.9_Mildly_Mythical_you_Found_on_Etsy_in_Sheep_Tax.png'],
+                    ['A0.5V0.1D1.0', 'A0.5V0.1D1.0_Smaug\'s_Intern_of_Mild_Power_in_Polyester_Hug.png'],
+                    ['A0.5V0.2D0.0', 'A0.5V0.2D0.0_Mildly_Mythical_that_Smells_Like_Coffee_in_Straight_Cut.png'],
+                    ['A0.5V0.2D0.1', 'A0.5V0.2D0.1_Mildly_Mythical_of_Seasonal_Confusion_in_See-through_Ambition.png'],
+                    ['A0.5V0.2D0.2', 'A0.5V0.2D0.2_Smaug\'s_Intern_of_Seasonal_Confusion_in_Michelin_Mood.png'],
+                    ['A0.5V0.2D0.3', 'A0.5V0.2D0.3_Winged_Rumor_from_Grandma_in_Shed_Risk.png'],
+                    ['A0.5V0.2D0.4', 'A0.5V0.2D0.4_Smaug\'s_Intern_from_Grandma_in_Prom_Night.png'],
+                    ['A0.5V0.2D0.5', 'A0.5V0.2D0.5_Smaug\'s_Intern_that_Smells_Like_Coffee_in_Cow_Adjacent.png'],
+                    ['A0.5V0.2D0.6', 'A0.5V0.2D0.6_Smaug\'s_Intern_from_Grandma_in_ASMR_Pants.png'],
+                    ['A0.5V0.2D0.7', 'A0.5V0.2D0.7_Smaug\'s_Intern_that_Smells_Like_Coffee_in_Glitter_Debt.png'],
+                    ['A0.5V0.2D0.8', 'A0.5V0.2D0.8_Mildly_Mythical_of_Seasonal_Confusion_in_Touch_Me_Not.png'],
+                    ['A0.5V0.2D0.9', 'A0.5V0.2D0.9_Winged_Rumor_from_Grandma_in_Itchy_Decision.png'],
+                    ['A0.5V0.2D1.0', 'A0.5V0.2D1.0_Winged_Rumor_from_Grandma_in_Polyester_Hug.png'],
+                    ['A0.5V0.3D0.0', 'A0.5V0.3D0.0_Mildly_Mythical_of_Cloud_Watching_in_Straight_Cut.png'],
+                    ['A0.5V0.3D0.1', 'A0.5V0.3D0.1_Mildly_Mythical_of_Deep_Sea_Lies_in_Breathable_Drama.png'],
+                    ['A0.5V0.3D0.2', 'A0.5V0.3D0.2_Mildly_Mythical_for_No_Reason_in_Overinflated_Ego.png'],
+                    ['A0.5V0.3D0.3', 'A0.5V0.3D0.3_Smaug\'s_Intern_of_Cloud_Watching_in_Shed_Risk.png'],
+                    ['A0.5V0.3D0.4', 'A0.5V0.3D0.4_Mildly_Mythical_for_No_Reason_in_Prom_Night.png'],
+                    ['A0.5V0.3D0.5', 'A0.5V0.3D0.5_Winged_Rumor_for_No_Reason_in_Rebel_Lite.png'],
+                    ['A0.5V0.3D0.6', 'A0.5V0.3D0.6_Smaug\'s_Intern_of_Cloud_Watching_in_Faculty_Meeting.png'],
+                    ['A0.5V0.3D0.7', 'A0.5V0.3D0.7_Mildly_Mythical_of_Deep_Sea_Lies_in_Dance_Floor_Hazard.png'],
+                    ['A0.5V0.3D0.8', 'A0.5V0.3D0.8_Winged_Rumor_of_Deep_Sea_Lies_in_Lounge_Lizard.png'],
+                    ['A0.5V0.3D0.9', 'A0.5V0.3D0.9_Smaug\'s_Intern_of_Deep_Sea_Lies_in_Itchy_Decision.png'],
+                    ['A0.5V0.3D1.0', 'A0.5V0.3D1.0_Mildly_Mythical_of_Deep_Sea_Lies_in_Mall_Santa.png'],
+                    ['A0.5V0.4D0.0', 'A0.5V0.4D0.0_Smaug\'s_Intern_from_a_Pawn_Shop_in_Dad_Fit.png'],
+                    ['A0.5V0.4D0.1', 'A0.5V0.4D0.1_Smaug\'s_Intern_with_Crypto_Ambitions_in_Drafty_Statement.png'],
+                    ['A0.5V0.4D0.2', 'A0.5V0.4D0.2_Mildly_Mythical_from_a_Pawn_Shop_in_Overinflated_Ego.png'],
+                    ['A0.5V0.4D0.3', 'A0.5V0.4D0.3_Smaug\'s_Intern_of_Questionable_Origin_in_Shed_Risk.png'],
+                    ['A0.5V0.4D0.4', 'A0.5V0.4D0.4_Winged_Rumor_with_Crypto_Ambitions_in_Formal-ish.png'],
+                    ['A0.5V0.4D0.5', 'A0.5V0.4D0.5_Winged_Rumor_from_a_Pawn_Shop_in_Rebel_Lite.png'],
+                    ['A0.5V0.4D0.6', 'A0.5V0.4D0.6_Smaug\'s_Intern_of_Questionable_Origin_in_Grandpa_Energy.png'],
+                    ['A0.5V0.4D0.7', 'A0.5V0.4D0.7_Smaug\'s_Intern_of_Questionable_Origin_in_Unsubtle.png'],
+                    ['A0.5V0.4D0.8', 'A0.5V0.4D0.8_Winged_Rumor_of_Questionable_Origin_in_Theatre_Kid.png'],
+                    ['A0.5V0.4D0.9', 'A0.5V0.4D0.9_Smaug\'s_Intern_from_a_Pawn_Shop_in_Sweater_Weather.png'],
+                    ['A0.5V0.4D1.0', 'A0.5V0.4D1.0_Winged_Rumor_with_Crypto_Ambitions_in_Mall_Santa.png'],
+                    ['A0.5V0.5D0.0', 'A0.5V0.5D0.0_Smaug\'s_Intern_from_the_Back_of_a_Trunk_in_Straight_Cut.png'],
+                    ['A0.5V0.5D0.1', 'A0.5V0.5D0.1_Smaug\'s_Intern_that_Missed_the_Drop_in_Drafty_Statement.png'],
+                    ['A0.5V0.5D0.2', 'A0.5V0.5D0.2_Mildly_Mythical_that_Missed_the_Drop_in_Hood_Optional.png'],
+                    ['A0.5V0.5D0.3', 'A0.5V0.5D0.3_Winged_Rumor_that_Missed_the_Drop_in_Shed_Risk.png'],
+                    ['A0.5V0.5D0.4', 'A0.5V0.5D0.4_Winged_Rumor_that_Missed_the_Drop_in_Slippery_Deal.png'],
+                    ['A0.5V0.5D0.5', 'A0.5V0.5D0.5_Smaug\'s_Intern_with_Street_Regret_in_Rebel_Lite.png'],
+                    ['A0.5V0.5D0.6', 'A0.5V0.5D0.6_Winged_Rumor_with_Street_Regret_in_ASMR_Pants.png'],
+                    ['A0.5V0.5D0.7', 'A0.5V0.5D0.7_Mildly_Mythical_that_Missed_the_Drop_in_Glitter_Debt.png'],
+                    ['A0.5V0.5D0.8', 'A0.5V0.5D0.8_Smaug\'s_Intern_that_Missed_the_Drop_in_Touch_Me_Not.png'],
+                    ['A0.5V0.5D0.9', 'A0.5V0.5D0.9_Winged_Rumor_from_the_Back_of_a_Trunk_in_Sweater_Weather.png'],
+                    ['A0.5V0.5D1.0', 'A0.5V0.5D1.0_Smaug\'s_Intern_that_Missed_the_Drop_in_Campfire_Smoke.png'],
+                    ['A0.5V0.6D0.0', 'A0.5V0.6D0.0_Mildly_Mythical_from_a_Failed_Marathon_in_Dad_Fit.png'],
+                    ['A0.5V0.6D0.1', 'A0.5V0.6D0.1_Smaug\'s_Intern_from_a_Failed_Marathon_in_Drafty_Statement.png'],
+                    ['A0.5V0.6D0.2', 'A0.5V0.6D0.2_Smaug\'s_Intern_of_Mid_80s_Aerobics_in_Overinflated_Ego.png'],
+                    ['A0.5V0.6D0.3', 'A0.5V0.6D0.3_Mildly_Mythical_of_Mid_80s_Aerobics_in_Zoo_Chic.png'],
+                    ['A0.5V0.6D0.4', 'A0.5V0.6D0.4_Mildly_Mythical_from_a_Failed_Marathon_in_Prom_Night.png'],
+                    ['A0.5V0.6D0.5', 'A0.5V0.6D0.5_Smaug\'s_Intern_of_Sweat_Equity_in_Hot_Car_Seat.png'],
+                    ['A0.5V0.6D0.6', 'A0.5V0.6D0.6_Winged_Rumor_of_Sweat_Equity_in_ASMR_Pants.png'],
+                    ['A0.5V0.6D0.7', 'A0.5V0.6D0.7_Winged_Rumor_of_Mid_80s_Aerobics_in_Glitter_Debt.png'],
+                    ['A0.5V0.6D0.8', 'A0.5V0.6D0.8_Smaug\'s_Intern_from_a_Failed_Marathon_in_Touch_Me_Not.png'],
+                    ['A0.5V0.6D0.9', 'A0.5V0.6D0.9_Winged_Rumor_from_a_Failed_Marathon_in_Itchy_Decision.png'],
+                    ['A0.5V0.6D1.0', 'A0.5V0.6D1.0_Smaug\'s_Intern_of_Sweat_Equity_in_Campfire_Smoke.png'],
+                    ['A0.5V0.7D0.0', 'A0.5V0.7D0.0_Smaug\'s_Intern_of_Participation_in_Dad_Fit.png'],
+                    ['A0.5V0.7D0.1', 'A0.5V0.7D0.1_Mildly_Mythical_from_a_Lost_Pageant_in_See-through_Ambition.png'],
+                    ['A0.5V0.7D0.2', 'A0.5V0.7D0.2_Mildly_Mythical_with_Misspelled_Title_in_Overinflated_Ego.png'],
+                    ['A0.5V0.7D0.3', 'A0.5V0.7D0.3_Smaug\'s_Intern_from_a_Lost_Pageant_in_Pettable_Crime.png'],
+                    ['A0.5V0.7D0.4', 'A0.5V0.7D0.4_Winged_Rumor_with_Misspelled_Title_in_Slippery_Deal.png'],
+                    ['A0.5V0.7D0.5', 'A0.5V0.7D0.5_Smaug\'s_Intern_with_Misspelled_Title_in_Rebel_Lite.png'],
+                    ['A0.5V0.7D0.6', 'A0.5V0.7D0.6_Mildly_Mythical_from_a_Lost_Pageant_in_ASMR_Pants.png'],
+                    ['A0.5V0.7D0.7', 'A0.5V0.7D0.7_Mildly_Mythical_from_a_Lost_Pageant_in_Glitter_Debt.png'],
+                    ['A0.5V0.7D0.8', 'A0.5V0.7D0.8_Winged_Rumor_from_a_Lost_Pageant_in_Lounge_Lizard.png'],
+                    ['A0.5V0.7D0.9', 'A0.5V0.7D0.9_Smaug\'s_Intern_with_Misspelled_Title_in_Itchy_Decision.png'],
+                    ['A0.5V0.7D1.0', 'A0.5V0.7D1.0_Winged_Rumor_from_a_Lost_Pageant_in_Mall_Santa.png'],
+                    ['A0.5V0.8D0.0', 'A0.5V0.8D0.0_Mildly_Mythical_of_Minimal_Authority_in_Dad_Fit.png'],
+                    ['A0.5V0.8D0.1', 'A0.5V0.8D0.1_Winged_Rumor_of_Minimal_Authority_in_See-through_Ambition.png'],
+                    ['A0.5V0.8D0.2', 'A0.5V0.8D0.2_Smaug\'s_Intern_from_Camp_Nope_in_Hood_Optional.png'],
+                    ['A0.5V0.8D0.3', 'A0.5V0.8D0.3_Smaug\'s_Intern_from_Camp_Nope_in_Shed_Risk.png'],
+                    ['A0.5V0.8D0.4', 'A0.5V0.8D0.4_Winged_Rumor_from_Camp_Nope_in_Formal-ish.png'],
+                    ['A0.5V0.8D0.5', 'A0.5V0.8D0.5_Mildly_Mythical_of_Minimal_Authority_in_Rebel_Lite.png'],
+                    ['A0.5V0.8D0.6', 'A0.5V0.8D0.6_Winged_Rumor_of_Minimal_Authority_in_Faculty_Meeting.png'],
+                    ['A0.5V0.8D0.7', 'A0.5V0.8D0.7_Winged_Rumor_of_Minimal_Authority_in_Unsubtle.png'],
+                    ['A0.5V0.8D0.8', 'A0.5V0.8D0.8_Mildly_Mythical_that_Says_\'Hi\'_in_Touch_Me_Not.png'],
+                    ['A0.5V0.8D0.9', 'A0.5V0.8D0.9_Smaug\'s_Intern_that_Says_\'Hi\'_in_Sheep_Tax.png'],
+                    ['A0.5V0.8D1.0', 'A0.5V0.8D1.0_Winged_Rumor_of_Minimal_Authority_in_Campfire_Smoke.png'],
+                    ['A0.5V0.9D0.0', 'A0.5V0.9D0.0_Winged_Rumor_from_Dad\'s_Closet_in_Acid_Wash.png'],
+                    ['A0.5V0.9D0.1', 'A0.5V0.9D0.1_Mildly_Mythical_from_Dad\'s_Closet_in_See-through_Ambition.png'],
+                    ['A0.5V0.9D0.2', 'A0.5V0.9D0.2_Mildly_Mythical_from_Dad\'s_Closet_in_Overinflated_Ego.png'],
+                    ['A0.5V0.9D0.3', 'A0.5V0.9D0.3_Smaug\'s_Intern_of_Poor_Fit_in_Shed_Risk.png'],
+                    ['A0.5V0.9D0.4', 'A0.5V0.9D0.4_Mildly_Mythical_of_Loose_Morals_in_Slippery_Deal.png'],
+                    ['A0.5V0.9D0.5', 'A0.5V0.9D0.5_Winged_Rumor_of_Loose_Morals_in_Hot_Car_Seat.png'],
+                    ['A0.5V0.9D0.6', 'A0.5V0.9D0.6_Smaug\'s_Intern_of_Loose_Morals_in_Grandpa_Energy.png'],
+                    ['A0.5V0.9D0.7', 'A0.5V0.9D0.7_Winged_Rumor_of_Loose_Morals_in_Dance_Floor_Hazard.png'],
+                    ['A0.5V0.9D0.8', 'A0.5V0.9D0.8_Smaug\'s_Intern_from_Dad\'s_Closet_in_Theatre_Kid.png'],
+                    ['A0.5V0.9D0.9', 'A0.5V0.9D0.9_Smaug\'s_Intern_from_Dad\'s_Closet_in_Itchy_Decision.png'],
+                    ['A0.5V0.9D1.0', 'A0.5V0.9D1.0_Smaug\'s_Intern_of_Loose_Morals_in_Mall_Santa.png'],
+                    ['A0.5V1.0D0.0', 'A0.5V1.0D0.0_Smaug\'s_Intern_of_Hollow_Gold_in_Straight_Cut.png'],
+                    ['A0.5V1.0D0.1', 'A0.5V1.0D0.1_Smaug\'s_Intern_of_Questionable_Sovereignty_in_Drafty_Statement.png'],
+                    ['A0.5V1.0D0.2', 'A0.5V1.0D0.2_Smaug\'s_Intern_of_Questionable_Sovereignty_in_Hood_Optional.png'],
+                    ['A0.5V1.0D0.3', 'A0.5V1.0D0.3_Mildly_Mythical_of_Hollow_Gold_in_Shed_Risk.png'],
+                    ['A0.5V1.0D0.4', 'A0.5V1.0D0.4_Mildly_Mythical_from_a_Party_Store_in_Prom_Night.png'],
+                    ['A0.5V1.0D0.5', 'A0.5V1.0D0.5_Winged_Rumor_of_Hollow_Gold_in_Rebel_Lite.png'],
+                    ['A0.5V1.0D0.6', 'A0.5V1.0D0.6_Smaug\'s_Intern_of_Questionable_Sovereignty_in_Grandpa_Energy.png'],
+                    ['A0.5V1.0D0.7', 'A0.5V1.0D0.7_Smaug\'s_Intern_of_Hollow_Gold_in_Unsubtle.png'],
+                    ['A0.5V1.0D0.8', 'A0.5V1.0D0.8_Smaug\'s_Intern_from_a_Party_Store_in_Lounge_Lizard.png'],
+                    ['A0.5V1.0D0.9', 'A0.5V1.0D0.9_Mildly_Mythical_from_a_Party_Store_in_Itchy_Decision.png'],
+                    ['A0.5V1.0D1.0', 'A0.5V1.0D1.0_Smaug\'s_Intern_of_Hollow_Gold_in_Campfire_Smoke.png'],
+                    ['A0.6V0.0D0.0', 'A0.6V0.0D0.0_Fantastic_Debt_of_Sentiment_in_Straight_Cut.png'],
+                    ['A0.6V0.0D0.1', 'A0.6V0.0D0.1_Fantastic_Debt_of_Sentiment_in_Drafty_Statement.png'],
+                    ['A0.6V0.0D0.2', 'A0.6V0.0D0.2_Vulpine_Scheme_of_Quiet_Flex_in_Hood_Optional.png'],
+                    ['A0.6V0.0D0.3', 'A0.6V0.0D0.3_Vulpine_Scheme_of_Sentiment_in_Pettable_Crime.png'],
+                    ['A0.6V0.0D0.4', 'A0.6V0.0D0.4_Vulpine_Scheme_with_Ancestral_Debt_in_Formal-ish.png'],
+                    ['A0.6V0.0D0.5', 'A0.6V0.0D0.5_Fantastic_Debt_of_Sentiment_in_Rebel_Lite.png'],
+                    ['A0.6V0.0D0.6', 'A0.6V0.0D0.6_Vulpine_Scheme_with_Ancestral_Debt_in_ASMR_Pants.png'],
+                    ['A0.6V0.0D0.7', 'A0.6V0.0D0.7_Sly_Commission_with_Ancestral_Debt_in_Unsubtle.png'],
+                    ['A0.6V0.0D0.8', 'A0.6V0.0D0.8_Fantastic_Debt_of_Sentiment_in_Touch_Me_Not.png'],
+                    ['A0.6V0.0D0.9', 'A0.6V0.0D0.9_Vulpine_Scheme_of_Quiet_Flex_in_Sheep_Tax.png'],
+                    ['A0.6V0.0D1.0', 'A0.6V0.0D1.0_Vulpine_Scheme_of_Quiet_Flex_in_Mall_Santa.png'],
+                    ['A0.6V0.1D0.0', 'A0.6V0.1D0.0_Sly_Commission_you_Found_on_Etsy_in_Straight_Cut.png'],
+                    ['A0.6V0.1D0.1', 'A0.6V0.1D0.1_Sly_Commission_you_Found_on_Etsy_in_Drafty_Statement.png'],
+                    ['A0.6V0.1D0.2', 'A0.6V0.1D0.2_Sly_Commission_of_Mild_Power_in_Overinflated_Ego.png'],
+                    ['A0.6V0.1D0.3', 'A0.6V0.1D0.3_Sly_Commission_you_Found_on_Etsy_in_Pettable_Crime.png'],
+                    ['A0.6V0.1D0.4', 'A0.6V0.1D0.4_Sly_Commission_of_Mild_Power_in_Formal-ish.png'],
+                    ['A0.6V0.1D0.5', 'A0.6V0.1D0.5_Sly_Commission_of_Mild_Power_in_Rebel_Lite.png'],
+                    ['A0.6V0.1D0.6', 'A0.6V0.1D0.6_Fantastic_Debt_of_Mild_Power_in_ASMR_Pants.png'],
+                    ['A0.6V0.1D0.7', 'A0.6V0.1D0.7_Vulpine_Scheme_of_Mild_Power_in_Dance_Floor_Hazard.png'],
+                    ['A0.6V0.1D0.8', 'A0.6V0.1D0.8_Sly_Commission_from_Summer_Camp_in_Theatre_Kid.png'],
+                    ['A0.6V0.1D0.9', 'A0.6V0.1D0.9_Fantastic_Debt_you_Found_on_Etsy_in_Itchy_Decision.png'],
+                    ['A0.6V0.1D1.0', 'A0.6V0.1D1.0_Vulpine_Scheme_you_Found_on_Etsy_in_Polyester_Hug.png'],
+                    ['A0.6V0.2D0.0', 'A0.6V0.2D0.0_Vulpine_Scheme_of_Seasonal_Confusion_in_Straight_Cut.png'],
+                    ['A0.6V0.2D0.1', 'A0.6V0.2D0.1_Vulpine_Scheme_that_Smells_Like_Coffee_in_See-through_Ambition.png'],
+                    ['A0.6V0.2D0.2', 'A0.6V0.2D0.2_Fantastic_Debt_that_Smells_Like_Coffee_in_Overinflated_Ego.png'],
+                    ['A0.6V0.2D0.3', 'A0.6V0.2D0.3_Sly_Commission_of_Seasonal_Confusion_in_Pettable_Crime.png'],
+                    ['A0.6V0.2D0.4', 'A0.6V0.2D0.4_Vulpine_Scheme_from_Grandma_in_Slippery_Deal.png'],
+                    ['A0.6V0.2D0.5', 'A0.6V0.2D0.5_Vulpine_Scheme_from_Grandma_in_Hot_Car_Seat.png'],
+                    ['A0.6V0.2D0.6', 'A0.6V0.2D0.6_Vulpine_Scheme_of_Seasonal_Confusion_in_ASMR_Pants.png'],
+                    ['A0.6V0.2D0.7', 'A0.6V0.2D0.7_Sly_Commission_from_Grandma_in_Unsubtle.png'],
+                    ['A0.6V0.2D0.8', 'A0.6V0.2D0.8_Vulpine_Scheme_from_Grandma_in_Lounge_Lizard.png'],
+                    ['A0.6V0.2D0.9', 'A0.6V0.2D0.9_Fantastic_Debt_from_Grandma_in_Sweater_Weather.png'],
+                    ['A0.6V0.2D1.0', 'A0.6V0.2D1.0_Sly_Commission_of_Seasonal_Confusion_in_Campfire_Smoke.png'],
+                    ['A0.6V0.3D0.0', 'A0.6V0.3D0.0_Fantastic_Debt_of_Cloud_Watching_in_Dad_Fit.png'],
+                    ['A0.6V0.3D0.1', 'A0.6V0.3D0.1_Fantastic_Debt_of_Deep_Sea_Lies_in_Breathable_Drama.png'],
+                    ['A0.6V0.3D0.2', 'A0.6V0.3D0.2_Sly_Commission_of_Cloud_Watching_in_Overinflated_Ego.png'],
+                    ['A0.6V0.3D0.3', 'A0.6V0.3D0.3_Vulpine_Scheme_for_No_Reason_in_Pettable_Crime.png'],
+                    ['A0.6V0.3D0.4', 'A0.6V0.3D0.4_Vulpine_Scheme_for_No_Reason_in_Prom_Night.png'],
+                    ['A0.6V0.3D0.5', 'A0.6V0.3D0.5_Sly_Commission_for_No_Reason_in_Rebel_Lite.png'],
+                    ['A0.6V0.3D0.6', 'A0.6V0.3D0.6_Vulpine_Scheme_of_Deep_Sea_Lies_in_Grandpa_Energy.png'],
+                    ['A0.6V0.3D0.7', 'A0.6V0.3D0.7_Sly_Commission_of_Cloud_Watching_in_Unsubtle.png'],
+                    ['A0.6V0.3D0.8', 'A0.6V0.3D0.8_Vulpine_Scheme_of_Cloud_Watching_in_Touch_Me_Not.png'],
+                    ['A0.6V0.3D0.9', 'A0.6V0.3D0.9_Vulpine_Scheme_of_Deep_Sea_Lies_in_Itchy_Decision.png'],
+                    ['A0.6V0.3D1.0', 'A0.6V0.3D1.0_Vulpine_Scheme_of_Deep_Sea_Lies_in_Campfire_Smoke.png'],
+                    ['A0.6V0.4D0.0', 'A0.6V0.4D0.0_Sly_Commission_with_Crypto_Ambitions_in_Straight_Cut.png'],
+                    ['A0.6V0.4D0.1', 'A0.6V0.4D0.1_Sly_Commission_from_a_Pawn_Shop_in_Breathable_Drama.png'],
+                    ['A0.6V0.4D0.2', 'A0.6V0.4D0.2_Vulpine_Scheme_from_a_Pawn_Shop_in_Overinflated_Ego.png'],
+                    ['A0.6V0.4D0.3', 'A0.6V0.4D0.3_Sly_Commission_from_a_Pawn_Shop_in_Shed_Risk.png'],
+                    ['A0.6V0.4D0.4', 'A0.6V0.4D0.4_Fantastic_Debt_with_Crypto_Ambitions_in_Prom_Night.png'],
+                    ['A0.6V0.4D0.5', 'A0.6V0.4D0.5_Vulpine_Scheme_with_Crypto_Ambitions_in_Hot_Car_Seat.png'],
+                    ['A0.6V0.4D0.6', 'A0.6V0.4D0.6_Fantastic_Debt_with_Crypto_Ambitions_in_Faculty_Meeting.png'],
+                    ['A0.6V0.4D0.7', 'A0.6V0.4D0.7_Sly_Commission_with_Crypto_Ambitions_in_Glitter_Debt.png'],
+                    ['A0.6V0.4D0.8', 'A0.6V0.4D0.8_Sly_Commission_of_Questionable_Origin_in_Touch_Me_Not.png'],
+                    ['A0.6V0.4D0.9', 'A0.6V0.4D0.9_Sly_Commission_from_a_Pawn_Shop_in_Sheep_Tax.png'],
+                    ['A0.6V0.4D1.0', 'A0.6V0.4D1.0_Vulpine_Scheme_from_a_Pawn_Shop_in_Campfire_Smoke.png'],
+                    ['A0.6V0.5D0.0', 'A0.6V0.5D0.0_Fantastic_Debt_that_Missed_the_Drop_in_Dad_Fit.png'],
+                    ['A0.6V0.5D0.1', 'A0.6V0.5D0.1_Vulpine_Scheme_that_Missed_the_Drop_in_Breathable_Drama.png'],
+                    ['A0.6V0.5D0.2', 'A0.6V0.5D0.2_Sly_Commission_with_Street_Regret_in_Hood_Optional.png'],
+                    ['A0.6V0.5D0.3', 'A0.6V0.5D0.3_Fantastic_Debt_that_Missed_the_Drop_in_Zoo_Chic.png'],
+                    ['A0.6V0.5D0.4', 'A0.6V0.5D0.4_Sly_Commission_that_Missed_the_Drop_in_Formal-ish.png'],
+                    ['A0.6V0.5D0.5', 'A0.6V0.5D0.5_Sly_Commission_with_Street_Regret_in_Rebel_Lite.png'],
+                    ['A0.6V0.5D0.6', 'A0.6V0.5D0.6_Sly_Commission_from_the_Back_of_a_Trunk_in_Grandpa_Energy.png'],
+                    ['A0.6V0.5D0.7', 'A0.6V0.5D0.7_Vulpine_Scheme_that_Missed_the_Drop_in_Unsubtle.png'],
+                    ['A0.6V0.5D0.8', 'A0.6V0.5D0.8_Vulpine_Scheme_from_the_Back_of_a_Trunk_in_Lounge_Lizard.png'],
+                    ['A0.6V0.5D0.9', 'A0.6V0.5D0.9_Vulpine_Scheme_with_Street_Regret_in_Sweater_Weather.png'],
+                    ['A0.6V0.5D1.0', 'A0.6V0.5D1.0_Sly_Commission_from_the_Back_of_a_Trunk_in_Polyester_Hug.png'],
+                    ['A0.6V0.6D0.0', 'A0.6V0.6D0.0_Fantastic_Debt_of_Mid_80s_Aerobics_in_Acid_Wash.png'],
+                    ['A0.6V0.6D0.1', 'A0.6V0.6D0.1_Fantastic_Debt_of_Mid_80s_Aerobics_in_See-through_Ambition.png'],
+                    ['A0.6V0.6D0.2', 'A0.6V0.6D0.2_Fantastic_Debt_of_Sweat_Equity_in_Michelin_Mood.png'],
+                    ['A0.6V0.6D0.3', 'A0.6V0.6D0.3_Sly_Commission_from_a_Failed_Marathon_in_Shed_Risk.png'],
+                    ['A0.6V0.6D0.4', 'A0.6V0.6D0.4_Sly_Commission_from_a_Failed_Marathon_in_Formal-ish.png'],
+                    ['A0.6V0.6D0.5', 'A0.6V0.6D0.5_Vulpine_Scheme_of_Sweat_Equity_in_Cow_Adjacent.png'],
+                    ['A0.6V0.6D0.6', 'A0.6V0.6D0.6_Fantastic_Debt_of_Sweat_Equity_in_ASMR_Pants.png'],
+                    ['A0.6V0.6D0.7', 'A0.6V0.6D0.7_Sly_Commission_from_a_Failed_Marathon_in_Unsubtle.png'],
+                    ['A0.6V0.6D0.8', 'A0.6V0.6D0.8_Fantastic_Debt_from_a_Failed_Marathon_in_Lounge_Lizard.png'],
+                    ['A0.6V0.6D0.9', 'A0.6V0.6D0.9_Fantastic_Debt_of_Mid_80s_Aerobics_in_Sheep_Tax.png'],
+                    ['A0.6V0.6D1.0', 'A0.6V0.6D1.0_Vulpine_Scheme_from_a_Failed_Marathon_in_Campfire_Smoke.png'],
+                    ['A0.6V0.7D0.0', 'A0.6V0.7D0.0_Fantastic_Debt_with_Misspelled_Title_in_Dad_Fit.png'],
+                    ['A0.6V0.7D0.1', 'A0.6V0.7D0.1_Sly_Commission_from_a_Lost_Pageant_in_See-through_Ambition.png'],
+                    ['A0.6V0.7D0.2', 'A0.6V0.7D0.2_Fantastic_Debt_with_Misspelled_Title_in_Michelin_Mood.png'],
+                    ['A0.6V0.7D0.3', 'A0.6V0.7D0.3_Fantastic_Debt_from_a_Lost_Pageant_in_Pettable_Crime.png'],
+                    ['A0.6V0.7D0.4', 'A0.6V0.7D0.4_Vulpine_Scheme_from_a_Lost_Pageant_in_Formal-ish.png'],
+                    ['A0.6V0.7D0.5', 'A0.6V0.7D0.5_Vulpine_Scheme_from_a_Lost_Pageant_in_Rebel_Lite.png'],
+                    ['A0.6V0.7D0.6', 'A0.6V0.7D0.6_Vulpine_Scheme_with_Misspelled_Title_in_Faculty_Meeting.png'],
+                    ['A0.6V0.7D0.7', 'A0.6V0.7D0.7_Fantastic_Debt_with_Misspelled_Title_in_Glitter_Debt.png'],
+                    ['A0.6V0.7D0.8', 'A0.6V0.7D0.8_Vulpine_Scheme_with_Misspelled_Title_in_Theatre_Kid.png'],
+                    ['A0.6V0.7D0.9', 'A0.6V0.7D0.9_Sly_Commission_with_Misspelled_Title_in_Sheep_Tax.png'],
+                    ['A0.6V0.7D1.0', 'A0.6V0.7D1.0_Fantastic_Debt_from_a_Lost_Pageant_in_Polyester_Hug.png'],
+                    ['A0.6V0.8D0.0', 'A0.6V0.8D0.0_Vulpine_Scheme_of_Minimal_Authority_in_Straight_Cut.png'],
+                    ['A0.6V0.8D0.1', 'A0.6V0.8D0.1_Fantastic_Debt_from_Camp_Nope_in_See-through_Ambition.png'],
+                    ['A0.6V0.8D0.2', 'A0.6V0.8D0.2_Fantastic_Debt_that_Says_\'Hi\'_in_Hood_Optional.png'],
+                    ['A0.6V0.8D0.3', 'A0.6V0.8D0.3_Vulpine_Scheme_of_Minimal_Authority_in_Shed_Risk.png'],
+                    ['A0.6V0.8D0.4', 'A0.6V0.8D0.4_Vulpine_Scheme_of_Minimal_Authority_in_Formal-ish.png'],
+                    ['A0.6V0.8D0.5', 'A0.6V0.8D0.5_Vulpine_Scheme_that_Says_\'Hi\'_in_Hot_Car_Seat.png'],
+                    ['A0.6V0.8D0.6', 'A0.6V0.8D0.6_Vulpine_Scheme_from_Camp_Nope_in_Grandpa_Energy.png'],
+                    ['A0.6V0.8D0.7', 'A0.6V0.8D0.7_Sly_Commission_from_Camp_Nope_in_Unsubtle.png'],
+                    ['A0.6V0.8D0.8', 'A0.6V0.8D0.8_Vulpine_Scheme_of_Minimal_Authority_in_Theatre_Kid.png'],
+                    ['A0.6V0.8D0.9', 'A0.6V0.8D0.9_Vulpine_Scheme_that_Says_\'Hi\'_in_Itchy_Decision.png'],
+                    ['A0.6V0.8D1.0', 'A0.6V0.8D1.0_Sly_Commission_that_Says_\'Hi\'_in_Polyester_Hug.png'],
+                    ['A0.6V0.9D0.0', 'A0.6V0.9D0.0_Fantastic_Debt_of_Poor_Fit_in_Straight_Cut.png'],
+                    ['A0.6V0.9D0.1', 'A0.6V0.9D0.1_Fantastic_Debt_from_Dad\'s_Closet_in_Drafty_Statement.png'],
+                    ['A0.6V0.9D0.2', 'A0.6V0.9D0.2_Vulpine_Scheme_of_Loose_Morals_in_Michelin_Mood.png'],
+                    ['A0.6V0.9D0.3', 'A0.6V0.9D0.3_Fantastic_Debt_of_Loose_Morals_in_Zoo_Chic.png'],
+                    ['A0.6V0.9D0.4', 'A0.6V0.9D0.4_Sly_Commission_from_Dad\'s_Closet_in_Formal-ish.png'],
+                    ['A0.6V0.9D0.5', 'A0.6V0.9D0.5_Vulpine_Scheme_of_Poor_Fit_in_Cow_Adjacent.png'],
+                    ['A0.6V0.9D0.6', 'A0.6V0.9D0.6_Fantastic_Debt_from_Dad\'s_Closet_in_ASMR_Pants.png'],
+                    ['A0.6V0.9D0.7', 'A0.6V0.9D0.7_Vulpine_Scheme_of_Loose_Morals_in_Unsubtle.png'],
+                    ['A0.6V0.9D0.8', 'A0.6V0.9D0.8_Sly_Commission_from_Dad\'s_Closet_in_Theatre_Kid.png'],
+                    ['A0.6V0.9D0.9', 'A0.6V0.9D0.9_Vulpine_Scheme_of_Loose_Morals_in_Sweater_Weather.png'],
+                    ['A0.6V0.9D1.0', 'A0.6V0.9D1.0_Fantastic_Debt_from_Dad\'s_Closet_in_Polyester_Hug.png'],
+                    ['A0.6V1.0D0.0', 'A0.6V1.0D0.0_Vulpine_Scheme_of_Questionable_Sovereignty_in_Dad_Fit.png'],
+                    ['A0.6V1.0D0.1', 'A0.6V1.0D0.1_Fantastic_Debt_from_a_Party_Store_in_Breathable_Drama.png'],
+                    ['A0.6V1.0D0.2', 'A0.6V1.0D0.2_Fantastic_Debt_from_a_Party_Store_in_Michelin_Mood.png'],
+                    ['A0.6V1.0D0.3', 'A0.6V1.0D0.3_Vulpine_Scheme_from_a_Party_Store_in_Shed_Risk.png'],
+                    ['A0.6V1.0D0.4', 'A0.6V1.0D0.4_Fantastic_Debt_of_Hollow_Gold_in_Slippery_Deal.png'],
+                    ['A0.6V1.0D0.5', 'A0.6V1.0D0.5_Fantastic_Debt_of_Questionable_Sovereignty_in_Hot_Car_Seat.png'],
+                    ['A0.6V1.0D0.6', 'A0.6V1.0D0.6_Vulpine_Scheme_of_Questionable_Sovereignty_in_ASMR_Pants.png'],
+                    ['A0.6V1.0D0.7', 'A0.6V1.0D0.7_Fantastic_Debt_of_Questionable_Sovereignty_in_Dance_Floor_Hazard.png'],
+                    ['A0.6V1.0D0.8', 'A0.6V1.0D0.8_Fantastic_Debt_from_a_Party_Store_in_Lounge_Lizard.png'],
+                    ['A0.6V1.0D0.9', 'A0.6V1.0D0.9_Vulpine_Scheme_of_Questionable_Sovereignty_in_Sheep_Tax.png'],
+                    ['A0.6V1.0D1.0', 'A0.6V1.0D1.0_Fantastic_Debt_from_a_Party_Store_in_Polyester_Hug.png'],
+                    ['A0.7V0.0D0.0', 'A0.7V0.0D0.0_Kung_Food_of_Sentiment_in_Straight_Cut.png'],
+                    ['A0.7V0.0D0.1', 'A0.7V0.0D0.1_Bamboo_Problem_of_Quiet_Flex_in_Drafty_Statement.png'],
+                    ['A0.7V0.0D0.2', 'A0.7V0.0D0.2_Monochrome_Menace_of_Quiet_Flex_in_Michelin_Mood.png'],
+                    ['A0.7V0.0D0.3', 'A0.7V0.0D0.3_Bamboo_Problem_with_Ancestral_Debt_in_Pettable_Crime.png'],
+                    ['A0.7V0.0D0.4', 'A0.7V0.0D0.4_Monochrome_Menace_of_Sentiment_in_Prom_Night.png'],
+                    ['A0.7V0.0D0.5', 'A0.7V0.0D0.5_Monochrome_Menace_with_Ancestral_Debt_in_Hot_Car_Seat.png'],
+                    ['A0.7V0.0D0.6', 'A0.7V0.0D0.6_Bamboo_Problem_of_Quiet_Flex_in_ASMR_Pants.png'],
+                    ['A0.7V0.0D0.7', 'A0.7V0.0D0.7_Monochrome_Menace_of_Sentiment_in_Glitter_Debt.png'],
+                    ['A0.7V0.0D0.8', 'A0.7V0.0D0.8_Monochrome_Menace_with_Ancestral_Debt_in_Lounge_Lizard.png'],
+                    ['A0.7V0.0D0.9', 'A0.7V0.0D0.9_Kung_Food_with_Ancestral_Debt_in_Sweater_Weather.png'],
+                    ['A0.7V0.0D1.0', 'A0.7V0.0D1.0_Monochrome_Menace_with_Ancestral_Debt_in_Campfire_Smoke.png'],
+                    ['A0.7V0.1D0.0', 'A0.7V0.1D0.0_Bamboo_Problem_you_Found_on_Etsy_in_Acid_Wash.png'],
+                    ['A0.7V0.1D0.1', 'A0.7V0.1D0.1_Bamboo_Problem_from_Summer_Camp_in_Drafty_Statement.png'],
+                    ['A0.7V0.1D0.2', 'A0.7V0.1D0.2_Bamboo_Problem_of_Mild_Power_in_Overinflated_Ego.png'],
+                    ['A0.7V0.1D0.3', 'A0.7V0.1D0.3_Bamboo_Problem_of_Mild_Power_in_Zoo_Chic.png'],
+                    ['A0.7V0.1D0.4', 'A0.7V0.1D0.4_Kung_Food_from_Summer_Camp_in_Slippery_Deal.png'],
+                    ['A0.7V0.1D0.5', 'A0.7V0.1D0.5_Monochrome_Menace_from_Summer_Camp_in_Hot_Car_Seat.png'],
+                    ['A0.7V0.1D0.6', 'A0.7V0.1D0.6_Kung_Food_you_Found_on_Etsy_in_ASMR_Pants.png'],
+                    ['A0.7V0.1D0.7', 'A0.7V0.1D0.7_Kung_Food_from_Summer_Camp_in_Dance_Floor_Hazard.png'],
+                    ['A0.7V0.1D0.8', 'A0.7V0.1D0.8_Bamboo_Problem_you_Found_on_Etsy_in_Lounge_Lizard.png'],
+                    ['A0.7V0.1D0.9', 'A0.7V0.1D0.9_Bamboo_Problem_from_Summer_Camp_in_Itchy_Decision.png'],
+                    ['A0.7V0.1D1.0', 'A0.7V0.1D1.0_Kung_Food_of_Mild_Power_in_Mall_Santa.png'],
+                    ['A0.7V0.2D0.0', 'A0.7V0.2D0.0_Kung_Food_of_Seasonal_Confusion_in_Straight_Cut.png'],
+                    ['A0.7V0.2D0.1', 'A0.7V0.2D0.1_Monochrome_Menace_from_Grandma_in_Breathable_Drama.png'],
+                    ['A0.7V0.2D0.2', 'A0.7V0.2D0.2_Bamboo_Problem_that_Smells_Like_Coffee_in_Overinflated_Ego.png'],
+                    ['A0.7V0.2D0.3', 'A0.7V0.2D0.3_Bamboo_Problem_that_Smells_Like_Coffee_in_Zoo_Chic.png'],
+                    ['A0.7V0.2D0.4', 'A0.7V0.2D0.4_Kung_Food_from_Grandma_in_Prom_Night.png'],
+                    ['A0.7V0.2D0.5', 'A0.7V0.2D0.5_Kung_Food_that_Smells_Like_Coffee_in_Cow_Adjacent.png'],
+                    ['A0.7V0.2D0.6', 'A0.7V0.2D0.6_Bamboo_Problem_of_Seasonal_Confusion_in_Faculty_Meeting.png'],
+                    ['A0.7V0.2D0.7', 'A0.7V0.2D0.7_Monochrome_Menace_that_Smells_Like_Coffee_in_Glitter_Debt.png'],
+                    ['A0.7V0.2D0.8', 'A0.7V0.2D0.8_Monochrome_Menace_that_Smells_Like_Coffee_in_Lounge_Lizard.png'],
+                    ['A0.7V0.2D0.9', 'A0.7V0.2D0.9_Monochrome_Menace_of_Seasonal_Confusion_in_Sheep_Tax.png'],
+                    ['A0.7V0.2D1.0', 'A0.7V0.2D1.0_Monochrome_Menace_of_Seasonal_Confusion_in_Polyester_Hug.png'],
+                    ['A0.7V0.3D0.0', 'A0.7V0.3D0.0_Bamboo_Problem_of_Deep_Sea_Lies_in_Straight_Cut.png'],
+                    ['A0.7V0.3D0.1', 'A0.7V0.3D0.1_Monochrome_Menace_of_Cloud_Watching_in_See-through_Ambition.png'],
+                    ['A0.7V0.3D0.2', 'A0.7V0.3D0.2_Monochrome_Menace_of_Cloud_Watching_in_Hood_Optional.png'],
+                    ['A0.7V0.3D0.3', 'A0.7V0.3D0.3_Bamboo_Problem_of_Deep_Sea_Lies_in_Pettable_Crime.png'],
+                    ['A0.7V0.3D0.4', 'A0.7V0.3D0.4_Kung_Food_of_Cloud_Watching_in_Prom_Night.png'],
+                    ['A0.7V0.3D0.5', 'A0.7V0.3D0.5_Kung_Food_of_Cloud_Watching_in_Cow_Adjacent.png'],
+                    ['A0.7V0.3D0.6', 'A0.7V0.3D0.6_Monochrome_Menace_of_Deep_Sea_Lies_in_Grandpa_Energy.png'],
+                    ['A0.7V0.3D0.7', 'A0.7V0.3D0.7_Monochrome_Menace_for_No_Reason_in_Glitter_Debt.png'],
+                    ['A0.7V0.3D0.8', 'A0.7V0.3D0.8_Monochrome_Menace_of_Cloud_Watching_in_Lounge_Lizard.png'],
+                    ['A0.7V0.3D0.9', 'A0.7V0.3D0.9_Bamboo_Problem_of_Cloud_Watching_in_Sweater_Weather.png'],
+                    ['A0.7V0.3D1.0', 'A0.7V0.3D1.0_Bamboo_Problem_for_No_Reason_in_Campfire_Smoke.png'],
+                    ['A0.7V0.4D0.0', 'A0.7V0.4D0.0_Monochrome_Menace_of_Questionable_Origin_in_Dad_Fit.png'],
+                    ['A0.7V0.4D0.1', 'A0.7V0.4D0.1_Kung_Food_of_Questionable_Origin_in_Drafty_Statement.png'],
+                    ['A0.7V0.4D0.2', 'A0.7V0.4D0.2_Kung_Food_of_Questionable_Origin_in_Hood_Optional.png'],
+                    ['A0.7V0.4D0.3', 'A0.7V0.4D0.3_Monochrome_Menace_from_a_Pawn_Shop_in_Pettable_Crime.png'],
+                    ['A0.7V0.4D0.4', 'A0.7V0.4D0.4_Monochrome_Menace_of_Questionable_Origin_in_Formal-ish.png'],
+                    ['A0.7V0.4D0.5', 'A0.7V0.4D0.5_Monochrome_Menace_from_a_Pawn_Shop_in_Cow_Adjacent.png'],
+                    ['A0.7V0.4D0.6', 'A0.7V0.4D0.6_Monochrome_Menace_with_Crypto_Ambitions_in_ASMR_Pants.png'],
+                    ['A0.7V0.4D0.7', 'A0.7V0.4D0.7_Kung_Food_with_Crypto_Ambitions_in_Dance_Floor_Hazard.png'],
+                    ['A0.7V0.4D0.8', 'A0.7V0.4D0.8_Bamboo_Problem_with_Crypto_Ambitions_in_Lounge_Lizard.png'],
+                    ['A0.7V0.4D0.9', 'A0.7V0.4D0.9_Monochrome_Menace_of_Questionable_Origin_in_Sweater_Weather.png'],
+                    ['A0.7V0.4D1.0', 'A0.7V0.4D1.0_Bamboo_Problem_from_a_Pawn_Shop_in_Mall_Santa.png'],
+                    ['A0.7V0.5D0.0', 'A0.7V0.5D0.0_Bamboo_Problem_from_the_Back_of_a_Trunk_in_Acid_Wash.png'],
+                    ['A0.7V0.5D0.1', 'A0.7V0.5D0.1_Bamboo_Problem_that_Missed_the_Drop_in_Breathable_Drama.png'],
+                    ['A0.7V0.5D0.2', 'A0.7V0.5D0.2_Monochrome_Menace_from_the_Back_of_a_Trunk_in_Hood_Optional.png'],
+                    ['A0.7V0.5D0.3', 'A0.7V0.5D0.3_Kung_Food_with_Street_Regret_in_Pettable_Crime.png'],
+                    ['A0.7V0.5D0.4', 'A0.7V0.5D0.4_Bamboo_Problem_from_the_Back_of_a_Trunk_in_Slippery_Deal.png'],
+                    ['A0.7V0.5D0.5', 'A0.7V0.5D0.5_Monochrome_Menace_from_the_Back_of_a_Trunk_in_Hot_Car_Seat.png'],
+                    ['A0.7V0.5D0.6', 'A0.7V0.5D0.6_Bamboo_Problem_that_Missed_the_Drop_in_Grandpa_Energy.png'],
+                    ['A0.7V0.5D0.7', 'A0.7V0.5D0.7_Bamboo_Problem_with_Street_Regret_in_Glitter_Debt.png'],
+                    ['A0.7V0.5D0.8', 'A0.7V0.5D0.8_Bamboo_Problem_from_the_Back_of_a_Trunk_in_Touch_Me_Not.png'],
+                    ['A0.7V0.5D0.9', 'A0.7V0.5D0.9_Bamboo_Problem_that_Missed_the_Drop_in_Sheep_Tax.png'],
+                    ['A0.7V0.5D1.0', 'A0.7V0.5D1.0_Monochrome_Menace_with_Street_Regret_in_Campfire_Smoke.png'],
+                    ['A0.7V0.6D0.0', 'A0.7V0.6D0.0_Bamboo_Problem_from_a_Failed_Marathon_in_Acid_Wash.png'],
+                    ['A0.7V0.6D0.1', 'A0.7V0.6D0.1_Bamboo_Problem_from_a_Failed_Marathon_in_Drafty_Statement.png'],
+                    ['A0.7V0.6D0.2', 'A0.7V0.6D0.2_Bamboo_Problem_from_a_Failed_Marathon_in_Hood_Optional.png'],
+                    ['A0.7V0.6D0.3', 'A0.7V0.6D0.3_Kung_Food_of_Sweat_Equity_in_Shed_Risk.png'],
+                    ['A0.7V0.6D0.4', 'A0.7V0.6D0.4_Bamboo_Problem_from_a_Failed_Marathon_in_Formal-ish.png'],
+                    ['A0.7V0.6D0.5', 'A0.7V0.6D0.5_Monochrome_Menace_of_Sweat_Equity_in_Rebel_Lite.png'],
+                    ['A0.7V0.6D0.6', 'A0.7V0.6D0.6_Bamboo_Problem_of_Mid_80s_Aerobics_in_ASMR_Pants.png'],
+                    ['A0.7V0.6D0.7', 'A0.7V0.6D0.7_Bamboo_Problem_of_Sweat_Equity_in_Unsubtle.png'],
+                    ['A0.7V0.6D0.8', 'A0.7V0.6D0.8_Kung_Food_of_Mid_80s_Aerobics_in_Lounge_Lizard.png'],
+                    ['A0.7V0.6D0.9', 'A0.7V0.6D0.9_Bamboo_Problem_of_Mid_80s_Aerobics_in_Sheep_Tax.png'],
+                    ['A0.7V0.6D1.0', 'A0.7V0.6D1.0_Monochrome_Menace_from_a_Failed_Marathon_in_Campfire_Smoke.png'],
+                    ['A0.7V0.7D0.0', 'A0.7V0.7D0.0_Bamboo_Problem_from_a_Lost_Pageant_in_Dad_Fit.png'],
+                    ['A0.7V0.7D0.1', 'A0.7V0.7D0.1_Kung_Food_of_Participation_in_See-through_Ambition.png'],
+                    ['A0.7V0.7D0.2', 'A0.7V0.7D0.2_Kung_Food_from_a_Lost_Pageant_in_Hood_Optional.png'],
+                    ['A0.7V0.7D0.3', 'A0.7V0.7D0.3_Bamboo_Problem_of_Participation_in_Shed_Risk.png'],
+                    ['A0.7V0.7D0.4', 'A0.7V0.7D0.4_Bamboo_Problem_from_a_Lost_Pageant_in_Prom_Night.png'],
+                    ['A0.7V0.7D0.5', 'A0.7V0.7D0.5_Bamboo_Problem_from_a_Lost_Pageant_in_Hot_Car_Seat.png'],
+                    ['A0.7V0.7D0.6', 'A0.7V0.7D0.6_Kung_Food_with_Misspelled_Title_in_Faculty_Meeting.png'],
+                    ['A0.7V0.7D0.7', 'A0.7V0.7D0.7_Monochrome_Menace_from_a_Lost_Pageant_in_Unsubtle.png'],
+                    ['A0.7V0.7D0.8', 'A0.7V0.7D0.8_Monochrome_Menace_from_a_Lost_Pageant_in_Theatre_Kid.png'],
+                    ['A0.7V0.7D0.9', 'A0.7V0.7D0.9_Bamboo_Problem_with_Misspelled_Title_in_Sheep_Tax.png'],
+                    ['A0.7V0.7D1.0', 'A0.7V0.7D1.0_Bamboo_Problem_with_Misspelled_Title_in_Mall_Santa.png'],
+                    ['A0.7V0.8D0.0', 'A0.7V0.8D0.0_Bamboo_Problem_that_Says_\'Hi\'_in_Acid_Wash.png'],
+                    ['A0.7V0.8D0.1', 'A0.7V0.8D0.1_Bamboo_Problem_from_Camp_Nope_in_See-through_Ambition.png'],
+                    ['A0.7V0.8D0.2', 'A0.7V0.8D0.2_Monochrome_Menace_that_Says_\'Hi\'_in_Michelin_Mood.png'],
+                    ['A0.7V0.8D0.3', 'A0.7V0.8D0.3_Kung_Food_of_Minimal_Authority_in_Pettable_Crime.png'],
+                    ['A0.7V0.8D0.4', 'A0.7V0.8D0.4_Bamboo_Problem_of_Minimal_Authority_in_Prom_Night.png'],
+                    ['A0.7V0.8D0.5', 'A0.7V0.8D0.5_Bamboo_Problem_of_Minimal_Authority_in_Rebel_Lite.png'],
+                    ['A0.7V0.8D0.6', 'A0.7V0.8D0.6_Monochrome_Menace_of_Minimal_Authority_in_ASMR_Pants.png'],
+                    ['A0.7V0.8D0.7', 'A0.7V0.8D0.7_Bamboo_Problem_from_Camp_Nope_in_Glitter_Debt.png'],
+                    ['A0.7V0.8D0.8', 'A0.7V0.8D0.8_Bamboo_Problem_that_Says_\'Hi\'_in_Lounge_Lizard.png'],
+                    ['A0.7V0.8D0.9', 'A0.7V0.8D0.9_Monochrome_Menace_of_Minimal_Authority_in_Sweater_Weather.png'],
+                    ['A0.7V0.8D1.0', 'A0.7V0.8D1.0_Kung_Food_that_Says_\'Hi\'_in_Polyester_Hug.png'],
+                    ['A0.7V0.9D0.0', 'A0.7V0.9D0.0_Monochrome_Menace_from_Dad\'s_Closet_in_Straight_Cut.png'],
+                    ['A0.7V0.9D0.1', 'A0.7V0.9D0.1_Monochrome_Menace_of_Loose_Morals_in_Drafty_Statement.png'],
+                    ['A0.7V0.9D0.2', 'A0.7V0.9D0.2_Bamboo_Problem_of_Loose_Morals_in_Hood_Optional.png'],
+                    ['A0.7V0.9D0.3', 'A0.7V0.9D0.3_Bamboo_Problem_of_Poor_Fit_in_Zoo_Chic.png'],
+                    ['A0.7V0.9D0.4', 'A0.7V0.9D0.4_Kung_Food_from_Dad\'s_Closet_in_Slippery_Deal.png'],
+                    ['A0.7V0.9D0.5', 'A0.7V0.9D0.5_Monochrome_Menace_from_Dad\'s_Closet_in_Cow_Adjacent.png'],
+                    ['A0.7V0.9D0.6', 'A0.7V0.9D0.6_Kung_Food_of_Poor_Fit_in_Faculty_Meeting.png'],
+                    ['A0.7V0.9D0.7', 'A0.7V0.9D0.7_Kung_Food_of_Loose_Morals_in_Dance_Floor_Hazard.png'],
+                    ['A0.7V0.9D0.8', 'A0.7V0.9D0.8_Bamboo_Problem_of_Loose_Morals_in_Lounge_Lizard.png'],
+                    ['A0.7V0.9D0.9', 'A0.7V0.9D0.9_Monochrome_Menace_of_Poor_Fit_in_Sheep_Tax.png'],
+                    ['A0.7V0.9D1.0', 'A0.7V0.9D1.0_Kung_Food_from_Dad\'s_Closet_in_Mall_Santa.png'],
+                    ['A0.7V1.0D0.0', 'A0.7V1.0D0.0_Bamboo_Problem_of_Hollow_Gold_in_Straight_Cut.png'],
+                    ['A0.7V1.0D0.1', 'A0.7V1.0D0.1_Kung_Food_from_a_Party_Store_in_See-through_Ambition.png'],
+                    ['A0.7V1.0D0.2', 'A0.7V1.0D0.2_Bamboo_Problem_of_Questionable_Sovereignty_in_Overinflated_Ego.png'],
+                    ['A0.7V1.0D0.3', 'A0.7V1.0D0.3_Monochrome_Menace_of_Questionable_Sovereignty_in_Zoo_Chic.png'],
+                    ['A0.7V1.0D0.4', 'A0.7V1.0D0.4_Monochrome_Menace_of_Hollow_Gold_in_Prom_Night.png'],
+                    ['A0.7V1.0D0.5', 'A0.7V1.0D0.5_Kung_Food_of_Hollow_Gold_in_Hot_Car_Seat.png'],
+                    ['A0.7V1.0D0.6', 'A0.7V1.0D0.6_Monochrome_Menace_of_Hollow_Gold_in_Grandpa_Energy.png'],
+                    ['A0.7V1.0D0.7', 'A0.7V1.0D0.7_Bamboo_Problem_of_Questionable_Sovereignty_in_Glitter_Debt.png'],
+                    ['A0.7V1.0D0.8', 'A0.7V1.0D0.8_Monochrome_Menace_of_Questionable_Sovereignty_in_Touch_Me_Not.png'],
+                    ['A0.7V1.0D0.9', 'A0.7V1.0D0.9_Kung_Food_of_Questionable_Sovereignty_in_Sweater_Weather.png'],
+                    ['A0.7V1.0D1.0', 'A0.7V1.0D1.0_Monochrome_Menace_from_a_Party_Store_in_Polyester_Hug.png'],
+                    ['A0.8V0.0D0.0', 'A0.8V0.0D0.0_Captain_Squawk_of_Quiet_Flex_in_Straight_Cut.png'],
+                    ['A0.8V0.0D0.1', 'A0.8V0.0D0.1_Feather_Witness_with_Ancestral_Debt_in_Breathable_Drama.png'],
+                    ['A0.8V0.0D0.2', 'A0.8V0.0D0.2_Mimic_Error_of_Sentiment_in_Overinflated_Ego.png'],
+                    ['A0.8V0.0D0.3', 'A0.8V0.0D0.3_Feather_Witness_with_Ancestral_Debt_in_Zoo_Chic.png'],
+                    ['A0.8V0.0D0.4', 'A0.8V0.0D0.4_Feather_Witness_of_Quiet_Flex_in_Formal-ish.png'],
+                    ['A0.8V0.0D0.5', 'A0.8V0.0D0.5_Captain_Squawk_of_Sentiment_in_Hot_Car_Seat.png'],
+                    ['A0.8V0.0D0.6', 'A0.8V0.0D0.6_Captain_Squawk_with_Ancestral_Debt_in_Grandpa_Energy.png'],
+                    ['A0.8V0.0D0.7', 'A0.8V0.0D0.7_Feather_Witness_of_Sentiment_in_Glitter_Debt.png'],
+                    ['A0.8V0.0D0.8', 'A0.8V0.0D0.8_Feather_Witness_of_Quiet_Flex_in_Theatre_Kid.png'],
+                    ['A0.8V0.0D0.9', 'A0.8V0.0D0.9_Captain_Squawk_of_Sentiment_in_Sweater_Weather.png'],
+                    ['A0.8V0.0D1.0', 'A0.8V0.0D1.0_Feather_Witness_of_Quiet_Flex_in_Mall_Santa.png'],
+                    ['A0.8V0.1D0.0', 'A0.8V0.1D0.0_Feather_Witness_of_Mild_Power_in_Acid_Wash.png'],
+                    ['A0.8V0.1D0.1', 'A0.8V0.1D0.1_Feather_Witness_from_Summer_Camp_in_Drafty_Statement.png'],
+                    ['A0.8V0.1D0.2', 'A0.8V0.1D0.2_Captain_Squawk_you_Found_on_Etsy_in_Hood_Optional.png'],
+                    ['A0.8V0.1D0.3', 'A0.8V0.1D0.3_Mimic_Error_you_Found_on_Etsy_in_Pettable_Crime.png'],
+                    ['A0.8V0.1D0.4', 'A0.8V0.1D0.4_Feather_Witness_of_Mild_Power_in_Formal-ish.png'],
+                    ['A0.8V0.1D0.5', 'A0.8V0.1D0.5_Captain_Squawk_of_Mild_Power_in_Hot_Car_Seat.png'],
+                    ['A0.8V0.1D0.6', 'A0.8V0.1D0.6_Captain_Squawk_from_Summer_Camp_in_Faculty_Meeting.png'],
+                    ['A0.8V0.1D0.7', 'A0.8V0.1D0.7_Feather_Witness_of_Mild_Power_in_Dance_Floor_Hazard.png'],
+                    ['A0.8V0.1D0.8', 'A0.8V0.1D0.8_Captain_Squawk_from_Summer_Camp_in_Lounge_Lizard.png'],
+                    ['A0.8V0.1D0.9', 'A0.8V0.1D0.9_Mimic_Error_from_Summer_Camp_in_Sweater_Weather.png'],
+                    ['A0.8V0.1D1.0', 'A0.8V0.1D1.0_Feather_Witness_of_Mild_Power_in_Mall_Santa.png'],
+                    ['A0.8V0.2D0.0', 'A0.8V0.2D0.0_Mimic_Error_that_Smells_Like_Coffee_in_Straight_Cut.png'],
+                    ['A0.8V0.2D0.1', 'A0.8V0.2D0.1_Feather_Witness_of_Seasonal_Confusion_in_Breathable_Drama.png'],
+                    ['A0.8V0.2D0.2', 'A0.8V0.2D0.2_Feather_Witness_that_Smells_Like_Coffee_in_Michelin_Mood.png'],
+                    ['A0.8V0.2D0.3', 'A0.8V0.2D0.3_Feather_Witness_from_Grandma_in_Zoo_Chic.png'],
+                    ['A0.8V0.2D0.4', 'A0.8V0.2D0.4_Mimic_Error_of_Seasonal_Confusion_in_Prom_Night.png'],
+                    ['A0.8V0.2D0.5', 'A0.8V0.2D0.5_Captain_Squawk_from_Grandma_in_Hot_Car_Seat.png'],
+                    ['A0.8V0.2D0.6', 'A0.8V0.2D0.6_Mimic_Error_from_Grandma_in_ASMR_Pants.png'],
+                    ['A0.8V0.2D0.7', 'A0.8V0.2D0.7_Mimic_Error_of_Seasonal_Confusion_in_Dance_Floor_Hazard.png'],
+                    ['A0.8V0.2D0.8', 'A0.8V0.2D0.8_Feather_Witness_that_Smells_Like_Coffee_in_Touch_Me_Not.png'],
+                    ['A0.8V0.2D0.9', 'A0.8V0.2D0.9_Feather_Witness_that_Smells_Like_Coffee_in_Itchy_Decision.png'],
+                    ['A0.8V0.2D1.0', 'A0.8V0.2D1.0_Mimic_Error_that_Smells_Like_Coffee_in_Mall_Santa.png'],
+                    ['A0.8V0.3D0.0', 'A0.8V0.3D0.0_Mimic_Error_of_Deep_Sea_Lies_in_Straight_Cut.png'],
+                    ['A0.8V0.3D0.1', 'A0.8V0.3D0.1_Feather_Witness_for_No_Reason_in_Breathable_Drama.png'],
+                    ['A0.8V0.3D0.2', 'A0.8V0.3D0.2_Feather_Witness_of_Deep_Sea_Lies_in_Michelin_Mood.png'],
+                    ['A0.8V0.3D0.3', 'A0.8V0.3D0.3_Captain_Squawk_of_Cloud_Watching_in_Pettable_Crime.png'],
+                    ['A0.8V0.3D0.4', 'A0.8V0.3D0.4_Mimic_Error_for_No_Reason_in_Prom_Night.png'],
+                    ['A0.8V0.3D0.5', 'A0.8V0.3D0.5_Mimic_Error_of_Deep_Sea_Lies_in_Rebel_Lite.png'],
+                    ['A0.8V0.3D0.6', 'A0.8V0.3D0.6_Feather_Witness_for_No_Reason_in_ASMR_Pants.png'],
+                    ['A0.8V0.3D0.7', 'A0.8V0.3D0.7_Feather_Witness_of_Cloud_Watching_in_Glitter_Debt.png'],
+                    ['A0.8V0.3D0.8', 'A0.8V0.3D0.8_Mimic_Error_of_Deep_Sea_Lies_in_Theatre_Kid.png'],
+                    ['A0.8V0.3D0.9', 'A0.8V0.3D0.9_Feather_Witness_of_Cloud_Watching_in_Sweater_Weather.png'],
+                    ['A0.8V0.3D1.0', 'A0.8V0.3D1.0_Captain_Squawk_for_No_Reason_in_Campfire_Smoke.png'],
+                    ['A0.8V0.4D0.0', 'A0.8V0.4D0.0_Feather_Witness_of_Questionable_Origin_in_Acid_Wash.png'],
+                    ['A0.8V0.4D0.1', 'A0.8V0.4D0.1_Captain_Squawk_of_Questionable_Origin_in_See-through_Ambition.png'],
+                    ['A0.8V0.4D0.2', 'A0.8V0.4D0.2_Captain_Squawk_from_a_Pawn_Shop_in_Michelin_Mood.png'],
+                    ['A0.8V0.4D0.3', 'A0.8V0.4D0.3_Captain_Squawk_of_Questionable_Origin_in_Zoo_Chic.png'],
+                    ['A0.8V0.4D0.4', 'A0.8V0.4D0.4_Feather_Witness_from_a_Pawn_Shop_in_Slippery_Deal.png'],
+                    ['A0.8V0.4D0.5', 'A0.8V0.4D0.5_Mimic_Error_of_Questionable_Origin_in_Hot_Car_Seat.png'],
+                    ['A0.8V0.4D0.6', 'A0.8V0.4D0.6_Mimic_Error_with_Crypto_Ambitions_in_Faculty_Meeting.png'],
+                    ['A0.8V0.4D0.7', 'A0.8V0.4D0.7_Mimic_Error_of_Questionable_Origin_in_Glitter_Debt.png'],
+                    ['A0.8V0.4D0.8', 'A0.8V0.4D0.8_Captain_Squawk_of_Questionable_Origin_in_Theatre_Kid.png'],
+                    ['A0.8V0.4D0.9', 'A0.8V0.4D0.9_Captain_Squawk_of_Questionable_Origin_in_Sheep_Tax.png'],
+                    ['A0.8V0.4D1.0', 'A0.8V0.4D1.0_Feather_Witness_with_Crypto_Ambitions_in_Mall_Santa.png'],
+                    ['A0.8V0.5D0.0', 'A0.8V0.5D0.0_Mimic_Error_from_the_Back_of_a_Trunk_in_Acid_Wash.png'],
+                    ['A0.8V0.5D0.1', 'A0.8V0.5D0.1_Feather_Witness_that_Missed_the_Drop_in_Breathable_Drama.png'],
+                    ['A0.8V0.5D0.2', 'A0.8V0.5D0.2_Feather_Witness_with_Street_Regret_in_Michelin_Mood.png'],
+                    ['A0.8V0.5D0.3', 'A0.8V0.5D0.3_Feather_Witness_with_Street_Regret_in_Shed_Risk.png'],
+                    ['A0.8V0.5D0.4', 'A0.8V0.5D0.4_Feather_Witness_from_the_Back_of_a_Trunk_in_Formal-ish.png'],
+                    ['A0.8V0.5D0.5', 'A0.8V0.5D0.5_Mimic_Error_that_Missed_the_Drop_in_Hot_Car_Seat.png'],
+                    ['A0.8V0.5D0.6', 'A0.8V0.5D0.6_Captain_Squawk_that_Missed_the_Drop_in_Grandpa_Energy.png'],
+                    ['A0.8V0.5D0.7', 'A0.8V0.5D0.7_Mimic_Error_that_Missed_the_Drop_in_Unsubtle.png'],
+                    ['A0.8V0.5D0.8', 'A0.8V0.5D0.8_Mimic_Error_from_the_Back_of_a_Trunk_in_Lounge_Lizard.png'],
+                    ['A0.8V0.5D0.9', 'A0.8V0.5D0.9_Mimic_Error_with_Street_Regret_in_Sweater_Weather.png'],
+                    ['A0.8V0.5D1.0', 'A0.8V0.5D1.0_Mimic_Error_from_the_Back_of_a_Trunk_in_Campfire_Smoke.png'],
+                    ['A0.8V0.6D0.0', 'A0.8V0.6D0.0_Captain_Squawk_of_Sweat_Equity_in_Dad_Fit.png'],
+                    ['A0.8V0.6D0.1', 'A0.8V0.6D0.1_Feather_Witness_of_Mid_80s_Aerobics_in_See-through_Ambition.png'],
+                    ['A0.8V0.6D0.2', 'A0.8V0.6D0.2_Captain_Squawk_from_a_Failed_Marathon_in_Hood_Optional.png'],
+                    ['A0.8V0.6D0.3', 'A0.8V0.6D0.3_Captain_Squawk_from_a_Failed_Marathon_in_Pettable_Crime.png'],
+                    ['A0.8V0.6D0.4', 'A0.8V0.6D0.4_Mimic_Error_from_a_Failed_Marathon_in_Slippery_Deal.png'],
+                    ['A0.8V0.6D0.5', 'A0.8V0.6D0.5_Captain_Squawk_from_a_Failed_Marathon_in_Rebel_Lite.png'],
+                    ['A0.8V0.6D0.6', 'A0.8V0.6D0.6_Captain_Squawk_from_a_Failed_Marathon_in_ASMR_Pants.png'],
+                    ['A0.8V0.6D0.7', 'A0.8V0.6D0.7_Mimic_Error_of_Mid_80s_Aerobics_in_Glitter_Debt.png'],
+                    ['A0.8V0.6D0.8', 'A0.8V0.6D0.8_Feather_Witness_of_Sweat_Equity_in_Touch_Me_Not.png'],
+                    ['A0.8V0.6D0.9', 'A0.8V0.6D0.9_Feather_Witness_of_Sweat_Equity_in_Sweater_Weather.png'],
+                    ['A0.8V0.6D1.0', 'A0.8V0.6D1.0_Captain_Squawk_from_a_Failed_Marathon_in_Campfire_Smoke.png'],
+                    ['A0.8V0.7D0.0', 'A0.8V0.7D0.0_Captain_Squawk_from_a_Lost_Pageant_in_Acid_Wash.png'],
+                    ['A0.8V0.7D0.1', 'A0.8V0.7D0.1_Captain_Squawk_of_Participation_in_See-through_Ambition.png'],
+                    ['A0.8V0.7D0.2', 'A0.8V0.7D0.2_Mimic_Error_from_a_Lost_Pageant_in_Hood_Optional.png'],
+                    ['A0.8V0.7D0.3', 'A0.8V0.7D0.3_Mimic_Error_with_Misspelled_Title_in_Shed_Risk.png'],
+                    ['A0.8V0.7D0.4', 'A0.8V0.7D0.4_Captain_Squawk_with_Misspelled_Title_in_Formal-ish.png'],
+                    ['A0.8V0.7D0.5', 'A0.8V0.7D0.5_Captain_Squawk_from_a_Lost_Pageant_in_Hot_Car_Seat.png'],
+                    ['A0.8V0.7D0.6', 'A0.8V0.7D0.6_Feather_Witness_of_Participation_in_ASMR_Pants.png'],
+                    ['A0.8V0.7D0.7', 'A0.8V0.7D0.7_Mimic_Error_with_Misspelled_Title_in_Glitter_Debt.png'],
+                    ['A0.8V0.7D0.8', 'A0.8V0.7D0.8_Captain_Squawk_with_Misspelled_Title_in_Theatre_Kid.png'],
+                    ['A0.8V0.7D0.9', 'A0.8V0.7D0.9_Mimic_Error_of_Participation_in_Itchy_Decision.png'],
+                    ['A0.8V0.7D1.0', 'A0.8V0.7D1.0_Mimic_Error_of_Participation_in_Campfire_Smoke.png'],
+                    ['A0.8V0.8D0.0', 'A0.8V0.8D0.0_Feather_Witness_from_Camp_Nope_in_Dad_Fit.png'],
+                    ['A0.8V0.8D0.1', 'A0.8V0.8D0.1_Feather_Witness_of_Minimal_Authority_in_See-through_Ambition.png'],
+                    ['A0.8V0.8D0.2', 'A0.8V0.8D0.2_Captain_Squawk_of_Minimal_Authority_in_Michelin_Mood.png'],
+                    ['A0.8V0.8D0.3', 'A0.8V0.8D0.3_Mimic_Error_from_Camp_Nope_in_Zoo_Chic.png'],
+                    ['A0.8V0.8D0.4', 'A0.8V0.8D0.4_Mimic_Error_of_Minimal_Authority_in_Formal-ish.png'],
+                    ['A0.8V0.8D0.5', 'A0.8V0.8D0.5_Mimic_Error_that_Says_\'Hi\'_in_Rebel_Lite.png'],
+                    ['A0.8V0.8D0.6', 'A0.8V0.8D0.6_Mimic_Error_that_Says_\'Hi\'_in_ASMR_Pants.png'],
+                    ['A0.8V0.8D0.7', 'A0.8V0.8D0.7_Mimic_Error_from_Camp_Nope_in_Dance_Floor_Hazard.png'],
+                    ['A0.8V0.8D0.8', 'A0.8V0.8D0.8_Mimic_Error_of_Minimal_Authority_in_Lounge_Lizard.png'],
+                    ['A0.8V0.8D0.9', 'A0.8V0.8D0.9_Mimic_Error_that_Says_\'Hi\'_in_Sweater_Weather.png'],
+                    ['A0.8V0.8D1.0', 'A0.8V0.8D1.0_Feather_Witness_of_Minimal_Authority_in_Polyester_Hug.png'],
+                    ['A0.8V0.9D0.0', 'A0.8V0.9D0.0_Captain_Squawk_of_Poor_Fit_in_Dad_Fit.png'],
+                    ['A0.8V0.9D0.1', 'A0.8V0.9D0.1_Captain_Squawk_from_Dad\'s_Closet_in_Drafty_Statement.png'],
+                    ['A0.8V0.9D0.2', 'A0.8V0.9D0.2_Captain_Squawk_of_Poor_Fit_in_Overinflated_Ego.png'],
+                    ['A0.8V0.9D0.3', 'A0.8V0.9D0.3_Captain_Squawk_of_Poor_Fit_in_Pettable_Crime.png'],
+                    ['A0.8V0.9D0.4', 'A0.8V0.9D0.4_Mimic_Error_of_Loose_Morals_in_Prom_Night.png'],
+                    ['A0.8V0.9D0.5', 'A0.8V0.9D0.5_Captain_Squawk_of_Loose_Morals_in_Hot_Car_Seat.png'],
+                    ['A0.8V0.9D0.6', 'A0.8V0.9D0.6_Captain_Squawk_of_Poor_Fit_in_Grandpa_Energy.png'],
+                    ['A0.8V0.9D0.7', 'A0.8V0.9D0.7_Captain_Squawk_from_Dad\'s_Closet_in_Glitter_Debt.png'],
+                    ['A0.8V0.9D0.8', 'A0.8V0.9D0.8_Captain_Squawk_of_Poor_Fit_in_Lounge_Lizard.png'],
+                    ['A0.8V0.9D0.9', 'A0.8V0.9D0.9_Captain_Squawk_of_Poor_Fit_in_Sweater_Weather.png'],
+                    ['A0.8V0.9D1.0', 'A0.8V0.9D1.0_Feather_Witness_of_Poor_Fit_in_Polyester_Hug.png'],
+                    ['A0.8V1.0D0.0', 'A0.8V1.0D0.0_Mimic_Error_from_a_Party_Store_in_Acid_Wash.png'],
+                    ['A0.8V1.0D0.1', 'A0.8V1.0D0.1_Feather_Witness_of_Hollow_Gold_in_Breathable_Drama.png'],
+                    ['A0.8V1.0D0.2', 'A0.8V1.0D0.2_Captain_Squawk_of_Questionable_Sovereignty_in_Michelin_Mood.png'],
+                    ['A0.8V1.0D0.3', 'A0.8V1.0D0.3_Feather_Witness_of_Hollow_Gold_in_Shed_Risk.png'],
+                    ['A0.8V1.0D0.4', 'A0.8V1.0D0.4_Feather_Witness_of_Hollow_Gold_in_Formal-ish.png'],
+                    ['A0.8V1.0D0.5', 'A0.8V1.0D0.5_Captain_Squawk_of_Hollow_Gold_in_Cow_Adjacent.png'],
+                    ['A0.8V1.0D0.6', 'A0.8V1.0D0.6_Captain_Squawk_from_a_Party_Store_in_Faculty_Meeting.png'],
+                    ['A0.8V1.0D0.7', 'A0.8V1.0D0.7_Feather_Witness_of_Hollow_Gold_in_Unsubtle.png'],
+                    ['A0.8V1.0D0.8', 'A0.8V1.0D0.8_Captain_Squawk_of_Questionable_Sovereignty_in_Touch_Me_Not.png'],
+                    ['A0.8V1.0D0.9', 'A0.8V1.0D0.9_Feather_Witness_of_Questionable_Sovereignty_in_Sheep_Tax.png'],
+                    ['A0.8V1.0D1.0', 'A0.8V1.0D1.0_Mimic_Error_of_Questionable_Sovereignty_in_Campfire_Smoke.png'],
+                    ['A0.9V0.0D0.0', 'A0.9V0.0D0.0_Corporate_Predator_of_Sentiment_in_Dad_Fit.png'],
+                    ['A0.9V0.0D0.1', 'A0.9V0.0D0.1_Loan_Shark_of_Sentiment_in_Drafty_Statement.png'],
+                    ['A0.9V0.0D0.2', 'A0.9V0.0D0.2_Corporate_Predator_of_Quiet_Flex_in_Michelin_Mood.png'],
+                    ['A0.9V0.0D0.3', 'A0.9V0.0D0.3_Fin_Tax_of_Sentiment_in_Shed_Risk.png'],
+                    ['A0.9V0.0D0.4', 'A0.9V0.0D0.4_Loan_Shark_with_Ancestral_Debt_in_Prom_Night.png'],
+                    ['A0.9V0.0D0.5', 'A0.9V0.0D0.5_Corporate_Predator_of_Sentiment_in_Rebel_Lite.png'],
+                    ['A0.9V0.0D0.6', 'A0.9V0.0D0.6_Corporate_Predator_of_Sentiment_in_Grandpa_Energy.png'],
+                    ['A0.9V0.0D0.7', 'A0.9V0.0D0.7_Corporate_Predator_with_Ancestral_Debt_in_Unsubtle.png'],
+                    ['A0.9V0.0D0.8', 'A0.9V0.0D0.8_Fin_Tax_of_Sentiment_in_Theatre_Kid.png'],
+                    ['A0.9V0.0D0.9', 'A0.9V0.0D0.9_Loan_Shark_with_Ancestral_Debt_in_Itchy_Decision.png'],
+                    ['A0.9V0.0D1.0', 'A0.9V0.0D1.0_Fin_Tax_of_Sentiment_in_Campfire_Smoke.png'],
+                    ['A0.9V0.1D0.0', 'A0.9V0.1D0.0_Corporate_Predator_from_Summer_Camp_in_Acid_Wash.png'],
+                    ['A0.9V0.1D0.1', 'A0.9V0.1D0.1_Loan_Shark_you_Found_on_Etsy_in_See-through_Ambition.png'],
+                    ['A0.9V0.1D0.2', 'A0.9V0.1D0.2_Corporate_Predator_you_Found_on_Etsy_in_Hood_Optional.png'],
+                    ['A0.9V0.1D0.3', 'A0.9V0.1D0.3_Corporate_Predator_from_Summer_Camp_in_Zoo_Chic.png'],
+                    ['A0.9V0.1D0.4', 'A0.9V0.1D0.4_Fin_Tax_of_Mild_Power_in_Prom_Night.png'],
+                    ['A0.9V0.1D0.5', 'A0.9V0.1D0.5_Fin_Tax_you_Found_on_Etsy_in_Rebel_Lite.png'],
+                    ['A0.9V0.1D0.6', 'A0.9V0.1D0.6_Corporate_Predator_you_Found_on_Etsy_in_ASMR_Pants.png'],
+                    ['A0.9V0.1D0.7', 'A0.9V0.1D0.7_Loan_Shark_from_Summer_Camp_in_Dance_Floor_Hazard.png'],
+                    ['A0.9V0.1D0.8', 'A0.9V0.1D0.8_Fin_Tax_of_Mild_Power_in_Theatre_Kid.png'],
+                    ['A0.9V0.1D0.9', 'A0.9V0.1D0.9_Fin_Tax_from_Summer_Camp_in_Sweater_Weather.png'],
+                    ['A0.9V0.1D1.0', 'A0.9V0.1D1.0_Fin_Tax_of_Mild_Power_in_Polyester_Hug.png'],
+                    ['A0.9V0.2D0.0', 'A0.9V0.2D0.0_Corporate_Predator_of_Seasonal_Confusion_in_Dad_Fit.png'],
+                    ['A0.9V0.2D0.1', 'A0.9V0.2D0.1_Corporate_Predator_from_Grandma_in_See-through_Ambition.png'],
+                    ['A0.9V0.2D0.2', 'A0.9V0.2D0.2_Loan_Shark_that_Smells_Like_Coffee_in_Hood_Optional.png'],
+                    ['A0.9V0.2D0.3', 'A0.9V0.2D0.3_Corporate_Predator_from_Grandma_in_Pettable_Crime.png'],
+                    ['A0.9V0.2D0.4', 'A0.9V0.2D0.4_Loan_Shark_that_Smells_Like_Coffee_in_Prom_Night.png'],
+                    ['A0.9V0.2D0.5', 'A0.9V0.2D0.5_Loan_Shark_from_Grandma_in_Rebel_Lite.png'],
+                    ['A0.9V0.2D0.6', 'A0.9V0.2D0.6_Fin_Tax_of_Seasonal_Confusion_in_Grandpa_Energy.png'],
+                    ['A0.9V0.2D0.7', 'A0.9V0.2D0.7_Fin_Tax_of_Seasonal_Confusion_in_Glitter_Debt.png'],
+                    ['A0.9V0.2D0.8', 'A0.9V0.2D0.8_Fin_Tax_from_Grandma_in_Theatre_Kid.png'],
+                    ['A0.9V0.2D0.9', 'A0.9V0.2D0.9_Fin_Tax_of_Seasonal_Confusion_in_Sweater_Weather.png'],
+                    ['A0.9V0.2D1.0', 'A0.9V0.2D1.0_Loan_Shark_from_Grandma_in_Mall_Santa.png'],
+                    ['A0.9V0.3D0.0', 'A0.9V0.3D0.0_Fin_Tax_of_Deep_Sea_Lies_in_Acid_Wash.png'],
+                    ['A0.9V0.3D0.1', 'A0.9V0.3D0.1_Corporate_Predator_for_No_Reason_in_See-through_Ambition.png'],
+                    ['A0.9V0.3D0.2', 'A0.9V0.3D0.2_Loan_Shark_for_No_Reason_in_Hood_Optional.png'],
+                    ['A0.9V0.3D0.3', 'A0.9V0.3D0.3_Corporate_Predator_of_Deep_Sea_Lies_in_Zoo_Chic.png'],
+                    ['A0.9V0.3D0.4', 'A0.9V0.3D0.4_Loan_Shark_of_Deep_Sea_Lies_in_Prom_Night.png'],
+                    ['A0.9V0.3D0.5', 'A0.9V0.3D0.5_Corporate_Predator_of_Cloud_Watching_in_Hot_Car_Seat.png'],
+                    ['A0.9V0.3D0.6', 'A0.9V0.3D0.6_Fin_Tax_for_No_Reason_in_Grandpa_Energy.png'],
+                    ['A0.9V0.3D0.7', 'A0.9V0.3D0.7_Fin_Tax_of_Deep_Sea_Lies_in_Unsubtle.png'],
+                    ['A0.9V0.3D0.8', 'A0.9V0.3D0.8_Loan_Shark_for_No_Reason_in_Lounge_Lizard.png'],
+                    ['A0.9V0.3D0.9', 'A0.9V0.3D0.9_Loan_Shark_for_No_Reason_in_Sweater_Weather.png'],
+                    ['A0.9V0.3D1.0', 'A0.9V0.3D1.0_Fin_Tax_of_Deep_Sea_Lies_in_Campfire_Smoke.png'],
+                    ['A0.9V0.4D0.0', 'A0.9V0.4D0.0_Corporate_Predator_from_a_Pawn_Shop_in_Straight_Cut.png'],
+                    ['A0.9V0.4D0.1', 'A0.9V0.4D0.1_Loan_Shark_with_Crypto_Ambitions_in_Drafty_Statement.png'],
+                    ['A0.9V0.4D0.2', 'A0.9V0.4D0.2_Fin_Tax_from_a_Pawn_Shop_in_Michelin_Mood.png'],
+                    ['A0.9V0.4D0.3', 'A0.9V0.4D0.3_Loan_Shark_of_Questionable_Origin_in_Zoo_Chic.png'],
+                    ['A0.9V0.4D0.4', 'A0.9V0.4D0.4_Corporate_Predator_of_Questionable_Origin_in_Slippery_Deal.png'],
+                    ['A0.9V0.4D0.5', 'A0.9V0.4D0.5_Corporate_Predator_with_Crypto_Ambitions_in_Rebel_Lite.png'],
+                    ['A0.9V0.4D0.6', 'A0.9V0.4D0.6_Loan_Shark_from_a_Pawn_Shop_in_Faculty_Meeting.png'],
+                    ['A0.9V0.4D0.7', 'A0.9V0.4D0.7_Loan_Shark_from_a_Pawn_Shop_in_Dance_Floor_Hazard.png'],
+                    ['A0.9V0.4D0.8', 'A0.9V0.4D0.8_Loan_Shark_from_a_Pawn_Shop_in_Theatre_Kid.png'],
+                    ['A0.9V0.4D0.9', 'A0.9V0.4D0.9_Fin_Tax_from_a_Pawn_Shop_in_Sweater_Weather.png'],
+                    ['A0.9V0.4D1.0', 'A0.9V0.4D1.0_Corporate_Predator_with_Crypto_Ambitions_in_Polyester_Hug.png'],
+                    ['A0.9V0.5D0.0', 'A0.9V0.5D0.0_Fin_Tax_with_Street_Regret_in_Acid_Wash.png'],
+                    ['A0.9V0.5D0.1', 'A0.9V0.5D0.1_Loan_Shark_with_Street_Regret_in_Breathable_Drama.png'],
+                    ['A0.9V0.5D0.2', 'A0.9V0.5D0.2_Loan_Shark_with_Street_Regret_in_Hood_Optional.png'],
+                    ['A0.9V0.5D0.3', 'A0.9V0.5D0.3_Loan_Shark_with_Street_Regret_in_Pettable_Crime.png'],
+                    ['A0.9V0.5D0.4', 'A0.9V0.5D0.4_Fin_Tax_that_Missed_the_Drop_in_Slippery_Deal.png'],
+                    ['A0.9V0.5D0.5', 'A0.9V0.5D0.5_Corporate_Predator_that_Missed_the_Drop_in_Rebel_Lite.png'],
+                    ['A0.9V0.5D0.6', 'A0.9V0.5D0.6_Loan_Shark_with_Street_Regret_in_ASMR_Pants.png'],
+                    ['A0.9V0.5D0.7', 'A0.9V0.5D0.7_Corporate_Predator_that_Missed_the_Drop_in_Dance_Floor_Hazard.png'],
+                    ['A0.9V0.5D0.8', 'A0.9V0.5D0.8_Fin_Tax_from_the_Back_of_a_Trunk_in_Theatre_Kid.png'],
+                    ['A0.9V0.5D0.9', 'A0.9V0.5D0.9_Corporate_Predator_with_Street_Regret_in_Sweater_Weather.png'],
+                    ['A0.9V0.5D1.0', 'A0.9V0.5D1.0_Fin_Tax_with_Street_Regret_in_Campfire_Smoke.png'],
+                    ['A0.9V0.6D0.0', 'A0.9V0.6D0.0_Loan_Shark_from_a_Failed_Marathon_in_Acid_Wash.png'],
+                    ['A0.9V0.6D0.1', 'A0.9V0.6D0.1_Fin_Tax_from_a_Failed_Marathon_in_See-through_Ambition.png'],
+                    ['A0.9V0.6D0.2', 'A0.9V0.6D0.2_Fin_Tax_of_Mid_80s_Aerobics_in_Hood_Optional.png'],
+                    ['A0.9V0.6D0.3', 'A0.9V0.6D0.3_Corporate_Predator_of_Sweat_Equity_in_Zoo_Chic.png'],
+                    ['A0.9V0.6D0.4', 'A0.9V0.6D0.4_Corporate_Predator_of_Sweat_Equity_in_Slippery_Deal.png'],
+                    ['A0.9V0.6D0.5', 'A0.9V0.6D0.5_Loan_Shark_of_Sweat_Equity_in_Cow_Adjacent.png'],
+                    ['A0.9V0.6D0.6', 'A0.9V0.6D0.6_Loan_Shark_of_Sweat_Equity_in_Faculty_Meeting.png'],
+                    ['A0.9V0.6D0.7', 'A0.9V0.6D0.7_Loan_Shark_of_Mid_80s_Aerobics_in_Glitter_Debt.png'],
+                    ['A0.9V0.6D0.8', 'A0.9V0.6D0.8_Fin_Tax_from_a_Failed_Marathon_in_Lounge_Lizard.png'],
+                    ['A0.9V0.6D0.9', 'A0.9V0.6D0.9_Fin_Tax_from_a_Failed_Marathon_in_Itchy_Decision.png'],
+                    ['A0.9V0.6D1.0', 'A0.9V0.6D1.0_Loan_Shark_of_Sweat_Equity_in_Campfire_Smoke.png'],
+                    ['A0.9V0.7D0.0', 'A0.9V0.7D0.0_Fin_Tax_of_Participation_in_Straight_Cut.png'],
+                    ['A0.9V0.7D0.1', 'A0.9V0.7D0.1_Fin_Tax_of_Participation_in_Drafty_Statement.png'],
+                    ['A0.9V0.7D0.2', 'A0.9V0.7D0.2_Corporate_Predator_of_Participation_in_Hood_Optional.png'],
+                    ['A0.9V0.7D0.3', 'A0.9V0.7D0.3_Loan_Shark_of_Participation_in_Shed_Risk.png'],
+                    ['A0.9V0.7D0.4', 'A0.9V0.7D0.4_Fin_Tax_with_Misspelled_Title_in_Formal-ish.png'],
+                    ['A0.9V0.7D0.5', 'A0.9V0.7D0.5_Corporate_Predator_with_Misspelled_Title_in_Cow_Adjacent.png'],
+                    ['A0.9V0.7D0.6', 'A0.9V0.7D0.6_Fin_Tax_with_Misspelled_Title_in_Faculty_Meeting.png'],
+                    ['A0.9V0.7D0.7', 'A0.9V0.7D0.7_Loan_Shark_from_a_Lost_Pageant_in_Dance_Floor_Hazard.png'],
+                    ['A0.9V0.7D0.8', 'A0.9V0.7D0.8_Loan_Shark_with_Misspelled_Title_in_Lounge_Lizard.png'],
+                    ['A0.9V0.7D0.9', 'A0.9V0.7D0.9_Loan_Shark_of_Participation_in_Sweater_Weather.png'],
+                    ['A0.9V0.7D1.0', 'A0.9V0.7D1.0_Loan_Shark_of_Participation_in_Mall_Santa.png'],
+                    ['A0.9V0.8D0.0', 'A0.9V0.8D0.0_Loan_Shark_from_Camp_Nope_in_Dad_Fit.png'],
+                    ['A0.9V0.8D0.1', 'A0.9V0.8D0.1_Fin_Tax_from_Camp_Nope_in_Breathable_Drama.png'],
+                    ['A0.9V0.8D0.2', 'A0.9V0.8D0.2_Loan_Shark_of_Minimal_Authority_in_Hood_Optional.png'],
+                    ['A0.9V0.8D0.3', 'A0.9V0.8D0.3_Loan_Shark_that_Says_\'Hi\'_in_Zoo_Chic.png'],
+                    ['A0.9V0.8D0.4', 'A0.9V0.8D0.4_Corporate_Predator_that_Says_\'Hi\'_in_Formal-ish.png'],
+                    ['A0.9V0.8D0.5', 'A0.9V0.8D0.5_Loan_Shark_from_Camp_Nope_in_Cow_Adjacent.png'],
+                    ['A0.9V0.8D0.6', 'A0.9V0.8D0.6_Corporate_Predator_that_Says_\'Hi\'_in_ASMR_Pants.png'],
+                    ['A0.9V0.8D0.7', 'A0.9V0.8D0.7_Fin_Tax_of_Minimal_Authority_in_Glitter_Debt.png'],
+                    ['A0.9V0.8D0.8', 'A0.9V0.8D0.8_Fin_Tax_that_Says_\'Hi\'_in_Theatre_Kid.png'],
+                    ['A0.9V0.8D0.9', 'A0.9V0.8D0.9_Corporate_Predator_from_Camp_Nope_in_Sweater_Weather.png'],
+                    ['A0.9V0.8D1.0', 'A0.9V0.8D1.0_Fin_Tax_that_Says_\'Hi\'_in_Mall_Santa.png'],
+                    ['A0.9V0.9D0.0', 'A0.9V0.9D0.0_Loan_Shark_of_Loose_Morals_in_Straight_Cut.png'],
+                    ['A0.9V0.9D0.1', 'A0.9V0.9D0.1_Corporate_Predator_from_Dad\'s_Closet_in_Drafty_Statement.png'],
+                    ['A0.9V0.9D0.2', 'A0.9V0.9D0.2_Loan_Shark_from_Dad\'s_Closet_in_Overinflated_Ego.png'],
+                    ['A0.9V0.9D0.3', 'A0.9V0.9D0.3_Fin_Tax_of_Poor_Fit_in_Zoo_Chic.png'],
+                    ['A0.9V0.9D0.4', 'A0.9V0.9D0.4_Loan_Shark_of_Loose_Morals_in_Slippery_Deal.png'],
+                    ['A0.9V0.9D0.5', 'A0.9V0.9D0.5_Loan_Shark_of_Loose_Morals_in_Cow_Adjacent.png'],
+                    ['A0.9V0.9D0.6', 'A0.9V0.9D0.6_Fin_Tax_from_Dad\'s_Closet_in_Grandpa_Energy.png'],
+                    ['A0.9V0.9D0.7', 'A0.9V0.9D0.7_Corporate_Predator_of_Loose_Morals_in_Unsubtle.png'],
+                    ['A0.9V0.9D0.8', 'A0.9V0.9D0.8_Loan_Shark_of_Loose_Morals_in_Touch_Me_Not.png'],
+                    ['A0.9V0.9D0.9', 'A0.9V0.9D0.9_Fin_Tax_from_Dad\'s_Closet_in_Sheep_Tax.png'],
+                    ['A0.9V0.9D1.0', 'A0.9V0.9D1.0_Fin_Tax_from_Dad\'s_Closet_in_Mall_Santa.png'],
+                    ['A0.9V1.0D0.0', 'A0.9V1.0D0.0_Corporate_Predator_of_Hollow_Gold_in_Acid_Wash.png'],
+                    ['A0.9V1.0D0.1', 'A0.9V1.0D0.1_Corporate_Predator_from_a_Party_Store_in_Drafty_Statement.png'],
+                    ['A0.9V1.0D0.2', 'A0.9V1.0D0.2_Fin_Tax_of_Questionable_Sovereignty_in_Hood_Optional.png'],
+                    ['A0.9V1.0D0.3', 'A0.9V1.0D0.3_Loan_Shark_of_Hollow_Gold_in_Pettable_Crime.png'],
+                    ['A0.9V1.0D0.4', 'A0.9V1.0D0.4_Loan_Shark_from_a_Party_Store_in_Slippery_Deal.png'],
+                    ['A0.9V1.0D0.5', 'A0.9V1.0D0.5_Loan_Shark_from_a_Party_Store_in_Hot_Car_Seat.png'],
+                    ['A0.9V1.0D0.6', 'A0.9V1.0D0.6_Loan_Shark_from_a_Party_Store_in_Faculty_Meeting.png'],
+                    ['A0.9V1.0D0.7', 'A0.9V1.0D0.7_Fin_Tax_of_Questionable_Sovereignty_in_Glitter_Debt.png'],
+                    ['A0.9V1.0D0.8', 'A0.9V1.0D0.8_Loan_Shark_from_a_Party_Store_in_Lounge_Lizard.png'],
+                    ['A0.9V1.0D0.9', 'A0.9V1.0D0.9_Corporate_Predator_of_Hollow_Gold_in_Sweater_Weather.png'],
+                    ['A0.9V1.0D1.0', 'A0.9V1.0D1.0_Loan_Shark_of_Questionable_Sovereignty_in_Mall_Santa.png'],
+                    ['A1.0V0.0D0.0', 'A1.0V0.0D0.0_Cave_Accountant_of_Quiet_Flex_in_Acid_Wash.png'],
+                    ['A1.0V0.0D0.1', 'A1.0V0.0D0.1_Cave_Accountant_of_Sentiment_in_Drafty_Statement.png'],
+                    ['A1.0V0.0D0.2', 'A1.0V0.0D0.2_Midnight_Auditor_of_Quiet_Flex_in_Overinflated_Ego.png'],
+                    ['A1.0V0.0D0.3', 'A1.0V0.0D0.3_Cave_Accountant_of_Quiet_Flex_in_Shed_Risk.png'],
+                    ['A1.0V0.0D0.4', 'A1.0V0.0D0.4_Goth_Flap_with_Ancestral_Debt_in_Slippery_Deal.png'],
+                    ['A1.0V0.0D0.5', 'A1.0V0.0D0.5_Goth_Flap_with_Ancestral_Debt_in_Hot_Car_Seat.png'],
+                    ['A1.0V0.0D0.6', 'A1.0V0.0D0.6_Midnight_Auditor_of_Quiet_Flex_in_Grandpa_Energy.png'],
+                    ['A1.0V0.0D0.7', 'A1.0V0.0D0.7_Midnight_Auditor_of_Sentiment_in_Dance_Floor_Hazard.png'],
+                    ['A1.0V0.0D0.8', 'A1.0V0.0D0.8_Goth_Flap_of_Sentiment_in_Touch_Me_Not.png'],
+                    ['A1.0V0.0D0.9', 'A1.0V0.0D0.9_Cave_Accountant_of_Quiet_Flex_in_Sheep_Tax.png'],
+                    ['A1.0V0.0D1.0', 'A1.0V0.0D1.0_Midnight_Auditor_of_Quiet_Flex_in_Mall_Santa.png'],
+                    ['A1.0V0.1D0.0', 'A1.0V0.1D0.0_Cave_Accountant_of_Mild_Power_in_Straight_Cut.png'],
+                    ['A1.0V0.1D0.1', 'A1.0V0.1D0.1_Midnight_Auditor_you_Found_on_Etsy_in_See-through_Ambition.png'],
+                    ['A1.0V0.1D0.2', 'A1.0V0.1D0.2_Midnight_Auditor_from_Summer_Camp_in_Hood_Optional.png'],
+                    ['A1.0V0.1D0.3', 'A1.0V0.1D0.3_Goth_Flap_of_Mild_Power_in_Shed_Risk.png'],
+                    ['A1.0V0.1D0.4', 'A1.0V0.1D0.4_Goth_Flap_from_Summer_Camp_in_Prom_Night.png'],
+                    ['A1.0V0.1D0.5', 'A1.0V0.1D0.5_Goth_Flap_you_Found_on_Etsy_in_Rebel_Lite.png'],
+                    ['A1.0V0.1D0.6', 'A1.0V0.1D0.6_Goth_Flap_you_Found_on_Etsy_in_Grandpa_Energy.png'],
+                    ['A1.0V0.1D0.7', 'A1.0V0.1D0.7_Cave_Accountant_from_Summer_Camp_in_Dance_Floor_Hazard.png'],
+                    ['A1.0V0.1D0.8', 'A1.0V0.1D0.8_Midnight_Auditor_you_Found_on_Etsy_in_Touch_Me_Not.png'],
+                    ['A1.0V0.1D0.9', 'A1.0V0.1D0.9_Goth_Flap_from_Summer_Camp_in_Sheep_Tax.png'],
+                    ['A1.0V0.1D1.0', 'A1.0V0.1D1.0_Midnight_Auditor_from_Summer_Camp_in_Polyester_Hug.png'],
+                    ['A1.0V0.2D0.0', 'A1.0V0.2D0.0_Midnight_Auditor_from_Grandma_in_Dad_Fit.png'],
+                    ['A1.0V0.2D0.1', 'A1.0V0.2D0.1_Midnight_Auditor_that_Smells_Like_Coffee_in_Breathable_Drama.png'],
+                    ['A1.0V0.2D0.2', 'A1.0V0.2D0.2_Cave_Accountant_that_Smells_Like_Coffee_in_Michelin_Mood.png'],
+                    ['A1.0V0.2D0.3', 'A1.0V0.2D0.3_Midnight_Auditor_of_Seasonal_Confusion_in_Pettable_Crime.png'],
+                    ['A1.0V0.2D0.4', 'A1.0V0.2D0.4_Cave_Accountant_from_Grandma_in_Slippery_Deal.png'],
+                    ['A1.0V0.2D0.5', 'A1.0V0.2D0.5_Goth_Flap_from_Grandma_in_Rebel_Lite.png'],
+                    ['A1.0V0.2D0.6', 'A1.0V0.2D0.6_Goth_Flap_of_Seasonal_Confusion_in_ASMR_Pants.png'],
+                    ['A1.0V0.2D0.7', 'A1.0V0.2D0.7_Cave_Accountant_from_Grandma_in_Unsubtle.png'],
+                    ['A1.0V0.2D0.8', 'A1.0V0.2D0.8_Midnight_Auditor_that_Smells_Like_Coffee_in_Theatre_Kid.png'],
+                    ['A1.0V0.2D0.9', 'A1.0V0.2D0.9_Midnight_Auditor_from_Grandma_in_Sweater_Weather.png'],
+                    ['A1.0V0.2D1.0', 'A1.0V0.2D1.0_Midnight_Auditor_of_Seasonal_Confusion_in_Campfire_Smoke.png'],
+                    ['A1.0V0.3D0.0', 'A1.0V0.3D0.0_Midnight_Auditor_of_Cloud_Watching_in_Straight_Cut.png'],
+                    ['A1.0V0.3D0.1', 'A1.0V0.3D0.1_Midnight_Auditor_of_Deep_Sea_Lies_in_See-through_Ambition.png'],
+                    ['A1.0V0.3D0.2', 'A1.0V0.3D0.2_Midnight_Auditor_of_Deep_Sea_Lies_in_Michelin_Mood.png'],
+                    ['A1.0V0.3D0.3', 'A1.0V0.3D0.3_Cave_Accountant_of_Deep_Sea_Lies_in_Shed_Risk.png'],
+                    ['A1.0V0.3D0.4', 'A1.0V0.3D0.4_Cave_Accountant_of_Cloud_Watching_in_Slippery_Deal.png'],
+                    ['A1.0V0.3D0.5', 'A1.0V0.3D0.5_Goth_Flap_for_No_Reason_in_Hot_Car_Seat.png'],
+                    ['A1.0V0.3D0.6', 'A1.0V0.3D0.6_Cave_Accountant_for_No_Reason_in_Grandpa_Energy.png'],
+                    ['A1.0V0.3D0.7', 'A1.0V0.3D0.7_Midnight_Auditor_for_No_Reason_in_Dance_Floor_Hazard.png'],
+                    ['A1.0V0.3D0.8', 'A1.0V0.3D0.8_Cave_Accountant_of_Deep_Sea_Lies_in_Theatre_Kid.png'],
+                    ['A1.0V0.3D0.9', 'A1.0V0.3D0.9_Midnight_Auditor_of_Cloud_Watching_in_Sweater_Weather.png'],
+                    ['A1.0V0.3D1.0', 'A1.0V0.3D1.0_Cave_Accountant_of_Deep_Sea_Lies_in_Polyester_Hug.png'],
+                    ['A1.0V0.4D0.0', 'A1.0V0.4D0.0_Cave_Accountant_from_a_Pawn_Shop_in_Acid_Wash.png'],
+                    ['A1.0V0.4D0.1', 'A1.0V0.4D0.1_Cave_Accountant_of_Questionable_Origin_in_Drafty_Statement.png'],
+                    ['A1.0V0.4D0.2', 'A1.0V0.4D0.2_Cave_Accountant_with_Crypto_Ambitions_in_Hood_Optional.png'],
+                    ['A1.0V0.4D0.3', 'A1.0V0.4D0.3_Midnight_Auditor_with_Crypto_Ambitions_in_Pettable_Crime.png'],
+                    ['A1.0V0.4D0.4', 'A1.0V0.4D0.4_Goth_Flap_from_a_Pawn_Shop_in_Prom_Night.png'],
+                    ['A1.0V0.4D0.5', 'A1.0V0.4D0.5_Cave_Accountant_with_Crypto_Ambitions_in_Hot_Car_Seat.png'],
+                    ['A1.0V0.4D0.6', 'A1.0V0.4D0.6_Midnight_Auditor_with_Crypto_Ambitions_in_Grandpa_Energy.png'],
+                    ['A1.0V0.4D0.7', 'A1.0V0.4D0.7_Midnight_Auditor_of_Questionable_Origin_in_Unsubtle.png'],
+                    ['A1.0V0.4D0.8', 'A1.0V0.4D0.8_Midnight_Auditor_from_a_Pawn_Shop_in_Theatre_Kid.png'],
+                    ['A1.0V0.4D0.9', 'A1.0V0.4D0.9_Cave_Accountant_of_Questionable_Origin_in_Sheep_Tax.png'],
+                    ['A1.0V0.4D1.0', 'A1.0V0.4D1.0_Goth_Flap_from_a_Pawn_Shop_in_Campfire_Smoke.png'],
+                    ['A1.0V0.5D0.0', 'A1.0V0.5D0.0_Goth_Flap_with_Street_Regret_in_Dad_Fit.png'],
+                    ['A1.0V0.5D0.1', 'A1.0V0.5D0.1_Midnight_Auditor_that_Missed_the_Drop_in_Breathable_Drama.png'],
+                    ['A1.0V0.5D0.2', 'A1.0V0.5D0.2_Goth_Flap_with_Street_Regret_in_Michelin_Mood.png'],
+                    ['A1.0V0.5D0.3', 'A1.0V0.5D0.3_Cave_Accountant_from_the_Back_of_a_Trunk_in_Shed_Risk.png'],
+                    ['A1.0V0.5D0.4', 'A1.0V0.5D0.4_Goth_Flap_with_Street_Regret_in_Slippery_Deal.png'],
+                    ['A1.0V0.5D0.5', 'A1.0V0.5D0.5_Cave_Accountant_with_Street_Regret_in_Hot_Car_Seat.png'],
+                    ['A1.0V0.5D0.6', 'A1.0V0.5D0.6_Goth_Flap_from_the_Back_of_a_Trunk_in_Faculty_Meeting.png'],
+                    ['A1.0V0.5D0.7', 'A1.0V0.5D0.7_Cave_Accountant_from_the_Back_of_a_Trunk_in_Unsubtle.png'],
+                    ['A1.0V0.5D0.8', 'A1.0V0.5D0.8_Midnight_Auditor_from_the_Back_of_a_Trunk_in_Lounge_Lizard.png'],
+                    ['A1.0V0.5D0.9', 'A1.0V0.5D0.9_Goth_Flap_that_Missed_the_Drop_in_Sheep_Tax.png'],
+                    ['A1.0V0.5D1.0', 'A1.0V0.5D1.0_Cave_Accountant_that_Missed_the_Drop_in_Mall_Santa.png'],
+                    ['A1.0V0.6D0.0', 'A1.0V0.6D0.0_Goth_Flap_of_Sweat_Equity_in_Straight_Cut.png'],
+                    ['A1.0V0.6D0.1', 'A1.0V0.6D0.1_Midnight_Auditor_from_a_Failed_Marathon_in_Breathable_Drama.png'],
+                    ['A1.0V0.6D0.2', 'A1.0V0.6D0.2_Cave_Accountant_of_Sweat_Equity_in_Overinflated_Ego.png'],
+                    ['A1.0V0.6D0.3', 'A1.0V0.6D0.3_Cave_Accountant_of_Mid_80s_Aerobics_in_Zoo_Chic.png'],
+                    ['A1.0V0.6D0.4', 'A1.0V0.6D0.4_Goth_Flap_from_a_Failed_Marathon_in_Formal-ish.png'],
+                    ['A1.0V0.6D0.5', 'A1.0V0.6D0.5_Goth_Flap_of_Sweat_Equity_in_Rebel_Lite.png'],
+                    ['A1.0V0.6D0.6', 'A1.0V0.6D0.6_Midnight_Auditor_from_a_Failed_Marathon_in_Grandpa_Energy.png'],
+                    ['A1.0V0.6D0.7', 'A1.0V0.6D0.7_Cave_Accountant_of_Sweat_Equity_in_Dance_Floor_Hazard.png'],
+                    ['A1.0V0.6D0.8', 'A1.0V0.6D0.8_Cave_Accountant_of_Sweat_Equity_in_Theatre_Kid.png'],
+                    ['A1.0V0.6D0.9', 'A1.0V0.6D0.9_Cave_Accountant_from_a_Failed_Marathon_in_Sweater_Weather.png'],
+                    ['A1.0V0.6D1.0', 'A1.0V0.6D1.0_Cave_Accountant_of_Mid_80s_Aerobics_in_Polyester_Hug.png'],
+                    ['A1.0V0.7D0.0', 'A1.0V0.7D0.0_Goth_Flap_with_Misspelled_Title_in_Dad_Fit.png'],
+                    ['A1.0V0.7D0.1', 'A1.0V0.7D0.1_Cave_Accountant_with_Misspelled_Title_in_Drafty_Statement.png'],
+                    ['A1.0V0.7D0.2', 'A1.0V0.7D0.2_Midnight_Auditor_from_a_Lost_Pageant_in_Michelin_Mood.png'],
+                    ['A1.0V0.7D0.3', 'A1.0V0.7D0.3_Cave_Accountant_of_Participation_in_Zoo_Chic.png'],
+                    ['A1.0V0.7D0.4', 'A1.0V0.7D0.4_Goth_Flap_of_Participation_in_Prom_Night.png'],
+                    ['A1.0V0.7D0.5', 'A1.0V0.7D0.5_Cave_Accountant_with_Misspelled_Title_in_Rebel_Lite.png'],
+                    ['A1.0V0.7D0.6', 'A1.0V0.7D0.6_Cave_Accountant_with_Misspelled_Title_in_Faculty_Meeting.png'],
+                    ['A1.0V0.7D0.7', 'A1.0V0.7D0.7_Cave_Accountant_with_Misspelled_Title_in_Unsubtle.png'],
+                    ['A1.0V0.7D0.8', 'A1.0V0.7D0.8_Midnight_Auditor_with_Misspelled_Title_in_Theatre_Kid.png'],
+                    ['A1.0V0.7D0.9', 'A1.0V0.7D0.9_Midnight_Auditor_of_Participation_in_Itchy_Decision.png'],
+                    ['A1.0V0.7D1.0', 'A1.0V0.7D1.0_Cave_Accountant_from_a_Lost_Pageant_in_Mall_Santa.png'],
+                    ['A1.0V0.8D0.0', 'A1.0V0.8D0.0_Goth_Flap_from_Camp_Nope_in_Straight_Cut.png'],
+                    ['A1.0V0.8D0.1', 'A1.0V0.8D0.1_Midnight_Auditor_from_Camp_Nope_in_Drafty_Statement.png'],
+                    ['A1.0V0.8D0.2', 'A1.0V0.8D0.2_Goth_Flap_that_Says_\'Hi\'_in_Overinflated_Ego.png'],
+                    ['A1.0V0.8D0.3', 'A1.0V0.8D0.3_Cave_Accountant_that_Says_\'Hi\'_in_Pettable_Crime.png'],
+                    ['A1.0V0.8D0.4', 'A1.0V0.8D0.4_Midnight_Auditor_of_Minimal_Authority_in_Prom_Night.png'],
+                    ['A1.0V0.8D0.5', 'A1.0V0.8D0.5_Cave_Accountant_from_Camp_Nope_in_Hot_Car_Seat.png'],
+                    ['A1.0V0.8D0.6', 'A1.0V0.8D0.6_Cave_Accountant_of_Minimal_Authority_in_ASMR_Pants.png'],
+                    ['A1.0V0.8D0.7', 'A1.0V0.8D0.7_Midnight_Auditor_that_Says_\'Hi\'_in_Dance_Floor_Hazard.png'],
+                    ['A1.0V0.8D0.8', 'A1.0V0.8D0.8_Goth_Flap_of_Minimal_Authority_in_Touch_Me_Not.png'],
+                    ['A1.0V0.8D0.9', 'A1.0V0.8D0.9_Cave_Accountant_of_Minimal_Authority_in_Itchy_Decision.png'],
+                    ['A1.0V0.8D1.0', 'A1.0V0.8D1.0_Cave_Accountant_from_Camp_Nope_in_Campfire_Smoke.png'],
+                    ['A1.0V0.9D0.0', 'A1.0V0.9D0.0_Cave_Accountant_from_Dad\'s_Closet_in_Straight_Cut.png'],
+                    ['A1.0V0.9D0.1', 'A1.0V0.9D0.1_Cave_Accountant_of_Loose_Morals_in_Breathable_Drama.png'],
+                    ['A1.0V0.9D0.2', 'A1.0V0.9D0.2_Cave_Accountant_of_Loose_Morals_in_Overinflated_Ego.png'],
+                    ['A1.0V0.9D0.3', 'A1.0V0.9D0.3_Goth_Flap_of_Poor_Fit_in_Shed_Risk.png'],
+                    ['A1.0V0.9D0.4', 'A1.0V0.9D0.4_Cave_Accountant_of_Loose_Morals_in_Prom_Night.png'],
+                    ['A1.0V0.9D0.5', 'A1.0V0.9D0.5_Goth_Flap_of_Loose_Morals_in_Hot_Car_Seat.png'],
+                    ['A1.0V0.9D0.6', 'A1.0V0.9D0.6_Midnight_Auditor_from_Dad\'s_Closet_in_Faculty_Meeting.png'],
+                    ['A1.0V0.9D0.7', 'A1.0V0.9D0.7_Midnight_Auditor_of_Poor_Fit_in_Unsubtle.png'],
+                    ['A1.0V0.9D0.8', 'A1.0V0.9D0.8_Midnight_Auditor_of_Loose_Morals_in_Touch_Me_Not.png'],
+                    ['A1.0V0.9D0.9', 'A1.0V0.9D0.9_Midnight_Auditor_of_Loose_Morals_in_Sweater_Weather.png'],
+                    ['A1.0V0.9D1.0', 'A1.0V0.9D1.0_Goth_Flap_of_Poor_Fit_in_Campfire_Smoke.png'],
+                    ['A1.0V1.0D0.0', 'A1.0V1.0D0.0_Midnight_Auditor_from_a_Party_Store_in_Acid_Wash.png'],
+                    ['A1.0V1.0D0.1', 'A1.0V1.0D0.1_Cave_Accountant_of_Questionable_Sovereignty_in_Drafty_Statement.png'],
+                    ['A1.0V1.0D0.2', 'A1.0V1.0D0.2_Goth_Flap_of_Questionable_Sovereignty_in_Hood_Optional.png'],
+                    ['A1.0V1.0D0.3', 'A1.0V1.0D0.3_Midnight_Auditor_of_Hollow_Gold_in_Zoo_Chic.png'],
+                    ['A1.0V1.0D0.4', 'A1.0V1.0D0.4_Midnight_Auditor_from_a_Party_Store_in_Prom_Night.png'],
+                    ['A1.0V1.0D0.5', 'A1.0V1.0D0.5_Midnight_Auditor_of_Questionable_Sovereignty_in_Hot_Car_Seat.png'],
+                    ['A1.0V1.0D0.6', 'A1.0V1.0D0.6_Cave_Accountant_from_a_Party_Store_in_ASMR_Pants.png'],
+                    ['A1.0V1.0D0.7', 'A1.0V1.0D0.7_Goth_Flap_of_Questionable_Sovereignty_in_Dance_Floor_Hazard.png'],
+                    ['A1.0V1.0D0.8', 'A1.0V1.0D0.8_Goth_Flap_of_Questionable_Sovereignty_in_Lounge_Lizard.png'],
+                    ['A1.0V1.0D0.9', 'A1.0V1.0D0.9_Midnight_Auditor_of_Questionable_Sovereignty_in_Sheep_Tax.png'],
+                    ['A1.0V1.0D1.0', 'A1.0V1.0D1.0_Cave_Accountant_of_Questionable_Sovereignty_in_Mall_Santa.png'],
+                ]);
+
                 
                 this.init();
             }
 
             init() {
-                // Debug: Check if knobs are found
-                console.log('Initializing knobs:', {
+                // Debug: Check if knobs and mix button are found
+                console.log('Initializing controls:', {
                     aura: this.auraKnob,
                     vibe: this.vibeKnob,
-                    drip: this.dripKnob
+                    drip: this.dripKnob,
+                    mixButton: this.mixButton
                 });
                 
-                // Add event listeners for custom knobs
-                if (this.auraKnob) this.setupKnobInteraction(this.auraKnob, () => this.updateImage());
-                if (this.vibeKnob) this.setupKnobInteraction(this.vibeKnob, () => this.updateImage());
-                if (this.dripKnob) this.setupKnobInteraction(this.dripKnob, () => this.updateImage());
+                // Add event listeners for custom knobs (static transitions)
+                if (this.auraKnob) this.setupKnobInteraction(this.auraKnob, () => this.updateImage(false));
+                if (this.vibeKnob) this.setupKnobInteraction(this.vibeKnob, () => this.updateImage(false));
+                if (this.dripKnob) this.setupKnobInteraction(this.dripKnob, () => this.updateImage(false));
+                
+                // Add mix button event listener
+                if (this.mixButton) {
+                    console.log('Setting up mix button event listener');
+                    this.mixButton.addEventListener('click', () => this.randomizeKnobs());
+                } else {
+                    console.error('Mix button not found!');
+                }
+                
+                // Add menu event listeners
+                if (this.hamburgerMenu) {
+                    this.hamburgerMenu.addEventListener('click', () => this.toggleAboutPanel());
+                }
+                
+                if (this.closeBtn) {
+                    this.closeBtn.addEventListener('click', () => this.closeAboutPanel());
+                }
+                
+                // Close panel when clicking outside (on the blurred background)
+                document.addEventListener('click', (e) => {
+                    if (this.aboutPanel.classList.contains('open') && 
+                        !this.aboutPanel.contains(e.target) && 
+                        !this.hamburgerMenu.contains(e.target)) {
+                        this.closeAboutPanel();
+                    }
+                });
+                
+                // Add background navigation event listeners
+                if (this.bgNavLeft) {
+                    console.log('Setting up left background navigation');
+                    this.bgNavLeft.addEventListener('click', () => this.changeBackground(-1));
+                } else {
+                    console.error('Left background nav not found!');
+                }
+                
+                if (this.bgNavRight) {
+                    console.log('Setting up right background navigation');
+                    this.bgNavRight.addEventListener('click', () => this.changeBackground(1));
+                } else {
+                    console.error('Right background nav not found!');
+                }
+                
+                // Background indicator removed for cleaner design
+                
+                // Keyboard navigation for backgrounds
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'ArrowLeft') {
+                        this.changeBackground(-1);
+                        e.preventDefault();
+                    } else if (e.key === 'ArrowRight') {
+                        this.changeBackground(1);
+                        e.preventDefault();
+                    }
+                });
                 
                 // Initial load
                 this.loadInitialImage();
@@ -509,7 +2432,12 @@
                 
                 let isDragging = false;
                 let startAngle = 0;
-                let currentRotation = -135; // Start at minimum position (-135 degrees)
+                
+                // Calculate initial rotation based on data-value
+                const initialValue = parseFloat(knob.dataset.value || 0);
+                let currentRotation = (initialValue * 270) - 135; // Map 0-1 to -135 to +135 degrees
+                
+                console.log(`ðŸ”§ ${knob.id}: ${initialValue} (${currentRotation}Â°)`);
                 
                 // Set initial rotation
                 knob.style.transform = `rotate(${currentRotation}deg)`;
@@ -597,41 +2525,147 @@
                 updateKnobValue();
             }
 
+            // Randomize all knobs to random discrete values
+            randomizeKnobs() {
+                console.log('Randomizing knobs...');
+                
+                // Change to green button
+                this.mixButton.classList.add('activated');
+                
+                // Disable button temporarily to prevent multiple clicks
+                this.mixButton.style.pointerEvents = 'none';
+                
+                // Generate random discrete values (0.0, 0.1, 0.2, ..., 1.0)
+                const getRandomDiscreteValue = () => {
+                    const discreteValues = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0];
+                    return discreteValues[Math.floor(Math.random() * discreteValues.length)];
+                };
+                
+                const newAura = getRandomDiscreteValue();
+                const newVibe = getRandomDiscreteValue();
+                const newDrip = getRandomDiscreteValue();
+                
+                // Animate knobs to new positions
+                this.animateKnobToValue(this.auraKnob, newAura);
+                this.animateKnobToValue(this.vibeKnob, newVibe);
+                this.animateKnobToValue(this.dripKnob, newDrip);
+                
+                // Return to red button after 1 second and re-enable
+                setTimeout(() => {
+                    this.mixButton.classList.remove('activated');
+                    this.mixButton.style.pointerEvents = 'auto';
+                }, 1000);
+            }
+
+            // Animate a knob to a specific value with smooth rotation
+            animateKnobToValue(knob, targetValue) {
+                const targetRotation = (targetValue * 270) - 135; // Map 0-1 to -135 to +135 degrees
+                const currentRotation = knob._currentRotation || -135;
+                const rotationDifference = targetRotation - currentRotation;
+                
+                // Smooth animation over 600ms
+                const duration = 600;
+                const startTime = performance.now();
+                const startRotation = currentRotation;
+                
+                const animate = (currentTime) => {
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    
+                    // Use easing function for smooth animation
+                    const easeProgress = 1 - Math.pow(1 - progress, 3); // Ease out cubic
+                    
+                    const newRotation = startRotation + (rotationDifference * easeProgress);
+                    
+                    // Apply rotation
+                    knob.style.transform = `rotate(${newRotation}deg)`;
+                    knob._currentRotation = newRotation;
+                    
+                    // Update the knob's data value
+                    const normalizedRotation = (newRotation + 135) / 270;
+                    const clampedValue = Math.max(0, Math.min(1, normalizedRotation));
+                    knob.dataset.value = clampedValue.toString();
+                    
+                    // Update display values in real-time
+                    this.updateDisplayValues();
+                    
+                    if (progress < 1) {
+                        requestAnimationFrame(animate);
+                    } else {
+                        // Animation complete, trigger image update with pop animation
+                        this.updateImage(true);
+                    }
+                };
+                
+                requestAnimationFrame(animate);
+            }
+
             // Load the first image immediately when page starts
             async loadInitialImage() {
                 try {
-                    // Set initial values
-                    this.updateDisplayValues();
-                    
-                    const filename = this.generateFilename();
-                    const newSrc = this.basePath + filename;
+                                    console.log('ðŸš€ LOADING INITIAL LAFUFU...');
+                
+                // Set initial values
+                this.updateDisplayValues();
+                
+                const filename = this.generateFilename();
+                const newSrc = this.basePath + filename;
+                
+                                    console.log('ðŸ“ Available files count:', this.availableFiles.size, '(extended sample including failed matches)');
                     
                     // Show loading briefly
                     this.showLoading();
                     
-                    // Load the image
-                    const img = await this.loadImage(filename);
-                    
                     // Get the first image element
                     const activeImage = this.getActiveImage();
-                    activeImage.src = newSrc;
                     
-                    // Show it immediately once loaded
-                    this.hideLoading();
-                    activeImage.classList.add('active');
-                    this.currentImageSrc = newSrc;
-                    this.errorMessage.style.display = 'none';
+                    console.log('Setting up initial image load for:', newSrc);
+                    console.log('Active image element:', activeImage);
+                    
+                    // Set up event handlers for the image element itself
+                    activeImage.onload = () => {
+                        console.log('âœ… Image onload fired for:', newSrc);
+                        console.log('Image natural dimensions:', activeImage.naturalWidth, 'x', activeImage.naturalHeight);
+                        
+                        // Show it immediately once loaded
+                        this.hideLoading();
+                        activeImage.classList.add('active');
+                        
+                        console.log('Active image element classes after:', activeImage.className);
+                        console.log('Active image computed style opacity:', window.getComputedStyle(activeImage).opacity);
+                        
+                        this.currentImageSrc = newSrc;
+                        this.errorMessage.style.display = 'none';
+                        
+                        console.log('Initial image should now be visible with opacity:', window.getComputedStyle(activeImage).opacity);
+                    };
+                    
+                    activeImage.onerror = () => {
+                        console.error('âŒ Image failed to load:', newSrc);
+                        console.error('âŒ Trying to access file at full path:', window.location.origin + '/' + newSrc);
+                        console.error('âŒ Image element:', activeImage);
+                        this.hideLoading();
+                        this.showError();
+                    };
+                    
+                    // Add cache busting to avoid browser caching issues
+                    const cacheBustingSrc = newSrc + '?t=' + Date.now();
+                    activeImage.src = cacheBustingSrc;
+                    console.log('Image src set with cache busting:', cacheBustingSrc);
+                    
+                    console.log('Initial image should now be visible');
                     
                 } catch (error) {
                     console.error('Failed to load initial image:', error);
+                    console.error('Error details:', error.message);
                     this.showError();
                 }
             }
 
-            // Map smooth knob values (0.0-1.0) to discrete values (0.0, 0.2, 0.4, 0.6, 0.8, 1.0)
+            // Map smooth knob values (0.0-1.0) to discrete values (0.0, 0.1, 0.2, ..., 1.0)
             mapToDiscreteValue(knobValue) {
-                // Round to nearest 0.2 increment
-                const discrete = Math.round(knobValue * 5) / 5;
+                // Round to nearest 0.1 increment
+                const discrete = Math.round(knobValue * 10) / 10;
                 return Math.max(0, Math.min(1, discrete));
             }
 
@@ -646,20 +2680,67 @@
                 const vibe = this.mapToDiscreteValue(parseFloat(this.vibeKnob.dataset.value || 0));
                 const drip = this.mapToDiscreteValue(parseFloat(this.dripKnob.dataset.value || 0));
                 
-                const filename = `A${this.formatValue(aura)}V${this.formatValue(vibe)}D${this.formatValue(drip)}.png`;
-                console.log('Generated filename:', filename, 'Full path:', this.basePath + filename);
-                return filename;
+                const key = `A${this.formatValue(aura)}V${this.formatValue(vibe)}D${this.formatValue(drip)}`;
+                console.log('ðŸŽ¯ Looking for:', key);
+                
+                // Check if we have this exact file in our mapping
+                if (this.availableFiles.has(key)) {
+                    const filename = this.availableFiles.get(key);
+                    console.log('âœ… Found exact match:', filename);
+                    this.extractAndDisplayTitle(filename);
+                    return filename;
+                }
+                
+                // Use the first available file as fallback
+                const fallbackKey = Array.from(this.availableFiles.keys())[0];
+                if (fallbackKey) {
+                    const fallbackFilename = this.availableFiles.get(fallbackKey);
+                    console.log('âŒ No exact match found, using first available file:', fallbackFilename);
+                    this.updateTitle('LAFUFU NOT FOUND - USING BACKUP!');
+                    return fallbackFilename;
+                }
+                
+                // Last resort fallback
+                console.log('âŒ No files available at all!');
+                this.updateTitle('LAFUFU NOT FOUND - STILL COOKING!');
+                return `${key}_fallback.png`;
+            }
+            
+            // Extract title from filename and update the display
+            extractAndDisplayTitle(filename) {
+                // Extract title between first underscore and ".png"
+                const match = filename.match(/_(.+)\.png$/);
+                if (match) {
+                    // Replace underscores with spaces and clean up quotes
+                    const title = match[1]
+                        .replace(/_/g, ' ')
+                        .replace(/\\'/g, "'")
+                        .replace(/'/g, "'");
+                    this.updateTitle(title);
+                } else {
+                    this.updateTitle('MYSTERIOUS LAFUFU');
+                }
+            }
+            
+            // Update the title display
+            updateTitle(title) {
+                const titleElement = document.querySelector('.title');
+                if (titleElement) {
+                    this.currentLafufuTitle = title;
+                    titleElement.textContent = title;
+                    console.log('Updated title to:', title);
+                }
             }
 
-            // Update display values
+            // Update display values (values are now hidden, but we still need to update them internally)
             updateDisplayValues() {
+                // Values are hidden from user but still needed for internal logic
                 const aura = this.mapToDiscreteValue(parseFloat(this.auraKnob.dataset.value || 0));
                 const vibe = this.mapToDiscreteValue(parseFloat(this.vibeKnob.dataset.value || 0));
                 const drip = this.mapToDiscreteValue(parseFloat(this.dripKnob.dataset.value || 0));
                 
-                this.auraValue.textContent = this.formatValue(aura);
-                this.vibeValue.textContent = this.formatValue(vibe);
-                this.dripValue.textContent = this.formatValue(drip);
+                // Store values internally but don't display them
+                this.currentValues = { aura, vibe, drip };
             }
 
             // Get current active image element
@@ -745,7 +2826,7 @@
             }
 
             // Update image based on current slider values
-            async updateImage() {
+            async updateImage(triggerPopAnimation = true) {
                 // Prevent multiple simultaneous transitions (except for initial load)
                 if (this.isTransitioning && this.currentImageSrc) {
                     return;
@@ -828,15 +2909,25 @@
                         }
                     });
                     
-                    // Start cross-fade transition
+                    // Add transitioning effect to current image for smoother morphing
+                    activeImage.classList.add('transitioning');
+                    
+                    // Start cross-fade transition with immediate swap to avoid overlap
                     inactiveImage.classList.add('active');
                     
-                    // Trigger pop-up animation
-                    this.triggerPopAnimation();
+                    // Immediately hide the old image to prevent overlap
+                    setTimeout(() => {
+                        activeImage.classList.remove('active');
+                    }, 100); // Very short delay to avoid flash
+                    
+                    // Trigger pop-up animation only if requested (e.g., from MIX button)
+                    if (triggerPopAnimation) {
+                        this.triggerPopAnimation();
+                    }
                     
                     // Wait for transition to complete, then swap active states
                     setTimeout(() => {
-                        activeImage.classList.remove('active');
+                        activeImage.classList.remove('transitioning');
                         // Switch which image is considered active
                         this.activeImage = this.activeImage === 'A' ? 'B' : 'A';
                         // Clear the old image source
@@ -846,7 +2937,7 @@
                         this.isTransitioning = false;
                         this.hideLoading();
                         this.errorMessage.style.display = 'none';
-                    }, 600); // Match the CSS transition duration
+                    }, 800); // Match the reduced CSS transition duration
                     
                 } catch (error) {
                     console.error('Failed to load image:', filename, error);
@@ -860,6 +2951,90 @@
             preloadNearbyImages() {
                 // This could be enhanced to preload adjacent images
                 // for even smoother transitions
+            }
+
+            // Menu methods
+            toggleAboutPanel() {
+                const isOpen = this.aboutPanel.classList.contains('open');
+                if (isOpen) {
+                    this.closeAboutPanel();
+                } else {
+                    this.openAboutPanel();
+                }
+            }
+
+            openAboutPanel() {
+                this.aboutPanel.classList.add('open');
+                this.hamburgerMenu.classList.add('active');
+                // Prevent scrolling when panel is open
+                document.body.style.overflow = 'hidden';
+            }
+
+            closeAboutPanel() {
+                this.aboutPanel.classList.remove('open');
+                this.hamburgerMenu.classList.remove('active');
+                // Restore scrolling
+                document.body.style.overflow = 'auto';
+            }
+
+            // Background methods
+            changeBackground(direction) {
+                console.log('🎨 Background change requested, direction:', direction);
+                if (this.isBgTransitioning) {
+                    console.log('Background transition already in progress, ignoring');
+                    return;
+                }
+                
+                const newIndex = (this.currentBgIndex + direction + this.backgrounds.length) % this.backgrounds.length;
+                console.log('Current index:', this.currentBgIndex, '→ New index:', newIndex, '(' + this.backgrounds[newIndex] + ')');
+                this.setBackground(newIndex);
+            }
+
+            setBackground(index) {
+                if (this.isBgTransitioning || index === this.currentBgIndex) return;
+                
+                this.isBgTransitioning = true;
+                
+                const currentBg = this.backgroundContainer.querySelector('.background-image.active');
+                const newBgName = this.backgrounds[index];
+                const newBg = this.backgroundContainer.querySelector(`[data-bg="${newBgName}"]`);
+                
+                if (!newBg) {
+                    console.error('Background not found:', newBgName);
+                    this.isBgTransitioning = false;
+                    return;
+                }
+                
+                // Add transitioning effect to current background
+                if (currentBg) {
+                    currentBg.classList.add('transitioning');
+                }
+                
+                // Start transition
+                newBg.classList.add('active');
+                
+                // Apply environmental tinting to Lafufus
+                this.applyEnvironmentalTinting(newBgName);
+                
+                // Complete transition
+                setTimeout(() => {
+                    if (currentBg) {
+                        currentBg.classList.remove('active', 'transitioning');
+                    }
+                    this.currentBgIndex = index;
+                    this.isBgTransitioning = false;
+                }, 1000); // Match CSS transition duration
+            }
+
+            applyEnvironmentalTinting(backgroundName) {
+                console.log('🎨 Applying environmental tinting for:', backgroundName);
+                
+                // Remove all existing environment classes
+                const envClasses = ['env-cloudscape', 'env-pillowfortress', 'env-freudsoffice', 'env-floorislava', 'env-chroma'];
+                envClasses.forEach(cls => this.imageContainer.classList.remove(cls));
+                
+                // Add the new environment class
+                this.imageContainer.classList.add(`env-${backgroundName}`);
             }
         }
 

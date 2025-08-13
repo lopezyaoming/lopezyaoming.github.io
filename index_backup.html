@@ -1,0 +1,1410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lafufu Generator - AVD Controller</title>
+    <link rel="icon" type="image/png" href="assets/lafufu/A0.8V1.0D0.4.png">
+    <link rel="shortcut icon" type="image/png" href="assets/lafufu/A0.8V1.0D0.4.png">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            font-family: 'Arial', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 90vw;
+            width: 100%;
+        }
+
+        .title {
+            font-size: 2.5rem;
+            font-weight: 300;
+            letter-spacing: 3px;
+            margin-bottom: 2rem;
+            text-align: center;
+            opacity: 0.9;
+        }
+
+        .image-container {
+            position: relative;
+            width: 500px;
+            height: 500px;
+            margin-bottom: 3rem;
+            background: transparent;
+            transition: transform 0.2s ease-out;
+        }
+
+        .image-container.pop-animation {
+            animation: popUp 0.7s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes popUp {
+            0% {
+                transform: scale(1) rotate(0deg);
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            }
+            30% {
+                transform: scale(1.15) rotate(1deg);
+                box-shadow: 0 16px 48px rgba(255, 255, 255, 0.2), 0 8px 32px rgba(0, 0, 0, 0.4);
+            }
+            60% {
+                transform: scale(0.95) rotate(-0.5deg);
+                box-shadow: 0 12px 40px rgba(255, 255, 255, 0.1), 0 8px 32px rgba(0, 0, 0, 0.35);
+            }
+            80% {
+                transform: scale(1.02) rotate(0.2deg);
+                box-shadow: 0 10px 36px rgba(255, 255, 255, 0.05), 0 8px 32px rgba(0, 0, 0, 0.32);
+            }
+            100% {
+                transform: scale(1) rotate(0deg);
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            }
+        }
+
+        .lafufu-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            opacity: 0;
+            transition: opacity 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+                        filter 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            filter: brightness(1) contrast(1.05) blur(0px);
+            /* Hide alt text and broken image icons */
+            color: transparent;
+            text-indent: -9999px;
+            font-size: 0;
+        }
+
+        .lafufu-image.active {
+            opacity: 1;
+            filter: brightness(1) contrast(1.05) blur(0px);
+        }
+
+        .lafufu-image.transitioning {
+            filter: brightness(0.9) contrast(1.1) blur(1px);
+        }
+
+        .lafufu-image.loading {
+            opacity: 0.2;
+        }
+
+        .loading-spinner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            border: 2px solid #333;
+            border-top: 2px solid #fff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            z-index: 10;
+        }
+
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: row;
+            gap: 3.125rem;
+            width: 100%;
+            max-width: 875px;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .knob-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.875rem;
+            min-width: 150px;
+        }
+
+        .knob-label {
+            font-size: 1.625rem;
+            font-weight: 600;
+            letter-spacing: 3.75px;
+            opacity: 0.9;
+            text-transform: uppercase;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .knob-container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.25rem;
+        }
+
+        .knob-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.9);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.2);
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            min-width: 50px;
+            text-align: center;
+        }
+
+        /* Custom knob styling */
+        .custom-knob {
+            width: 100px;
+            height: 100px;
+            background-image: url('assets/knob.png');
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: center;
+            border-radius: 50%;
+            cursor: pointer;
+            filter: drop-shadow(0 7.5px 20px rgba(0, 0, 0, 0.4));
+            transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            position: relative;
+        }
+
+        .custom-knob:hover {
+            transform: scale(1.08) translateY(-2.5px);
+            filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.5));
+        }
+
+        .custom-knob:active {
+            transform: scale(1.02) translateY(1.25px);
+            filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.4));
+            transition: all 0.1s ease;
+        }
+
+        /* Add a subtle glow effect */
+        .knob-container:hover .custom-knob {
+            filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 25px rgba(255, 255, 255, 0.1));
+        }
+
+        /* Mix button styling */
+        .mix-button {
+            width: 100px;
+            height: 100px;
+            background-image: url('assets/redbutton.png');
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: center;
+            border-radius: 50%;
+            cursor: pointer;
+            filter: drop-shadow(0 7.5px 20px rgba(0, 0, 0, 0.4));
+            transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            position: relative;
+        }
+
+        .mix-button:hover {
+            transform: scale(1.08) translateY(-2.5px);
+            filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.5));
+        }
+
+        .mix-button:active {
+            transform: scale(1.02) translateY(1.25px);
+            filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.4));
+            transition: all 0.1s ease;
+        }
+
+        /* Green button state when activated */
+        .mix-button.activated {
+            background-image: url('assets/greenbutton.png');
+        }
+
+        /* Add a subtle glow effect */
+        .knob-container:hover .mix-button {
+            filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 25px rgba(255, 255, 255, 0.1));
+        }
+
+        .current-config {
+            display: none;
+        }
+
+        .error-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ff6b6b;
+            font-size: 0.9rem;
+            text-align: center;
+            z-index: 5;
+        }
+
+        .credit {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            font-size: 0.8rem;
+            opacity: 0.5;
+            letter-spacing: 1px;
+            font-weight: 300;
+            color: #ffffff;
+            transition: opacity 0.2s ease;
+            z-index: 1000;
+        }
+
+        .credit:hover {
+            opacity: 0.8;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .image-container {
+                width: 375px;
+                height: 375px;
+                margin-bottom: 2rem;
+            }
+            
+            .title {
+                font-size: 2.5rem;
+                margin-bottom: 1.5rem;
+            }
+            
+            .controls {
+                max-width: 90%;
+                gap: 2.5rem;
+            }
+
+            .credit {
+                font-size: 0.7rem;
+                bottom: 15px;
+                right: 15px;
+            }
+        }
+
+        /* iPhone and small mobile devices */
+        @media (max-width: 480px) {
+            body {
+                padding: 1rem;
+                min-height: 100vh;
+            }
+
+            .container {
+                max-width: 100%;
+                padding: 0 1rem;
+            }
+
+            .title {
+                font-size: 2.25rem;
+                letter-spacing: 2.5px;
+                margin-bottom: 1.5rem;
+                line-height: 1.2;
+            }
+
+            .image-container {
+                width: 350px;
+                height: 350px;
+                margin-bottom: 2rem;
+            }
+
+            .controls {
+                flex-direction: column;
+                gap: 2.5rem;
+                max-width: 100%;
+            }
+
+            .mix-button {
+                width: 87.5px;
+                height: 87.5px;
+            }
+
+            .knob-group {
+                gap: 1.25rem;
+                min-width: 125px;
+            }
+
+            .knob-label {
+                font-size: 1.375rem;
+                letter-spacing: 2.5px;
+            }
+
+            .knob-container {
+                gap: 1rem;
+            }
+
+            .knob-value {
+                font-size: 1.125rem;
+                padding: 0.25rem 0.75rem;
+            }
+
+            .custom-knob {
+                width: 87.5px;
+                height: 87.5px;
+            }
+
+            .credit {
+                font-size: 0.6rem;
+                bottom: 10px;
+                right: 10px;
+            }
+        }
+
+        /* Very small screens (iPhone SE, etc.) */
+        @media (max-width: 375px) {
+            .title {
+                font-size: 2rem;
+                letter-spacing: 1.25px;
+            }
+
+            .image-container {
+                width: 312.5px;
+                height: 312.5px;
+            }
+
+            .knob-label {
+                font-size: 1.25rem;
+                letter-spacing: 1.25px;
+            }
+
+            .knob-container {
+                gap: 0.75rem;
+            }
+
+            .knob-value {
+                font-size: 1rem;
+                padding: 0.25rem 0.625rem;
+            }
+
+            .custom-knob {
+                width: 75px;
+                height: 75px;
+            }
+
+            .mix-button {
+                width: 75px;
+                height: 75px;
+            }
+        }
+
+        /* Ensure touch targets are adequate */
+        @media (max-width: 768px) {
+            .custom-knob, .mix-button {
+                cursor: pointer;
+                -webkit-tap-highlight-color: transparent;
+                touch-action: manipulation;
+            }
+        }
+
+        /* Landscape orientation on mobile */
+        @media (max-width: 768px) and (orientation: landscape) {
+            body {
+                padding: 0.5rem;
+            }
+
+            .container {
+                flex-direction: row;
+                gap: 2rem;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .title {
+                position: absolute;
+                top: 1rem;
+                left: 50%;
+                transform: translateX(-50%);
+                font-size: 1.5rem;
+                margin-bottom: 0;
+            }
+
+            .image-container {
+                width: 250px;
+                height: 250px;
+                margin-bottom: 0;
+                margin-top: 3rem;
+            }
+
+            .controls {
+                margin-top: 3rem;
+                max-width: 625px;
+                flex-direction: row;
+                gap: 1.875rem;
+            }
+
+            .knob-group {
+                min-width: 87.5px;
+            }
+
+            .custom-knob, .mix-button {
+                width: 68.75px;
+                height: 68.75px;
+            }
+        }
+
+        /* Hamburger Menu Styles */
+        .hamburger-menu {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            padding: 10px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .hamburger-menu:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: scale(1.05);
+        }
+
+        .hamburger-line {
+            width: 24px;
+            height: 2px;
+            background-color: #ffffff;
+            border-radius: 2px;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .hamburger-menu.active .hamburger-line:nth-child(1) {
+            transform: rotate(45deg) translate(7px, 7px);
+        }
+
+        .hamburger-menu.active .hamburger-line:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger-menu.active .hamburger-line:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -7px);
+        }
+
+        /* About Panel Styles */
+        .about-panel {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 400px;
+            height: 100vh;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(20, 20, 20, 0.95) 100%);
+            backdrop-filter: blur(20px);
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 999;
+            transition: right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            overflow-y: auto;
+        }
+
+        .about-panel.open {
+            right: 0;
+        }
+
+        .about-content {
+            padding: 3rem 2rem;
+            color: #ffffff;
+            line-height: 1.6;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-size: 2rem;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: rotate(90deg);
+        }
+
+        .about-content h2 {
+            font-size: 1.8rem;
+            font-weight: 300;
+            margin-bottom: 2rem;
+            text-align: center;
+            letter-spacing: 2px;
+            opacity: 0.9;
+        }
+
+        .about-text {
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+
+        .about-text p {
+            margin-bottom: 1rem;
+        }
+
+        .about-text p em {
+            color: #ffd700;
+            font-style: italic;
+            opacity: 1;
+            text-align: center;
+            display: block;
+            margin-bottom: 1rem;
+        }
+
+        .about-text h3 {
+            color: #ffd700;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            opacity: 1;
+        }
+
+        .about-text ul {
+            padding-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .about-text ol {
+            padding-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .about-text li {
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+
+        .about-text strong {
+            color: #ffffff;
+            opacity: 1;
+        }
+
+        .about-text .signature {
+            text-align: center;
+            font-style: italic;
+            color: #ffd700;
+            opacity: 0.7;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        /* Responsive Design for Menu */
+        @media (max-width: 768px) {
+            .hamburger-menu {
+                top: 1rem;
+                right: 1rem;
+                width: 45px;
+                height: 45px;
+            }
+
+            .about-panel {
+                width: 90vw;
+                right: -90vw;
+            }
+
+            .about-content {
+                padding: 2rem 1.5rem;
+            }
+
+            .about-content h2 {
+                font-size: 1.5rem;
+            }
+
+            .about-text {
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hamburger-menu {
+                width: 40px;
+                height: 40px;
+            }
+
+            .hamburger-line {
+                width: 20px;
+            }
+
+            .about-panel {
+                width: 100vw;
+                right: -100vw;
+            }
+
+            .about-content {
+                padding: 1.5rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hamburger Menu -->
+    <div class="hamburger-menu" id="hamburgerMenu">
+        <div class="hamburger-line"></div>
+        <div class="hamburger-line"></div>
+        <div class="hamburger-line"></div>
+    </div>
+    
+    <!-- About Panel -->
+    <div class="about-panel" id="aboutPanel">
+        <div class="about-content">
+            <button class="close-btn" id="closeBtn">&times;</button>
+            <h2>The Lafufu Laboratory 🧪</h2>
+            <div class="about-text">
+                <p><em>"Where digital dreams meet adorable chaos"</em></p>
+                <br>
+                <p>Welcome to the most scientifically unscientific character generator in the multiverse! You've stumbled upon a top-secret laboratory where we've successfully cracked the code to manufacturing pure cuteness.</p>
+                <br>
+                <h3>🎛️ The Sacred Trinity of Lafufu Creation:</h3>
+                <br>
+                <ul>
+                    <li><strong>AURA (0.0-1.0):</strong> The mystical energy field that makes your Lafufu either zen master or chaotic gremlin. Low aura = chill vibes, High aura = cosmic entity that probably knows your WiFi password.</li>
+                    <br>
+                    <li><strong>VIBE (0.0-1.0):</strong> The emotional frequency of your creature. Think of it as the difference between "I just woke up" energy and "I had 7 espressos" energy. Choose wisely.</li>
+                    <br>
+                    <li><strong>DRIP (0.0-1.0):</strong> The fashion sense quotient. From "borrowed my dad's clothes" to "walking the runway in Milan." Because even interdimensional beings need to look fresh.</li>
+                </ul>
+                <br>
+                <h3>🤖 The ComfyUI Magic Behind the Madness:</h3>
+                <br>
+                <p>Each Lafufu is born from a sophisticated AI art pipeline that would make even the most caffeinated data scientist weep tears of joy:</p>
+                <br>
+                <ol>
+                    <li><strong>Prompt Engineering:</strong> Your A/V/D values get injected into carefully crafted prompts that tell our AI exactly what kind of adorable chaos to create.</li>
+                    <br>
+                    <li><strong>Stable Diffusion XL:</strong> The heavy-lifting AI model that transforms your numerical desires into visual reality through the dark arts of latent space manipulation.</li>
+                    <br>
+                    <li><strong>ComfyUI Workflow:</strong> A complex node-based system that processes your inputs through multiple stages - like a digital assembly line for manufacturing cuteness.</li>
+                    <br>
+                    <li><strong>Pre-Generation Matrix:</strong> We've pre-rendered 216 unique combinations (6×6×6 grid) so you get instant gratification instead of waiting for the AI gods to respond.</li>
+                </ol>
+                <br>
+                <p><strong>🎲 PRO TIP:</strong> Hit the MIX button when you're feeling adventurous - it's like shaking a magic 8-ball, but instead of cryptic advice, you get an adorable creature that may or may not judge your life choices.</p>
+                <br>
+                <p class="signature">Built with ❤️, caffeine, and questionable amounts of AI wizardry.</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <h1 class="title">MAKE YOUR OWN LAFUFU!</h1>
+        
+        <div class="image-container">
+            <div class="loading-spinner" id="loadingSpinner"></div>
+            <img class="lafufu-image" id="lafufuImageA" alt="" />
+            <img class="lafufu-image" id="lafufuImageB" alt="" />
+            <div class="error-message" id="errorMessage" style="display: none;">
+                Image not found
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="knob-group">
+                <div class="knob-label">AURA</div>
+                <div class="knob-container">
+                    <div class="custom-knob" id="auraKnob" data-value="0.0" data-min="0" data-max="1"></div>
+                </div>
+            </div>
+
+            <div class="knob-group">
+                <div class="knob-label">VIBE</div>
+                <div class="knob-container">
+                    <div class="custom-knob" id="vibeKnob" data-value="0.0" data-min="0" data-max="1"></div>
+                </div>
+            </div>
+
+            <div class="knob-group">
+                <div class="knob-label">DRIP</div>
+                <div class="knob-container">
+                    <div class="custom-knob" id="dripKnob" data-value="0.0" data-min="0" data-max="1"></div>
+                </div>
+            </div>
+
+            <div class="knob-group">
+                <div class="knob-label">MIX</div>
+                <div class="knob-container">
+                    <div class="mix-button" id="mixButton"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="current-config" id="currentConfig">
+            Current: A0.0V0.0D0.0.png
+        </div>
+    </div>
+
+    <div class="credit">
+        Made by @juan_joselopezc
+    </div>
+
+    <script>
+        class LafufuViewer {
+            constructor() {
+                this.auraKnob = document.getElementById('auraKnob');
+                this.vibeKnob = document.getElementById('vibeKnob');
+                this.dripKnob = document.getElementById('dripKnob');
+                
+                this.auraValue = document.getElementById('auraValue');
+                this.vibeValue = document.getElementById('vibeValue');
+                this.dripValue = document.getElementById('dripValue');
+                
+                this.imageA = document.getElementById('lafufuImageA');
+                this.imageB = document.getElementById('lafufuImageB');
+                this.imageContainer = document.querySelector('.image-container');
+                this.loadingSpinner = document.getElementById('loadingSpinner');
+                this.errorMessage = document.getElementById('errorMessage');
+                this.currentConfig = document.getElementById('currentConfig');
+                this.mixButton = document.getElementById('mixButton');
+                
+                // Menu elements
+                this.hamburgerMenu = document.getElementById('hamburgerMenu');
+                this.aboutPanel = document.getElementById('aboutPanel');
+                this.closeBtn = document.getElementById('closeBtn');
+                
+                this.basePath = 'assets/lafufuv2/';
+                this.imageCache = new Map();
+                this.currentImageSrc = '';
+                this.activeImage = 'A'; // Track which image is currently active
+                this.isTransitioning = false;
+                this.currentLafufuTitle = '';
+                
+// LOADING COMPLETE MAPPING FROM EXTERNAL FILE...
+                
+                this.init();
+            }
+
+            init() {
+                // Debug: Check if knobs and mix button are found
+                console.log('Initializing controls:', {
+                    aura: this.auraKnob,
+                    vibe: this.vibeKnob,
+                    drip: this.dripKnob,
+                    mixButton: this.mixButton
+                });
+                
+                // Add event listeners for custom knobs (static transitions)
+                if (this.auraKnob) this.setupKnobInteraction(this.auraKnob, () => this.updateImage(false));
+                if (this.vibeKnob) this.setupKnobInteraction(this.vibeKnob, () => this.updateImage(false));
+                if (this.dripKnob) this.setupKnobInteraction(this.dripKnob, () => this.updateImage(false));
+                
+                // Add mix button event listener
+                if (this.mixButton) {
+                    console.log('Setting up mix button event listener');
+                    this.mixButton.addEventListener('click', () => this.randomizeKnobs());
+                } else {
+                    console.error('Mix button not found!');
+                }
+                
+                // Add menu event listeners
+                if (this.hamburgerMenu) {
+                    this.hamburgerMenu.addEventListener('click', () => this.toggleAboutPanel());
+                }
+                
+                if (this.closeBtn) {
+                    this.closeBtn.addEventListener('click', () => this.closeAboutPanel());
+                }
+                
+                // Close panel when clicking outside (on the blurred background)
+                document.addEventListener('click', (e) => {
+                    if (this.aboutPanel.classList.contains('open') && 
+                        !this.aboutPanel.contains(e.target) && 
+                        !this.hamburgerMenu.contains(e.target)) {
+                        this.closeAboutPanel();
+                    }
+                });
+                
+                // Initial load
+                this.loadInitialImage();
+            }
+
+            // Setup knob interaction with rotation
+            setupKnobInteraction(knob, callback) {
+                console.log('Setting up knob interaction for:', knob.id);
+                
+                let isDragging = false;
+                let startAngle = 0;
+                
+                // Calculate initial rotation based on data-value
+                const initialValue = parseFloat(knob.dataset.value || 0);
+                let currentRotation = (initialValue * 270) - 135; // Map 0-1 to -135 to +135 degrees
+                
+                console.log(`🔧 ${knob.id}: ${initialValue} (${currentRotation}°)`);
+                
+                // Set initial rotation
+                knob.style.transform = `rotate(${currentRotation}deg)`;
+                console.log('Initial rotation set for', knob.id, ':', currentRotation);
+                
+                const getAngle = (e, knob) => {
+                    const rect = knob.getBoundingClientRect();
+                    const centerX = rect.left + rect.width / 2;
+                    const centerY = rect.top + rect.height / 2;
+                    
+                    let clientX, clientY;
+                    if (e.touches && e.touches[0]) {
+                        clientX = e.touches[0].clientX;
+                        clientY = e.touches[0].clientY;
+                    } else {
+                        clientX = e.clientX;
+                        clientY = e.clientY;
+                    }
+                    
+                    return Math.atan2(clientY - centerY, clientX - centerX) * (180 / Math.PI);
+                };
+                
+                const updateKnobValue = () => {
+                    // Map rotation (-135 to +135 degrees) to value (0 to 1)
+                    const normalizedRotation = (currentRotation + 135) / 270; // 270 degrees total range
+                    const clampedValue = Math.max(0, Math.min(1, normalizedRotation));
+                    knob.dataset.value = clampedValue.toString();
+                    callback();
+                };
+                
+                const startDrag = (e) => {
+                    isDragging = true;
+                    startAngle = getAngle(e, knob);
+                    e.preventDefault();
+                    
+                    // Add global event listeners
+                    document.addEventListener('mousemove', drag);
+                    document.addEventListener('mouseup', endDrag);
+                    document.addEventListener('touchmove', drag);
+                    document.addEventListener('touchend', endDrag);
+                };
+                
+                const drag = (e) => {
+                    if (!isDragging) return;
+                    
+                    const currentAngle = getAngle(e, knob);
+                    let deltaAngle = currentAngle - startAngle;
+                    
+                    // Handle angle wrapping
+                    if (deltaAngle > 180) deltaAngle -= 360;
+                    if (deltaAngle < -180) deltaAngle += 360;
+                    
+                    // Update rotation with constraints
+                    const newRotation = currentRotation + deltaAngle;
+                    currentRotation = Math.max(-135, Math.min(135, newRotation));
+                    
+                    // Apply rotation
+                    knob.style.transform = `rotate(${currentRotation}deg)`;
+                    
+                    startAngle = currentAngle;
+                    updateKnobValue();
+                    
+                    e.preventDefault();
+                };
+                
+                const endDrag = () => {
+                    isDragging = false;
+                    
+                    // Remove global event listeners
+                    document.removeEventListener('mousemove', drag);
+                    document.removeEventListener('mouseup', endDrag);
+                    document.removeEventListener('touchmove', drag);
+                    document.removeEventListener('touchend', endDrag);
+                };
+                
+                // Add local event listeners
+                knob.addEventListener('mousedown', startDrag);
+                knob.addEventListener('touchstart', startDrag);
+                
+                // Store rotation for this knob
+                knob._currentRotation = currentRotation;
+                knob._updateKnobValue = updateKnobValue;
+                
+                // Set initial value
+                updateKnobValue();
+            }
+
+            // Randomize all knobs to random discrete values
+            randomizeKnobs() {
+                console.log('Randomizing knobs...');
+                
+                // Change to green button
+                this.mixButton.classList.add('activated');
+                
+                // Disable button temporarily to prevent multiple clicks
+                this.mixButton.style.pointerEvents = 'none';
+                
+                // Generate random discrete values (0.0, 0.1, 0.2, ..., 1.0)
+                const getRandomDiscreteValue = () => {
+                    const discreteValues = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0];
+                    return discreteValues[Math.floor(Math.random() * discreteValues.length)];
+                };
+                
+                const newAura = getRandomDiscreteValue();
+                const newVibe = getRandomDiscreteValue();
+                const newDrip = getRandomDiscreteValue();
+                
+                // Animate knobs to new positions
+                this.animateKnobToValue(this.auraKnob, newAura);
+                this.animateKnobToValue(this.vibeKnob, newVibe);
+                this.animateKnobToValue(this.dripKnob, newDrip);
+                
+                // Return to red button after 1 second and re-enable
+                setTimeout(() => {
+                    this.mixButton.classList.remove('activated');
+                    this.mixButton.style.pointerEvents = 'auto';
+                }, 1000);
+            }
+
+            // Animate a knob to a specific value with smooth rotation
+            animateKnobToValue(knob, targetValue) {
+                const targetRotation = (targetValue * 270) - 135; // Map 0-1 to -135 to +135 degrees
+                const currentRotation = knob._currentRotation || -135;
+                const rotationDifference = targetRotation - currentRotation;
+                
+                // Smooth animation over 600ms
+                const duration = 600;
+                const startTime = performance.now();
+                const startRotation = currentRotation;
+                
+                const animate = (currentTime) => {
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    
+                    // Use easing function for smooth animation
+                    const easeProgress = 1 - Math.pow(1 - progress, 3); // Ease out cubic
+                    
+                    const newRotation = startRotation + (rotationDifference * easeProgress);
+                    
+                    // Apply rotation
+                    knob.style.transform = `rotate(${newRotation}deg)`;
+                    knob._currentRotation = newRotation;
+                    
+                    // Update the knob's data value
+                    const normalizedRotation = (newRotation + 135) / 270;
+                    const clampedValue = Math.max(0, Math.min(1, normalizedRotation));
+                    knob.dataset.value = clampedValue.toString();
+                    
+                    // Update display values in real-time
+                    this.updateDisplayValues();
+                    
+                    if (progress < 1) {
+                        requestAnimationFrame(animate);
+                    } else {
+                        // Animation complete, trigger image update with pop animation
+                        this.updateImage(true);
+                    }
+                };
+                
+                requestAnimationFrame(animate);
+            }
+
+            // Load the first image immediately when page starts
+            async loadInitialImage() {
+                try {
+                                    console.log('🚀 LOADING INITIAL LAFUFU...');
+                
+                // Set initial values
+                this.updateDisplayValues();
+                
+                const filename = this.generateFilename();
+                const newSrc = this.basePath + filename;
+                
+                                    console.log('📁 Available files count:', this.availableFiles.size, '(extended sample including failed matches)');
+                    
+                    // Show loading briefly
+                    this.showLoading();
+                    
+                    // Get the first image element
+                    const activeImage = this.getActiveImage();
+                    
+                    console.log('Setting up initial image load for:', newSrc);
+                    console.log('Active image element:', activeImage);
+                    
+                    // Set up event handlers for the image element itself
+                    activeImage.onload = () => {
+                        console.log('✅ Image onload fired for:', newSrc);
+                        console.log('Image natural dimensions:', activeImage.naturalWidth, 'x', activeImage.naturalHeight);
+                        
+                        // Show it immediately once loaded
+                        this.hideLoading();
+                        activeImage.classList.add('active');
+                        
+                        console.log('Active image element classes after:', activeImage.className);
+                        console.log('Active image computed style opacity:', window.getComputedStyle(activeImage).opacity);
+                        
+                        this.currentImageSrc = newSrc;
+                        this.errorMessage.style.display = 'none';
+                        
+                        console.log('Initial image should now be visible with opacity:', window.getComputedStyle(activeImage).opacity);
+                    };
+                    
+                    activeImage.onerror = () => {
+                        console.error('❌ Image failed to load:', newSrc);
+                        console.error('❌ Trying to access file at full path:', window.location.origin + '/' + newSrc);
+                        console.error('❌ Image element:', activeImage);
+                        this.hideLoading();
+                        this.showError();
+                    };
+                    
+                    // Add cache busting to avoid browser caching issues
+                    const cacheBustingSrc = newSrc + '?t=' + Date.now();
+                    activeImage.src = cacheBustingSrc;
+                    console.log('Image src set with cache busting:', cacheBustingSrc);
+                    
+                    console.log('Initial image should now be visible');
+                    
+                } catch (error) {
+                    console.error('Failed to load initial image:', error);
+                    console.error('Error details:', error.message);
+                    this.showError();
+                }
+            }
+
+            // Map smooth knob values (0.0-1.0) to discrete values (0.0, 0.1, 0.2, ..., 1.0)
+            mapToDiscreteValue(knobValue) {
+                // Round to nearest 0.1 increment
+                const discrete = Math.round(knobValue * 10) / 10;
+                return Math.max(0, Math.min(1, discrete));
+            }
+
+            // Format value for filename (ensure one decimal place)
+            formatValue(value) {
+                return value.toFixed(1);
+            }
+
+            // Generate filename based on current knob values
+            generateFilename() {
+                const aura = this.mapToDiscreteValue(parseFloat(this.auraKnob.dataset.value || 0));
+                const vibe = this.mapToDiscreteValue(parseFloat(this.vibeKnob.dataset.value || 0));
+                const drip = this.mapToDiscreteValue(parseFloat(this.dripKnob.dataset.value || 0));
+                
+                const key = `A${this.formatValue(aura)}V${this.formatValue(vibe)}D${this.formatValue(drip)}`;
+                console.log('🎯 Looking for:', key);
+                
+                // Check if we have this exact file in our mapping
+                if (this.availableFiles.has(key)) {
+                    const filename = this.availableFiles.get(key);
+                    console.log('✅ Found exact match:', filename);
+                    this.extractAndDisplayTitle(filename);
+                    return filename;
+                }
+                
+                // Use the first available file as fallback
+                const fallbackKey = Array.from(this.availableFiles.keys())[0];
+                if (fallbackKey) {
+                    const fallbackFilename = this.availableFiles.get(fallbackKey);
+                    console.log('❌ No exact match found, using first available file:', fallbackFilename);
+                    this.updateTitle('LAFUFU NOT FOUND - USING BACKUP!');
+                    return fallbackFilename;
+                }
+                
+                // Last resort fallback
+                console.log('❌ No files available at all!');
+                this.updateTitle('LAFUFU NOT FOUND - STILL COOKING!');
+                return `${key}_fallback.png`;
+            }
+            
+            // Extract title from filename and update the display
+            extractAndDisplayTitle(filename) {
+                // Extract title between first underscore and ".png"
+                const match = filename.match(/_(.+)\.png$/);
+                if (match) {
+                    // Replace underscores with spaces and clean up quotes
+                    const title = match[1]
+                        .replace(/_/g, ' ')
+                        .replace(/\\'/g, "'")
+                        .replace(/'/g, "'");
+                    this.updateTitle(title);
+                } else {
+                    this.updateTitle('MYSTERIOUS LAFUFU');
+                }
+            }
+            
+            // Update the title display
+            updateTitle(title) {
+                const titleElement = document.querySelector('.title');
+                if (titleElement) {
+                    this.currentLafufuTitle = title;
+                    titleElement.textContent = title;
+                    console.log('Updated title to:', title);
+                }
+            }
+
+            // Update display values (values are now hidden, but we still need to update them internally)
+            updateDisplayValues() {
+                // Values are hidden from user but still needed for internal logic
+                const aura = this.mapToDiscreteValue(parseFloat(this.auraKnob.dataset.value || 0));
+                const vibe = this.mapToDiscreteValue(parseFloat(this.vibeKnob.dataset.value || 0));
+                const drip = this.mapToDiscreteValue(parseFloat(this.dripKnob.dataset.value || 0));
+                
+                // Store values internally but don't display them
+                this.currentValues = { aura, vibe, drip };
+            }
+
+            // Get current active image element
+            getActiveImage() {
+                return this.activeImage === 'A' ? this.imageA : this.imageB;
+            }
+
+            // Get inactive image element
+            getInactiveImage() {
+                return this.activeImage === 'A' ? this.imageB : this.imageA;
+            }
+
+            // Show loading state
+            showLoading() {
+                if (!this.isTransitioning) {
+                    this.loadingSpinner.style.display = 'block';
+                }
+                this.errorMessage.style.display = 'none';
+            }
+
+            // Hide loading state
+            hideLoading() {
+                this.loadingSpinner.style.display = 'none';
+            }
+
+            // Trigger pop-up animation
+            triggerPopAnimation() {
+                const imageContainer = this.imageContainer;
+                
+                // Remove any existing animation class
+                imageContainer.classList.remove('pop-animation');
+                
+                // Force a reflow to ensure the class removal takes effect
+                imageContainer.offsetHeight;
+                
+                // Add the animation class
+                imageContainer.classList.add('pop-animation');
+                
+                // Remove the animation class after animation completes
+                setTimeout(() => {
+                    imageContainer.classList.remove('pop-animation');
+                }, 700); // Match the animation duration
+            }
+
+            // Show error state
+            showError() {
+                this.hideLoading();
+                this.errorMessage.style.display = 'block';
+                // Don't hide active image on error, keep current one visible
+            }
+
+            // Load and display image
+            async loadImage(filename) {
+                const fullPath = this.basePath + filename;
+                
+                // Return cached image if available
+                if (this.imageCache.has(fullPath)) {
+                    return this.imageCache.get(fullPath);
+                }
+
+                return new Promise((resolve, reject) => {
+                    const img = new Image();
+                    
+                    // Ensure image is completely loaded before resolving
+                    img.onload = () => {
+                        // Double-check the image is actually loaded
+                        if (img.complete && img.naturalWidth > 0) {
+                            this.imageCache.set(fullPath, img);
+                            resolve(img);
+                        } else {
+                            reject(new Error(`Image failed to load properly: ${filename}`));
+                        }
+                    };
+                    
+                    img.onerror = () => {
+                        console.error(`Failed to load image: ${filename} at path: ${fullPath}`);
+                        reject(new Error(`Failed to load image: ${filename}`));
+                    };
+                    
+                    // Set source after event listeners to avoid race conditions
+                    img.src = fullPath;
+                });
+            }
+
+            // Update image based on current slider values
+            async updateImage(triggerPopAnimation = true) {
+                // Prevent multiple simultaneous transitions (except for initial load)
+                if (this.isTransitioning && this.currentImageSrc) {
+                    return;
+                }
+
+                this.updateDisplayValues();
+                
+                const filename = this.generateFilename();
+                const newSrc = this.basePath + filename;
+                
+                // Don't reload if it's the same image
+                if (this.currentImageSrc === newSrc) {
+                    return;
+                }
+
+                // currentConfig is now hidden - no need to update
+
+                try {
+                    // Handle first image load differently
+                    if (!this.currentImageSrc) {
+                        this.showLoading();
+                        
+                        // Load the first image directly into the active image element
+                        const activeImage = this.getActiveImage();
+                        
+                        // Load and show the first image immediately
+                        const img = await this.loadImage(filename);
+                        activeImage.src = newSrc;
+                        
+                        // Show it immediately once loaded
+                        this.hideLoading();
+                        activeImage.classList.add('active');
+                        this.currentImageSrc = newSrc;
+                        this.errorMessage.style.display = 'none';
+                        
+                        return;
+                    }
+                    
+                    // Handle subsequent image transitions
+                    this.isTransitioning = true;
+                    
+                    // Load the new image
+                    const img = await this.loadImage(filename);
+                    
+                    // Get the inactive image element to load the new image
+                    const inactiveImage = this.getInactiveImage();
+                    const activeImage = this.getActiveImage();
+                    
+                    // Ensure the inactive image is hidden before loading
+                    inactiveImage.classList.remove('active');
+                    
+                    // Load new image into inactive element and wait for it to load
+                    inactiveImage.src = newSrc;
+                    
+                    // Create a promise to ensure image loads properly before showing
+                    await new Promise((resolve, reject) => {
+                        const timeoutId = setTimeout(() => {
+                            reject(new Error('Image load timeout'));
+                        }, 10000); // 10 second timeout
+                        
+                        inactiveImage.onload = () => {
+                            clearTimeout(timeoutId);
+                            if (inactiveImage.complete && inactiveImage.naturalWidth > 0) {
+                                resolve();
+                            } else {
+                                reject(new Error('Image failed to load properly'));
+                            }
+                        };
+                        
+                        inactiveImage.onerror = (e) => {
+                            clearTimeout(timeoutId);
+                            console.error('Image load error:', e, 'src:', newSrc);
+                            reject(new Error('Image failed to load'));
+                        };
+                        
+                        // If image is already loaded (cached), resolve immediately
+                        if (inactiveImage.complete && inactiveImage.naturalWidth > 0) {
+                            clearTimeout(timeoutId);
+                            resolve();
+                        }
+                    });
+                    
+                    // Add transitioning effect to current image for smoother morphing
+                    activeImage.classList.add('transitioning');
+                    
+                    // Start cross-fade transition
+                    inactiveImage.classList.add('active');
+                    
+                    // Trigger pop-up animation only if requested (e.g., from MIX button)
+                    if (triggerPopAnimation) {
+                        this.triggerPopAnimation();
+                    }
+                    
+                    // Wait for transition to complete, then swap active states
+                    setTimeout(() => {
+                        activeImage.classList.remove('active', 'transitioning');
+                        // Switch which image is considered active
+                        this.activeImage = this.activeImage === 'A' ? 'B' : 'A';
+                        // Clear the old image source
+                        activeImage.src = '';
+                        
+                        this.currentImageSrc = newSrc;
+                        this.isTransitioning = false;
+                        this.hideLoading();
+                        this.errorMessage.style.display = 'none';
+                    }, 1200); // Match the CSS transition duration
+                    
+                } catch (error) {
+                    console.error('Failed to load image:', filename, error);
+                    this.isTransitioning = false;
+                    this.hideLoading();
+                    this.showError();
+                }
+            }
+
+            // Preload nearby images for smoother transitions
+            preloadNearbyImages() {
+                // This could be enhanced to preload adjacent images
+                // for even smoother transitions
+            }
+
+            // Menu methods
+            toggleAboutPanel() {
+                const isOpen = this.aboutPanel.classList.contains('open');
+                if (isOpen) {
+                    this.closeAboutPanel();
+                } else {
+                    this.openAboutPanel();
+                }
+            }
+
+            openAboutPanel() {
+                this.aboutPanel.classList.add('open');
+                this.hamburgerMenu.classList.add('active');
+                // Prevent scrolling when panel is open
+                document.body.style.overflow = 'hidden';
+            }
+
+            closeAboutPanel() {
+                this.aboutPanel.classList.remove('open');
+                this.hamburgerMenu.classList.remove('active');
+                // Restore scrolling
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        // Initialize the viewer when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new LafufuViewer();
+        });
+    </script>
+</body>
+</html> 
